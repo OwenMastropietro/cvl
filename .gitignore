@@ -3,5 +3,5 @@
 *.pch
 *.out
 
-project1/data/modified/*
-!project1/data/modified/.gitinclude
+data/modified/*
+!data/modified/.gitinclude
