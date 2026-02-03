@@ -33,7 +33,7 @@ int main(int argc, const char *argv[]) {
     }
 
     writeImage(rotatedImage, "./data/modified/rotated.pbm");
-    writeImage(invertedImage, "./data/modified/inverted.pbm");
+    writeImage(invertedImage, "./data/modified/inverted.ppm");
     writeImage(inputImage, "./data/modified/gray.pgm");
     writeImage(inputImage, "./data/modified/black-white.pbm");
 
