@@ -18,8 +18,7 @@
 int main(int argc, const char * argv[]) {
     //-------------------------------------------------------------------------------
        //create blackWhiteImage:
-        // You need to change the path file: /Users/nha2/Downloads/Proj1_part1_2/Proj1_part1_2/ to your local directory
-       Image inputImage = readImage("/Users/nha2/Downloads/project1 5/CS136/CS136/car.ppm");
+       Image inputImage = readImage("./data/original/car.ppm");
 
        //-------------------------------------------------------------------------------
        // COMMENT THIS FUNCTION IF YOU DON'T WANT IT TO RUN EVEY TIME
@@ -35,10 +34,11 @@ int main(int argc, const char * argv[]) {
                invertedImage.map[y][x].b = 255 - inputImage.map[y][x].b;
                // Let's just ignore 'i' here; it's irrelevant if we want to save image as PPM.
            }
-       writeImage(rotatedImage, "/Users/nha2/Downloads/project1 5/CS136/CS136/rotated.pbm");
-       writeImage(invertedImage, "/Users/nha2/Downloads/project1 5/CS136/CS136/inverted.pbm");
-       writeImage(inputImage, "/Users/nha2/Downloads/project1 5/CS136/CS136/gray.pgm");
-       writeImage(inputImage, "/Users/nha2/Downloads/project1 5/CS136/CS136/black-white.pbm");
+
+       writeImage(rotatedImage, "./data/modified/rotated.pbm");
+       writeImage(invertedImage, "./data/modified/inverted.pbm");
+       writeImage(inputImage, "./data/modified/gray.pgm");
+       writeImage(inputImage, "./data/modified/black-white.pbm");
 
     //-------------------------------------------------------------------------------
        //create blackWhiteImage:

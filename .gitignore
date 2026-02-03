@@ -1,1 +1,7 @@
 .DS_Store
+
+*.pch
+*.out
+
+project1/data/modified/*
+!project1/data/modified/.gitinclude
