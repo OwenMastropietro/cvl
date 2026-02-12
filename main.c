@@ -10,6 +10,12 @@
 int main(void) {
     Image img = readImage("./data/original/car.ppm");
 
+    // cvl_rotate(&img);
+    // writeImage(img, "./data/modified/car_rotated.ppm");
+
+    // cvl_invert(&img, 255);
+    // writeImage(img, "./data/modified/car_inverted.ppm");
+
     cvl_threshold(&img, 128);
     writeImage(img, "./data/modified/car_bw.pbm");
 

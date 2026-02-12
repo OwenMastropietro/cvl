@@ -39,6 +39,37 @@ void cvl_add_noise(Image *img, double p) {
     }
 }
 
+// Rotates the image 180º.
+void cvl_rotate(Image *img) {
+    int h = img->height;
+    int w = img->width;
+
+    Image rotated = createImage(h, w);
+    for (int i = 0; i < h; ++i) {
+        for (int j = 0; j < w; ++j) {
+            rotated.map[i][j] = img->map[h - i - 1][w - j - 1];
+        }
+    }
+
+    for (int i = 0; i < h; ++i) {
+        for (int j = 0; j < w; ++j) {
+            img->map[i][j] = rotated.map[i][j];
+        }
+    }
+
+    deleteImage(rotated);
+}
+
+void cvl_invert(Image *img, int maxval) {
+    for (int i = 0; i < img->height; ++i) {
+        for (int j = 0; j < img->width; ++j) {
+            img->map[i][j].r = maxval - img->map[i][j].r;
+            img->map[i][j].g = maxval - img->map[i][j].g;
+            img->map[i][j].b = maxval - img->map[i][j].b;
+        }
+    }
+}
+
 // Changes all pixels with a pixel_value neighbor to pixel_value.
 static void _morph(Image *img, int pixel_value) {
     int h = img->height;
