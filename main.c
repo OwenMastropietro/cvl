@@ -13,6 +13,7 @@ int main(void) {
     cvl_threshold(&img, 128);
     writeImage(img, "./data/modified/car_bw.pbm");
 
+    srand(42);
     cvl_add_noise(&img, 0.1);
     writeImage(img, "./data/modified/car_bw_noisy.pbm");
 

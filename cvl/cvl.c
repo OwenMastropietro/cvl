@@ -3,10 +3,7 @@
 #include <stdbool.h>
 #include <stdlib.h>
 
-/**
- * Converts the image to black and white according to the threshold,
- * (black < threshold <= white)
- */
+// Changes all pixels below thresh to black (0), otherwise to white (255).
 void cvl_threshold(Image *img, int thresh) {
     unsigned char r, g, b;
 
@@ -24,23 +21,25 @@ void cvl_threshold(Image *img, int thresh) {
     }
 }
 
+// Randomly flips binary pixels with probability p.
 void cvl_add_noise(Image *img, double p) {
     assert(0.0 <= p && p <= 1.0);
-    srand(42);
 
     for (int i = 0; i < img->height; ++i) {
         for (int j = 0; j < img->width; ++j) {
             int pixel = img->map[i][j].i; // assuming rgb irrelevant
             assert(pixel == BLACK || pixel == WHITE);
 
-            float r = (float)rand() / RAND_MAX;
+            double r = (double)rand() / RAND_MAX;
             if (r < p) {
-                img->map[i][j].i = (pixel == BLACK) ? WHITE : BLACK;
+                unsigned char bw = (pixel == BLACK) ? WHITE : BLACK;
+                img->map[i][j] = (Pixel){bw, bw, bw, bw};
             }
         }
     }
 }
 
+// Changes all pixels with a pixel_value neighbor to pixel_value.
 static void _morph(Image *img, int pixel_value) {
     int h = img->height;
     int w = img->width;
@@ -52,7 +51,7 @@ static void _morph(Image *img, int pixel_value) {
     int dh[] = {-1, -1, -1, 0, 0, 1, 1, 1};
     int dw[] = {-1, 0, 1, -1, 1, -1, 0, 1};
 
-    // Set Mask.
+    // Set Mask - Marking Pixels to Change.
     for (int i = 0; i < h; ++i) {
         for (int j = 0; j < w; ++j) {
             if (img->map[i][j].i == pixel_value) {
@@ -72,7 +71,7 @@ static void _morph(Image *img, int pixel_value) {
         }
     }
 
-    // Expand Image (according to mask).
+    // Change Pixels According to Mask.
     for (int i = 0; i < h; ++i) {
         for (int j = 0; j < w; ++j) {
             if (mask[i][j]) {
@@ -84,6 +83,8 @@ static void _morph(Image *img, int pixel_value) {
     free(mask);
 }
 
+// Changes all pixels with black neighbors to black.
 void cvl_expand(Image *img) { _morph(img, BLACK); }
 
+// Changes all pixels with white neighbors to white.
 void cvl_shrink(Image *img) { _morph(img, WHITE); }
