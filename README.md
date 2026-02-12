@@ -1,13 +1,7 @@
-# Homework 1: Exploring a Simple Image Processing / Library.
+# CVL - Computer Vision Library in C
 
 ```bash
-# Compile.
-gcc netpbm/netpbm.h netpbm/netpbm.c netpbm/main.c
-# or
-gcc netpbm/netpbm.h netpbm/netpbm.c project.c
-
-# Execute.
-./a.out
+make run  # run the example program
 ```
 
-Note: `text_image.ppm` appears to be malformed.
+> Note: `text_image.ppm` appears to be malformed.
