@@ -4,8 +4,8 @@
 
 #include "../netpbm/netpbm.h"
 
-#define BLACK 0   // off - "absense of all color"
-#define WHITE 255 // on - "presence of all color"
+#define BLACK 0   // off - "absense of all color" - background
+#define WHITE 255 // on - "presence of all color" - foreground
 
 void cvl_threshold(Image *img, int thresh);
 
@@ -18,3 +18,7 @@ void cvl_invert(Image *img, int maxval);
 void cvl_expand(Image *img);
 
 void cvl_shrink(Image *img);
+
+int cvl_connected_components(Image *img, Matrix *labels, int connectivity);
+
+int cvl_color_components(Image *img, Matrix *labels, int thresh);
