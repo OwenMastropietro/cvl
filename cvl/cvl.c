@@ -1,6 +1,8 @@
 #include "cvl.h"
 #include <assert.h>
+#include <math.h>
 #include <stdbool.h>
+#include <stdio.h>
 #include <stdlib.h>
 
 typedef struct {
@@ -69,6 +71,31 @@ static void _morph(Image *img, int pixel_value) {
     free(mask);
 }
 
+// Compares two doubles for qsort ordering.
+static int _cmp(const void *a, const void *b) {
+    return (*(double *)a - *(double *)b);
+}
+
+// Returns the median an array (sorts the array in place).
+static double _median(double nums[], int n) {
+    qsort(nums, n, sizeof(double), _cmp); // hawk tua
+
+    if (n % 2 == 0) { // average of middle two
+        double a = nums[(n - 1) / 2];
+        double b = nums[n / 2];
+        return (a + b) / 2.0;
+    }
+
+    return nums[n / 2];
+}
+
+// Clamp x to inclusive range [lo, hi].
+static inline int _clamp(int x, int lo, int hi) {
+    if (x < lo) return lo;
+    if (x > hi) return hi;
+    return x;
+}
+
 // Changes all pixels below thresh to black (0), otherwise to white (255).
 void cvl_threshold(Image *img, int thresh) {
     unsigned char r, g, b;
@@ -126,6 +153,7 @@ void cvl_rotate(Image *img) {
     deleteImage(rotated);
 }
 
+// Inverts RGB channels according to the given max value.
 void cvl_invert(Image *img, int maxval) {
     for (int i = 0; i < img->height; ++i) {
         for (int j = 0; j < img->width; ++j) {
@@ -153,7 +181,6 @@ int cvl_connected_components(Image *img, Matrix *labels, int connectivity) {
     UFNode *uf = malloc((h * w + 1) * sizeof(UFNode));
     assert(uf);
 
-    
     int dh[] = {-1, 0, -1, -1}; // |- 0 -| or |0 0 0|
     int dw[] = {0, -1, -1, 1};  // |0 - -|    |0 - -|
     const int n_neighbors = (connectivity == 4) ? 2 : 4;
@@ -277,4 +304,121 @@ int cvl_color_components(Image *img, Matrix *labels, int thresh) {
     free(sizes);
 
     return count;
+}
+
+// Correlate src with kernel using zero padding.
+void cvl_correlate(Matrix *src, Matrix *dst, Matrix *kernel) {
+    // G(r, c) = \sum_{i=-m}^{m} \sum_{j=-n}^{n} K(i, j) * I(r + i), c + j)
+    assert(src->height == dst->height && src->width == dst->width);
+
+    int h = src->height;
+    int w = src->width;
+
+    int ar = floor(kernel->height / 2.0); // anchor (row)
+    int ac = floor(kernel->width / 2.0);  // anchor (column)
+
+    for (int r = 0; r < h; ++r) {
+        for (int c = 0; c < w; ++c) {
+            double ws = 0.0; // weighted sum
+            for (int i = 0; i < kernel->height; ++i) {
+                for (int j = 0; j < kernel->width; ++j) {
+                    int rr = r + i - ar;
+                    int cc = c + j - ac;
+                    bool in_bounds = (0 <= rr && rr < h) && (0 <= cc && cc < w);
+                    if (in_bounds) { // BORDER_CONSTANT
+                        ws += kernel->map[i][j] * src->map[rr][cc];
+                    }
+                }
+            }
+            dst->map[r][c] = ws;
+        }
+    }
+}
+
+// Convolve src with kernel using zero padding.
+void cvl_convolve(Matrix *src, Matrix *dst, Matrix *kernel) {
+    // G(r, c) = \sum_{i=-m}^{m} \sum_{j=-n}^{n} K(i, j) * I(r - i), c - j)
+    assert(src->height == dst->height && src->width == dst->width);
+
+    int h = src->height;
+    int w = src->width;
+
+    int ar = floor(kernel->height / 2.0); // anchor (row)
+    int ac = floor(kernel->width / 2.0);  // anchor (column)
+
+    for (int r = 0; r < h; ++r) {
+        for (int c = 0; c < w; ++c) {
+            double ws = 0.0; // weighted sum
+
+            for (int i = 0; i < kernel->height; ++i) {
+                for (int j = 0; j < kernel->width; ++j) {
+                    int rr = r - i - ar; // Dua Lipa
+                    int cc = c - j - ac; // Dua Lipa
+                    bool in_bounds = (0 <= rr && rr < h) && (0 <= cc && cc < w);
+                    if (in_bounds) { // BORDER_CONSTANT
+                        ws += kernel->map[i][j] * src->map[rr][cc];
+                    }
+                }
+            }
+
+            dst->map[r][c] = ws;
+        }
+    }
+}
+
+// Apply mean blur using normalized ksize * ksize uniformly kernel.
+void cvl_blur(Matrix *src, Matrix *dst, int ksize) {
+    assert(src->height == dst->height && src->width == dst->width);
+
+    double v = 1.0 / (ksize * ksize);
+    Matrix kernel = createMatrix(ksize, ksize);
+    for (int i = 0; i < kernel.height; ++i) {
+        for (int j = 0; j < kernel.width; ++j) {
+            kernel.map[i][j] = v;
+        }
+    }
+
+    cvl_convolve(src, dst, &kernel);
+
+    deleteMatrix(kernel);
+}
+
+// Apply median blur using replicated outlier pixel values.
+void cvl_median_blur(Matrix *src, Matrix *dst, int ksize) {
+    assert(src->height == dst->height && src->width == dst->width);
+    assert(ksize % 2 == 1);
+
+    int h = src->height;
+    int w = src->width;
+
+    int ar = floor(ksize / 2.0); // anchor (row)
+    int ac = floor(ksize / 2.0); // anchor (column)
+    double *kernel = calloc(ksize * ksize, sizeof(double));
+    assert(kernel);
+
+    for (int r = 0; r < h; ++r) {
+        for (int c = 0; c < w; ++c) {
+            for (int i = 0; i < ksize; ++i) {
+                for (int j = 0; j < ksize; ++j) {
+                    int rr = _clamp(r + i - ar, 0, h - 1);
+                    int cc = _clamp(c + j - ac, 0, w - 1);
+                    int k = (i * ksize) + j;
+
+                    kernel[k] = src->map[rr][cc]; // BORDER_REPLICATE
+
+                    /*
+                    bool in_bounds = (0 <= rr && rr < h) && (0 <= cc && cc < w);
+                    if (in_bounds) { // BORDER_CONSTANT
+                        kernel[k] = src->map[rr][cc];
+                    } else {
+                        kernel[k] = 0.0;
+                    }
+                    */
+                }
+            }
+            dst->map[r][c] = _median(kernel, ksize * ksize);
+        }
+    }
+
+    free(kernel);
 }

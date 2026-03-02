@@ -62,11 +62,39 @@ void part_iii(void) {
     deleteImage(img);
 }
 
+void p2(void) {
+    // Load Original Greyscale Image.
+    Image img = readImage("./data/original/sample.ppm");
+    Matrix src = image2Matrix(img);
+    writeImage(img, "./data/modified/original.pgm");
+
+    // Mean Windowing.
+    Matrix mean = createMatrix(img.height, img.width);
+    cvl_blur(&src, &mean, 3);
+    Image mean_img = matrix2Image(mean, 0, 1.0);
+    writeImage(mean_img, "./data/modified/mean.pgm");
+    deleteImage(mean_img);
+    deleteMatrix(mean);
+
+    // Median Windowing.
+    Matrix median = createMatrix(img.height, img.width);
+    cvl_median_blur(&src, &median, 3);
+    Image median_img = matrix2Image(median, 0, 1.0);
+    writeImage(median_img, "./data/modified/median.pgm");
+    deleteImage(median_img);
+    deleteMatrix(median);
+
+    deleteImage(img);
+    deleteMatrix(src);
+}
+
 int main(void) {
 
     // part_i();
     // part_ii();
-    part_iii();
+    // part_iii();
+
+    p2();
 
     return 0;
 }
