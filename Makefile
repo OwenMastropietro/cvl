@@ -8,21 +8,33 @@ SRC = main.c \
       cvl/cvl.c \
       netpbm/netpbm.c
 
-OBJ = $(SRC:.c=.o)
+LIB_OBJS = cvl/cvl.o netpbm/netpbm.o
+
+TEST_SRC = $(wildcard tests/*.c)
+TEST_OBJS = $(TEST_SRC:.c=.o)
+TEST_BIN = test_cvl
 
 all: $(TARGET)
 
-$(TARGET): $(OBJ)
-	$(CC) $(CFLAGS) -o $@ $^ $(LDFLAGS)
+$(TARGET): main.o $(LIB_OBJS)
+	$(CC) $(CFLAGS) -o $@ main.o $(LIB_OBJS) $(LDFLAGS)
 
 %.o: %.c
 	$(CC) $(CFLAGS) -c $< -o $@
 
-
-clean:
-	rm -f $(TARGET) $(OBJ)
-
 run: $(TARGET)
 	./$(TARGET)
+
+# Testing
+$(TEST_BIN): $(TEST_OBJS) $(LIB_OBJS)
+	$(CC) $(CFLAGS) -o $@ $(TEST_OBJS) $(LIB_OBJS) $(LDFLAGS)
+
+test: $(TEST_BIN)
+	./$(TEST_BIN)
+
+
+clean:
+	rm -f main.o $(TARGET) $(LIB_OBJS) $(TEST_OBJS) $(TEST_BIN)
+
 
 .PHONY: all clean run
