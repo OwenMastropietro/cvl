@@ -1,40 +1,68 @@
-CC      = gcc
-CFLAGS  = -std=c99 -Wall -Wextra -pedantic -g
+SRC = src
+INC = include
+OBJ = obj
+BIN = bin
+
+CFLAGS  = -std=c99 -Wall -Wextra -pedantic -g -I$(INC)
 LDFLAGS =
+CC      = gcc
+SHELL   = bash
 
-TARGET = p1
+TARGET = $(BIN)/cvl_demo.x
 
-SRC = main.c \
-      cvl/cvl.c \
-      netpbm/netpbm.c
+# Source Files
+SRC_FILES = $(wildcard $(SRC)/*.c)
+OBJ_FILES = $(SRC_FILES:$(SRC)/%.c=$(OBJ)/%.o)
 
-LIB_OBJS = cvl/cvl.o netpbm/netpbm.o
+# Example Program
+EXAMPLES = examples
+EXAMPLE_SRC = $(EXAMPLES)/demo.c
+EXAMPLE_OBJ = $(OBJ)/demo.o
 
-TEST_SRC = $(wildcard tests/*.c)
-TEST_OBJS = $(TEST_SRC:.c=.o)
-TEST_BIN = test_cvl
+# Tests
+TEST_SRCS := $(wildcard tests/*.c)
+TEST_OBJS := $(TEST_SRCS:tests/%.c=$(OBJ)/tests/%.o)
+TEST_BIN := $(BIN)/cvl_test.x
 
-all: $(TARGET)
+# Directories
+$(OBJ):
+	mkdir -p $(OBJ)
 
-$(TARGET): main.o $(LIB_OBJS)
-	$(CC) $(CFLAGS) -o $@ main.o $(LIB_OBJS) $(LDFLAGS)
+$(OBJ)/tests:
+	mkdir -p $(OBJ)/tests
 
-%.o: %.c
+$(BIN):
+	mkdir -p $(BIN)
+
+
+all : $(TARGET)
+
+$(TARGET) : $(OBJ_FILES) $(EXAMPLE_OBJ) | $(BIN)
+	$(CC) $^ -o $@ $(LDFLAGS)
+
+$(OBJ)/%.o: $(SRC)/%.c | $(OBJ)
 	$(CC) $(CFLAGS) -c $< -o $@
 
+$(OBJ)/demo.o: $(EXAMPLES)/demo.c | $(OBJ)
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(OBJ)/tests/%.o: tests/%.c | $(OBJ)/tests
+	$(CC) $(CFLAGS) -c $< -o $@
+
+$(TEST_BIN): $(OBJ_FILES) $(TEST_OBJS) | $(BIN)
+	$(CC) $^ -o $@
+
+# Run demo
 run: $(TARGET)
 	./$(TARGET)
 
-# Testing
-$(TEST_BIN): $(TEST_OBJS) $(LIB_OBJS)
-	$(CC) $(CFLAGS) -o $@ $(TEST_OBJS) $(LIB_OBJS) $(LDFLAGS)
 
 test: $(TEST_BIN)
 	./$(TEST_BIN)
 
 
 clean:
-	rm -f main.o $(TARGET) $(LIB_OBJS) $(TEST_OBJS) $(TEST_BIN)
+	rm -rf $(OBJ) $(BIN)
 
 
 .PHONY: all clean run

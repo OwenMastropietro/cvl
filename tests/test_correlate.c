@@ -1,5 +1,5 @@
-#include "../cvl/cvl.h"
-#include "../netpbm/netpbm.h"
+#include "cvl.h"
+#include "netpbm.h"
 #include <assert.h>
 #include <stdio.h>
 

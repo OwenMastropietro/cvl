@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "../netpbm/netpbm.h"
+#include "netpbm.h"
 
 #define BLACK 0   // off - "absense of all color"
 #define WHITE 255 // on - "presence of all color"
