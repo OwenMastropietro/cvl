@@ -1,5 +1,5 @@
-#include "cvl.h"
-#include "netpbm.h"
+#include "cvl_imgproc.h"
+#include "cvl_io.h"
 #include <assert.h>
 #include <stdio.h>
 

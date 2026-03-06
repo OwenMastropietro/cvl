@@ -1,7 +1,7 @@
-// Example Program: Interfacing with CVL and NetPBM.
+// Example Program: Using CVL.
 
-#include "cvl.h"
-#include "netpbm.h"
+#include "cvl_imgproc.h"
+#include "cvl_io.h"
 #include <assert.h>
 #include <stdbool.h>
 #include <stdio.h>

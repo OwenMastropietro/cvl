@@ -1,10 +1,6 @@
-// netpbm.c
-// Functions for reading and writing binary PBM, PGM, and PPM image files.
-// V2.2 by Marc Pomplun on 10/19/2013
-
 #define _CRT_SECURE_NO_WARNINGS
 
-#include "netpbm.h"
+#include "cvl_io.h"
 #include <float.h>
 #include <math.h>
 #include <stdio.h>
