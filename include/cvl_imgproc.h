@@ -4,9 +4,6 @@
 
 #include "cvl_io.h"
 
-#define BLACK 0   // off - "absense of all color"
-#define WHITE 255 // on - "presence of all color"
-
 void cvl_threshold(Image *img, int thresh);
 
 void cvl_add_noise(Image *img, double p);

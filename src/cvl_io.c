@@ -1,11 +1,105 @@
 #define _CRT_SECURE_NO_WARNINGS
 
 #include "cvl_io.h"
+#include <assert.h>
+#include <ctype.h>
 #include <float.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+
+static int write_pbm(const char *filename, Image *img) {
+    FILE *f = fopen(filename, "wb");
+    assert(f);
+
+    fprintf(f, "P4\n%d %d\n", img->width, img->height);
+    
+    int rowbytes = (img->width + 7) / 8;
+    unsigned char *row = calloc(rowbytes, 1);
+    assert(row);
+    for (int i = 0; i < img->height; ++i) {
+        memset(row, 0, rowbytes);
+        for (int j = 0; j < img->width; ++j) {
+            assert(img->map[i][j].i == BLACK || img->map[i][j].i == WHITE);
+
+            if (img->map[i][j].i == BLACK) { // hawk tuah, BLACK is 0 fool
+                row[j / 8] |= 0x80 >> (j % 8);
+            }
+        }
+        fwrite(row, 1, rowbytes, f);
+    }
+    free(row);
+    fclose(f);
+
+    return 0;
+}
+
+static int write_pgm(const char *filename, Image *img) {
+    FILE *f = fopen(filename, "wb");
+    assert (f);
+
+    fprintf(f, "P5\n%d %d\n255\n", img->width, img->height);
+
+    unsigned char *row = malloc(img->width);
+    assert(row);
+    for (int i = 0; i < img->height; ++i) {
+        for (int j = 0; j < img->width; ++j) {
+            row[j] = img->map[i][j].i;
+        }
+        fwrite(row, 1, img->width, f);
+    }
+    free(row);
+    fclose(f);
+
+    return 0;
+}
+
+static int write_ppm(const char *filename, Image *img) {
+    FILE *f = fopen(filename, "wb");
+    assert(f);
+
+    fprintf(f, "P6\n%d %d\n255\n", img->width, img->height);
+
+    unsigned char *row = malloc(3 * img->width);
+    assert(row);
+    for (int i = 0; i < img->height; ++i) {
+        for (int j = 0; j < img->width; ++j) {
+            row[3 * j + 0] = img->map[i][j].r;
+            row[3 * j + 1] = img->map[i][j].g;
+            row[3 * j + 2] = img->map[i][j].b;
+        }
+        fwrite(row, 1, 3 * img->width, f);
+    }
+    free(row);
+    fclose(f);
+
+    return 0;
+}
+
+// Saves an image to a specified file.
+// The image format is determined by the file extension.
+int cvl_imwrite(const char *filename, Image *img) {
+    assert(img->height > 0 && img->width > 0);
+
+    const char *ext = strrchr(filename, '.');
+    assert(ext);
+
+    if (strcmp(ext, ".pbm") == 0) {
+        return write_pbm(filename, img);
+    }
+    
+    if (strcmp(ext, ".pgm") == 0) {
+        return write_pgm(filename, img);
+    }
+    
+    if (strcmp(ext, ".ppm") == 0) {
+        return write_ppm(filename, img);
+    }
+
+    fprintf(stderr, "Unsupported format\n");
+    return -1;
+}
 
 // Create a new image of the given size and fill it with white pixels.
 // When you don't need the image anymore, don't forget to free its memory using
