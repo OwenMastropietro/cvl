@@ -23,7 +23,7 @@ void test_bad_ext(void) {
 
     assert(cvl_imwrite("test.bad", &img) == -1);
 
-    deleteImage(img);
+    cvl_imfree(img);
 }
 
 void test_write_pbm(void) {
@@ -46,7 +46,7 @@ void test_write_pbm(void) {
     assert(width == 10 && height == 5);
 
     fclose(f);
-    deleteImage(img);
+    cvl_imfree(img);
 }
 
 void test_write_pgm(void) {
@@ -69,7 +69,7 @@ void test_write_pgm(void) {
     assert(width == 10 && height == 5);
 
     fclose(f);
-    deleteImage(img);
+    cvl_imfree(img);
 }
 
 void test_write_ppm(void) {
@@ -92,5 +92,5 @@ void test_write_ppm(void) {
     assert(width == 10 && height == 5);
 
     fclose(f);
-    deleteImage(img);
+    cvl_imfree(img);
 }

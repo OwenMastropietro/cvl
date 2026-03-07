@@ -50,9 +50,9 @@ void test_1(void) {
         }
     }
 
-    deleteMatrix(src);
-    deleteMatrix(kernel);
-    deleteMatrix(dst);
+    cvl_matfree(src);
+    cvl_matfree(kernel);
+    cvl_matfree(dst);
 }
 
 void test_2(void) {
@@ -91,7 +91,7 @@ void test_2(void) {
         }
     }
 
-    deleteMatrix(src);
-    deleteMatrix(kernel);
-    deleteMatrix(dst);
+    cvl_matfree(src);
+    cvl_matfree(kernel);
+    cvl_matfree(dst);
 }

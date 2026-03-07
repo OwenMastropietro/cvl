@@ -37,7 +37,7 @@ typedef enum format { PBM, PGM, PPM } Format;
 
 Image createImage(int height, int width);
 
-void deleteImage(Image img);
+void cvl_imfree(Image img);
 
 Image readImage(char *filename);
 
@@ -47,7 +47,7 @@ Matrix createMatrix(int height, int width);
 
 Matrix createMatrixFromArray(double *entry, int height, int width);
 
-void deleteMatrix(Matrix mx);
+void cvl_matfree(Matrix mx);
 
 Matrix image2Matrix(Image img);
 

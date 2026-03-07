@@ -150,7 +150,7 @@ void cvl_rotate(Image *img) {
         }
     }
 
-    deleteImage(rotated);
+    cvl_imfree(rotated);
 }
 
 // Inverts RGB channels according to the given max value.
@@ -380,7 +380,7 @@ void cvl_blur(Matrix *src, Matrix *dst, int ksize) {
 
     cvl_convolve(src, dst, &kernel);
 
-    deleteMatrix(kernel);
+    cvl_matfree(kernel);
 }
 
 // Apply median blur using replicated outlier pixel values.

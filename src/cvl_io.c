@@ -126,10 +126,8 @@ Image createImage(int height, int width) {
 }
 
 // Delete a previously created image and free its allocated memory on the heap.
-void deleteImage(Image img) {
-    int i;
-
-    for (i = 0; i < img.height; i++) {
+void cvl_imfree(Image img) {
+    for (int i = 0; i < img.height; ++i) {
         free(img.map[i]);
     }
     free(img.map);
@@ -179,13 +177,11 @@ Matrix createMatrixFromArray(double *entry, int height, int width) {
 }
 
 // Delete a previously created matrix and free its allocated memory on the heap.
-void deleteMatrix(Matrix mx) {
-    int m;
-
-    for (m = 0; m < mx.height; m++) {
-        free(mx.map[m]);
+void cvl_matfree(Matrix mat) {
+    for (int i = 0; i < mat.height; ++i) {
+        free(mat.map[i]);
     }
-    free(mx.map);
+    free(mat.map);
 }
 
 // Read an image from a file and allocate the required heap memory for it.
