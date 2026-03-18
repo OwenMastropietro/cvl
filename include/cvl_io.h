@@ -8,6 +8,6 @@
 
 #include "cvl_core.h"
 
-Image readImage(char *filename);
+Image cvl_imread(char *filename);
 
 int cvl_imwrite(const char *filename, Image *img);

@@ -91,8 +91,10 @@ static double _median(double nums[], int n) {
 
 // Clamp x to inclusive range [lo, hi].
 static inline int _clamp(int x, int lo, int hi) {
-    if (x < lo) return lo;
-    if (x > hi) return hi;
+    if (x < lo)
+        return lo;
+    if (x > hi)
+        return hi;
     return x;
 }
 
@@ -137,7 +139,7 @@ void cvl_rotate(Image *img) {
     int h = img->height;
     int w = img->width;
 
-    Image rotated = createImage(h, w);
+    Image rotated = cvl_img_create(h, w);
     for (int i = 0; i < h; ++i) {
         for (int j = 0; j < w; ++j) {
             rotated.map[i][j] = img->map[h - i - 1][w - j - 1];
@@ -150,7 +152,7 @@ void cvl_rotate(Image *img) {
         }
     }
 
-    cvl_imfree(rotated);
+    cvl_img_free(rotated);
 }
 
 // Inverts RGB channels according to the given max value.
@@ -371,7 +373,7 @@ void cvl_blur(Matrix *src, Matrix *dst, int ksize) {
     assert(src->height == dst->height && src->width == dst->width);
 
     double v = 1.0 / (ksize * ksize);
-    Matrix kernel = createMatrix(ksize, ksize);
+    Matrix kernel = cvl_mat_create(ksize, ksize);
     for (int i = 0; i < kernel.height; ++i) {
         for (int j = 0; j < kernel.width; ++j) {
             kernel.map[i][j] = v;
@@ -380,7 +382,7 @@ void cvl_blur(Matrix *src, Matrix *dst, int ksize) {
 
     cvl_convolve(src, dst, &kernel);
 
-    cvl_matfree(kernel);
+    cvl_mat_free(kernel);
 }
 
 // Apply median blur using replicated outlier pixel values.

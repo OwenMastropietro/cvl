@@ -19,15 +19,15 @@ void test_imwrite(void) {
 }
 
 void test_bad_ext(void) {
-    Image img = createImage(5, 10);
+    Image img = cvl_img_create(5, 10);
 
     assert(cvl_imwrite("test.bad", &img) == -1);
 
-    cvl_imfree(img);
+    cvl_img_free(img);
 }
 
 void test_write_pbm(void) {
-    Image img = createImage(5, 10);
+    Image img = cvl_img_create(5, 10);
 
     assert(cvl_imwrite("test.pbm", &img) == 0);
 
@@ -46,11 +46,11 @@ void test_write_pbm(void) {
     assert(width == 10 && height == 5);
 
     fclose(f);
-    cvl_imfree(img);
+    cvl_img_free(img);
 }
 
 void test_write_pgm(void) {
-    Image img = createImage(5, 10);
+    Image img = cvl_img_create(5, 10);
 
     assert(cvl_imwrite("test_img.pgm", &img) == 0);
 
@@ -69,11 +69,11 @@ void test_write_pgm(void) {
     assert(width == 10 && height == 5);
 
     fclose(f);
-    cvl_imfree(img);
+    cvl_img_free(img);
 }
 
 void test_write_ppm(void) {
-    Image img = createImage(5, 10);
+    Image img = cvl_img_create(5, 10);
 
     assert(cvl_imwrite("test_img.ppm", &img) == 0);
 
@@ -92,5 +92,5 @@ void test_write_ppm(void) {
     assert(width == 10 && height == 5);
 
     fclose(f);
-    cvl_imfree(img);
+    cvl_img_free(img);
 }

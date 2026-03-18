@@ -20,21 +20,21 @@ void test_1(void) {
         {7, 8, 9},
     };
 
-    Matrix src = createMatrix(3, 3);
+    Matrix src = cvl_mat_create(3, 3);
     for (int i = 0; i < 3; ++i) {
         for (int j = 0; j < 3; ++j) {
             src.map[i][j] = vals[i][j];
         }
     }
 
-    Matrix kernel = createMatrix(3, 3);
+    Matrix kernel = cvl_mat_create(3, 3);
     for (int i = 0; i < 3; ++i) {
         for (int j = 0; j < 3; ++j) {
             kernel.map[i][j] = 1.0 / 9.0;
         }
     }
 
-    Matrix dst = createMatrix(3, 3);
+    Matrix dst = cvl_mat_create(3, 3);
 
     cvl_correlate(&src, &dst, &kernel);
 
@@ -50,9 +50,9 @@ void test_1(void) {
         }
     }
 
-    cvl_matfree(src);
-    cvl_matfree(kernel);
-    cvl_matfree(dst);
+    cvl_mat_free(src);
+    cvl_mat_free(kernel);
+    cvl_mat_free(dst);
 }
 
 void test_2(void) {
@@ -62,20 +62,20 @@ void test_2(void) {
         {7, 8, 9},
     };
 
-    Matrix src = createMatrix(3, 3);
+    Matrix src = cvl_mat_create(3, 3);
     for (int i = 0; i < 3; ++i) {
         for (int j = 0; j < 3; ++j) {
             src.map[i][j] = vals[i][j];
         }
     }
 
-    Matrix kernel = createMatrix(2, 2);
+    Matrix kernel = cvl_mat_create(2, 2);
     kernel.map[0][0] = 1 / 4.0;
     kernel.map[0][1] = 0 / 4.0;
     kernel.map[1][0] = 0 / 4.0;
     kernel.map[1][1] = 1 / 4.0;
 
-    Matrix dst = createMatrix(3, 3);
+    Matrix dst = cvl_mat_create(3, 3);
 
     cvl_correlate(&src, &dst, &kernel);
 
@@ -91,7 +91,7 @@ void test_2(void) {
         }
     }
 
-    cvl_matfree(src);
-    cvl_matfree(kernel);
-    cvl_matfree(dst);
+    cvl_mat_free(src);
+    cvl_mat_free(kernel);
+    cvl_mat_free(dst);
 }

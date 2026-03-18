@@ -26,30 +26,35 @@ typedef struct {
 // The supported file types using 1, 8, and 24 bits per pixel, respectively.
 typedef enum format { PBM, PGM, PPM } Format;
 
-Image createImage(int height, int width);
+Image cvl_img_create(int height, int width);
 
-void cvl_imfree(Image img);
+void cvl_img_free(Image img);
 
-Matrix createMatrix(int height, int width);
+Matrix cvl_mat_create(int height, int width);
 
-Matrix createMatrixFromArray(double *entry, int height, int width);
+Matrix cvl_mat_create_from(double *entry, int height, int width);
 
-void cvl_matfree(Matrix mx);
+void cvl_mat_free(Matrix mx);
 
-Matrix image2Matrix(Image img);
+Matrix cvl_img2mat(Image img);
 
-Image matrix2Image(Matrix mx, int scale, double gamma);
+Image cvl_mat2img(Matrix mx, int scale, double gamma);
 
 // todo: idk where to put these
 
 void setPixel(Image img, int vPos, int hPos, int r, int g, int b, int i);
 
-void filledEllipse(Image img, int vCenter, int hCenter, int vRadius, int hRadius, int r, int g, int b, int i);
+void filledEllipse(Image img, int vCenter, int hCenter, int vRadius,
+                   int hRadius, int r, int g, int b, int i);
 
-void filledRectangle(Image img, int v1, int h1, int v2, int h2, int r, int g, int b, int i);
+void filledRectangle(Image img, int v1, int h1, int v2, int h2, int r, int g,
+                     int b, int i);
 
-void line(Image img, int v1, int h1, int v2, int h2, int width, int dash, int gap, int r, int g, int b, int i);
+void line(Image img, int v1, int h1, int v2, int h2, int width, int dash,
+          int gap, int r, int g, int b, int i);
 
-void rectangle(Image img, int v1, int h1, int v2, int h2, int width, int dash, int gap, int r, int g, int b, int i);
+void rectangle(Image img, int v1, int h1, int v2, int h2, int width, int dash,
+               int gap, int r, int g, int b, int i);
 
-void ellipse(Image img, int vCenter, int hCenter, int vRadius, int hRadius, int width, int dash, int gap, int r, int g, int b, int i);
+void ellipse(Image img, int vCenter, int hCenter, int vRadius, int hRadius,
+             int width, int dash, int gap, int r, int g, int b, int i);

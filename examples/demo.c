@@ -9,7 +9,7 @@
 
 // Add and Remove Salt and Pepper Noise (via shrink-expand pipeline).
 void part_i(void) {
-    Image img = readImage("./data/original/text.pgm");
+    Image img = cvl_imread("./data/original/text.pgm");
 
     cvl_threshold(&img, 128);
     cvl_imwrite("./data/modified/bw.pbm", &img);
@@ -24,13 +24,13 @@ void part_i(void) {
     cvl_shrink(&img);
     cvl_imwrite("./data/modified/cleared.pbm", &img);
 
-    cvl_imfree(img);
+    cvl_img_free(img);
 }
 
 // Connected Component Labeling.
 void part_ii(void) {
-    Image img = readImage("./data/original/text.pgm");
-    Matrix mat = createMatrix(img.height, img.width); // labels
+    Image img = cvl_imread("./data/original/text.pgm");
+    Matrix mat = cvl_mat_create(img.height, img.width); // labels
 
     cvl_threshold(&img, 128);
     cvl_imwrite("./data/modified/bw.pbm", &img);
@@ -38,14 +38,14 @@ void part_ii(void) {
     int num_components = cvl_connected_components(&img, &mat, 4);
     printf("\nNumber of Components: %d\n", num_components);
 
-    cvl_matfree(mat);
-    cvl_imfree(img);
+    cvl_mat_free(mat);
+    cvl_img_free(img);
 }
 
 // Count & Color Components (according to a threshold).
 void part_iii(void) {
-    Image img = readImage("./data/original/text.pgm");
-    Matrix mat = createMatrix(img.height, img.width); // labels
+    Image img = cvl_imread("./data/original/text.pgm");
+    Matrix mat = cvl_mat_create(img.height, img.width); // labels
 
     cvl_threshold(&img, 128);
     cvl_imwrite("./data/modified/bw.pbm", &img);
@@ -58,34 +58,34 @@ void part_iii(void) {
 
     cvl_imwrite("./data/modified/components.ppm", &img);
 
-    cvl_matfree(mat);
-    cvl_imfree(img);
+    cvl_mat_free(mat);
+    cvl_img_free(img);
 }
 
 void p2(void) {
     // Load Original Greyscale Image.
-    Image img = readImage("./data/original/sample.ppm");
-    Matrix src = image2Matrix(img);
+    Image img = cvl_imread("./data/original/sample.ppm");
+    Matrix src = cvl_img2mat(img);
     cvl_imwrite("./data/modified/original.pgm", &img);
 
     // Mean Windowing.
-    Matrix mean = createMatrix(img.height, img.width);
+    Matrix mean = cvl_mat_create(img.height, img.width);
     cvl_blur(&src, &mean, 3);
-    Image mean_img = matrix2Image(mean, 0, 1.0);
+    Image mean_img = cvl_mat2img(mean, 0, 1.0);
     cvl_imwrite("./data/modified/mean.pgm", &mean_img);
-    cvl_imfree(mean_img);
-    cvl_matfree(mean);
+    cvl_img_free(mean_img);
+    cvl_mat_free(mean);
 
     // Median Windowing.
-    Matrix median = createMatrix(img.height, img.width);
+    Matrix median = cvl_mat_create(img.height, img.width);
     cvl_median_blur(&src, &median, 3);
-    Image median_img = matrix2Image(median, 0, 1.0);
+    Image median_img = cvl_mat2img(median, 0, 1.0);
     cvl_imwrite("./data/modified/median.pgm", &median_img);
-    cvl_imfree(median_img);
-    cvl_matfree(median);
+    cvl_img_free(median_img);
+    cvl_mat_free(median);
 
-    cvl_imfree(img);
-    cvl_matfree(src);
+    cvl_img_free(img);
+    cvl_mat_free(src);
 }
 
 int main(void) {

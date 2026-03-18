@@ -10,9 +10,7 @@
 #include <string.h>
 
 // Create a new image of the given size and fill it with white pixels.
-// When you don't need the image anymore, don't forget to free its memory using
-// deleteImage.
-Image createImage(int height, int width) {
+Image cvl_img_create(int height, int width) {
     int i, j;
     Image img;
 
@@ -34,7 +32,7 @@ Image createImage(int height, int width) {
 }
 
 // Delete a previously created image and free its allocated memory on the heap.
-void cvl_imfree(Image img) {
+void cvl_img_free(Image img) {
     for (int i = 0; i < img.height; ++i) {
         free(img.map[i]);
     }
@@ -42,9 +40,7 @@ void cvl_imfree(Image img) {
 }
 
 // Create a new matrix of the given size and fill it with zeroes.
-// When you don't need the matrix anymore, don't forget to free its memory using
-// deleteMatrix.
-Matrix createMatrix(int height, int width) {
+Matrix cvl_mat_create(int height, int width) {
     int i, j;
     Matrix mx;
 
@@ -62,11 +58,8 @@ Matrix createMatrix(int height, int width) {
     return mx;
 }
 
-// Create a new matrix of the given size and fill it with content of 2D double
-// array. Call this function with a pointer to the first element of the array,
-// e.g., &a[0][0]. When you don't need the matrix anymore, don't forget to free
-// its memory using deleteMatrix.
-Matrix createMatrixFromArray(double *entry, int height, int width) {
+// Create a new matrix of the given size and fill it with content of 2D double array.
+Matrix cvl_mat_create_from(double *entry, int height, int width) {
     int i, j;
     Matrix mx;
 
@@ -85,7 +78,7 @@ Matrix createMatrixFromArray(double *entry, int height, int width) {
 }
 
 // Delete a previously created matrix and free its allocated memory on the heap.
-void cvl_matfree(Matrix mat) {
+void cvl_mat_free(Matrix mat) {
     for (int i = 0; i < mat.height; ++i) {
         free(mat.map[i]);
     }
@@ -93,9 +86,9 @@ void cvl_matfree(Matrix mat) {
 }
 
 // Convert the intensity components of an image into a matrix of identical size.
-Matrix image2Matrix(Image img) {
+Matrix cvl_img2mat(Image img) {
     int m, n;
-    Matrix result = createMatrix(img.height, img.width);
+    Matrix result = cvl_mat_create(img.height, img.width);
 
     for (m = 0; m < img.height; m++) {
         for (n = 0; n < img.width; n++) {
@@ -106,16 +99,14 @@ Matrix image2Matrix(Image img) {
     return result;
 }
 
-// Convert a matrix into an image with corresponding, r, g, b, and i components
-// and size. If scale == 0 then values remain unchanged but if they are below 0
-// or above 255, they are set to 0 or 255, respectively. If scale != 0 the
-// values are scaled so that minimum value is zero and maximum is 255. Setting
-// the gamma value allows for exponential scaling, with gamma == 1.0 enabling
-// linear scaling.
-Image matrix2Image(Matrix mx, int scale, double gamma) {
+// Convert a matrix to an image.
+// If scale == 0 then values remain unchanged (and clamped to [0, 255]).
+// If scale != 0 the values are scaled so that minimum value is zero and maximum is 255.
+// Setting the gamma value allows for exponential scaling, with gamma == 1.0 enabling linear scaling.
+Image cvl_mat2img(Matrix mx, int scale, double gamma) {
     int m, n, intValue;
     double dblValue, minVal = DBL_MAX, maxVal = -DBL_MAX;
-    Image result = createImage(mx.height, mx.width);
+    Image result = cvl_img_create(mx.height, mx.width);
 
     if (scale) {
         for (m = 0; m < mx.height; m++) {
