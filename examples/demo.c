@@ -90,11 +90,11 @@ void p2(void) {
 
 int main(void) {
 
-    // part_i();
+    part_i();
     // part_ii();
     // part_iii();
 
-    p2();
+    // p2();
 
     return 0;
 }
