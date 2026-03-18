@@ -2,6 +2,5 @@
 
 ```bash
 make run  # run the example program
+make test # run unit tests
 ```
-
-> Note: `text_image.ppm` appears to be malformed.
