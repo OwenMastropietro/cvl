@@ -88,13 +88,69 @@ void p2(void) {
     cvl_mat_free(src);
 }
 
+void p3_sobel(void) {
+    Image img = cvl_imread("./data/original/lena.ppm");
+    cvl_imwrite("./data/modified/lena.ppm", &img);
+    
+    cvl_threshold(&img, 128);
+    cvl_imwrite("./data/modified/lena.pbm", &img);
+    
+    Matrix lena = cvl_img2mat(img);
+    Matrix lena_smooth = cvl_mat_create(lena.height, lena.width);
+    cvl_blur(&lena, &lena_smooth, 3);
+    
+    Matrix gx = cvl_mat_create(lena.height, lena.width);
+    Matrix gy = cvl_mat_create(lena.height, lena.width);
+    cvl_sobel(&lena_smooth, &gx, &gy);
+    
+    Image horizontal = cvl_mat2img(gx, 0, 1);
+    Image vertical = cvl_mat2img(gy, 0, 1);
+    
+    cvl_threshold(&horizontal, 128);
+    cvl_threshold(&vertical, 128);
+    
+    cvl_imwrite("./data/modified/sobel-lena_mags_horizontal.pbm", &horizontal);
+    cvl_imwrite("./data/modified/sobel-lena_mags_vertical.pbm", &vertical);
+    
+    cvl_img_free(vertical);
+    cvl_img_free(horizontal);
+    cvl_mat_free(gy);
+    cvl_mat_free(gx);
+    cvl_mat_free(lena_smooth);
+    cvl_mat_free(lena);
+    cvl_img_free(img);
+}
+
+void p3_canny(void) {
+    Image img = cvl_imread("./data/original/lena.ppm");
+    cvl_imwrite("./data/modified/lena.ppm", &img);
+    
+    cvl_threshold(&img, 128);
+    cvl_imwrite("./data/modified/lena.pbm", &img);
+    
+    Matrix lena = cvl_img2mat(img);
+    Matrix edges = cvl_mat_create(lena.height, lena.width);
+    cvl_canny(&lena, &edges, -1, 50, 120);
+    
+    Image lena_canny = cvl_mat2img(edges, 0, 1);
+    cvl_threshold(&lena_canny, 128);
+    cvl_imwrite("./data/modified/lena-canny.pbm", &lena_canny);
+
+    cvl_img_free(lena_canny);
+    cvl_mat_free(edges);
+    cvl_mat_free(lena);
+    cvl_img_free(img);
+}
+
 int main(void) {
 
-    part_i();
+    // part_i();
     // part_ii();
     // part_iii();
 
     // p2();
+    p3_sobel();
+    p3_canny();
 
     return 0;
 }

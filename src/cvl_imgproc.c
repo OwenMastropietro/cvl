@@ -424,3 +424,219 @@ void cvl_median_blur(Matrix *src, Matrix *dst, int ksize) {
 
     free(kernel);
 }
+
+void cvl_sobel(Matrix *src, Matrix *gx, Matrix *gy) {
+    double xvals[] = {
+        -1, 0, 1,
+        -2, 0, 2,
+        -1, 0, 1,
+    };
+    double yvals[] = {
+        -1, -2, -1,
+         0,  0,  0,
+         1,  2,  1,
+    };
+
+    Matrix xkernel = cvl_mat_create_from(xvals, 3, 3);
+    Matrix ykernel = cvl_mat_create_from(yvals, 3, 3);
+
+    cvl_convolve(src, gx, &xkernel);
+    cvl_convolve(src, gy, &ykernel);
+}
+
+static void cvl_mag(Matrix *g, Matrix *gx, Matrix *gy) {
+    for (int i = 0; i < g->height; ++i) {
+        for (int j = 0; j < g->width; ++j) {
+            g->map[i][j] = sqrt(SQR(gx->map[i][j]) + SQR(gy->map[i][j]));
+        }
+    }
+}
+
+static void cvl_ang(Matrix *a, Matrix *gx, Matrix *gy) {
+    for (int i = 0; i < a->height; ++i) {
+        for (int j = 0; j < a->width; ++j) {
+            a->map[i][j] = atan2(gy->map[i][j], gx->map[i][j]);
+        }
+    }
+}
+
+// Non-maximum Suppression.
+static void cvl_nms(Matrix *m, Matrix *a, Matrix *e) {
+    assert(m && m->map);
+    assert(a && a->map);
+    assert(e && e->map);
+
+    assert(m->height == a->height);
+    assert(m->height == e->height);
+    assert(m->width == m->width);
+    assert(m->width == e->width);
+
+    const int h = m->height;
+    const int w = m->width;
+
+    for (int i = 1; i < h - 1; ++i) {
+        for (int j = 1; j < w - 1; ++j) {
+            double angle = a->map[i][j];
+            if (angle < 0) angle += M_PI; // [0, pi]
+
+            int sector = (int)((angle + M_PI / 8) / (M_PI / 4)) % 4;
+            // sectors
+            // 3 2 1
+            // 0   0
+            // 1 2 3
+
+            switch (sector) {
+                case 0: { // 0°, 180° (horizontal)
+                    // double n1 = (j - 1 >= 0) ? m->map[i][j - 1] : 0.0;
+                    // double n2 = (j + 1 <  w) ? m->map[i][j + 1] : 0.0;
+                    double n1 = m->map[i][j - 1];
+                    double n2 = m->map[i][j + 1];
+                    if (m->map[i][j] >= n1 && m->map[i][j] >= n2) {
+                        e->map[i][j] = m->map[i][j];
+                        break;
+                    }
+                    e->map[i][j] = 0;
+                    break;
+                }
+                case 1: { // 45°, 225° (diagonal)
+                    double n1 = m->map[i - 1][j + 1];
+                    double n2 = m->map[i + 1][j - 1];
+                    if (m->map[i][j] >= n1 && m->map[i][j] >= n2) {
+                        e->map[i][j] = m->map[i][j];
+                        break;
+                    }
+                    e->map[i][j] = 0;
+                    break;
+                }
+                case 2: { // 90°, 270° (vertical)
+                    double n1 = m->map[i - 1][j];
+                    double n2 = m->map[i + 1][j];
+                    if (m->map[i][j] >= n1 && m->map[i][j] >= n2) {
+                        e->map[i][j] = m->map[i][j];
+                        break;
+                    }
+                    e->map[i][j] = 0;
+                    break;
+                }
+                case 3: { // 135°, 315° (diagonal)
+                    double n1 = m->map[i - 1][j - 1];
+                    double n2 = m->map[i + 1][j + 1];
+                    if (m->map[i][j] >= n1 && m->map[i][j] >= n2) {
+                        e->map[i][j] = m->map[i][j];
+                        break;
+                    }
+                    e->map[i][j] = 0;
+                    break;
+                }
+                default: assert(false);
+            }
+        }
+    }
+}
+
+// Hysteresis Thresholding.
+static void cvl_ht(Matrix *src, Matrix *dst, int lo, int hi) {
+    assert(src && src->map);
+    assert(dst && dst->map);
+    assert(src->height == dst->height);
+    assert(src->width == dst->width);
+
+    const int h = src->height;
+    const int w = src->width;
+
+    enum { N = 0, C = 1, E = 2 }; // non-edge, candidate, edge
+
+    Matrix tmp = cvl_mat_create(h, w);
+
+    // Classify Pixels.
+    for (int i = 0; i < h; ++i) {
+        for (int j = 0; j < w; ++j) {
+            double v = src->map[i][j];
+            if (v < lo)      tmp.map[i][j] = N;
+            else if (v > hi) tmp.map[i][j] = E;
+            else             tmp.map[i][j] = C;
+        }
+    }
+
+    // BFS - flood fill candidates (C) from strong edges (E).
+    const int n_neighbors = 8;
+    int dh[] = {-1, -1, -1, 0, 0, 1, 1, 1};
+    int dw[] = {-1, 0, 1, -1, 1, -1, 0, 1};
+
+    typedef struct { int i, j; } Point;
+    Point *queue = malloc(h * w * sizeof(Point));
+    assert(queue);
+    int front = 0, back = 0;
+    for (int i = 0; i < h; ++i) {
+        for (int j = 0; j < w; ++j) {
+            if (tmp.map[i][j] == E) {
+                queue[back++] = (Point){i, j};
+            }
+        }
+    }
+
+    while (front < back) {
+        if (back >= h * w) perror("queue overflow\n");
+        Point p = queue[front++];
+
+        for (int k = 0; k < n_neighbors; ++k) {
+            int ni = p.i + dh[k];
+            int nj = p.j + dw[k];
+
+            bool in_bounds = (0 <= ni && ni < h) && (0 <= nj && nj < w); 
+            if (!in_bounds) continue;
+
+            if (tmp.map[ni][nj] == C) {
+                tmp.map[ni][nj] = E;
+                if (back >= h * w) perror("queue overflow 1\n");
+                queue[back++] = (Point){ni, nj};
+                if (back >= h * w) perror("queue overflow 2\n");
+            }
+        }
+    }
+
+    for (int i = 0; i < h; ++i) {
+        for (int j = 0; j < w; ++j) {
+            dst->map[i][j] = (tmp.map[i][j] == E) ? src->map[i][j] : 0.0;
+        }
+    }
+
+    free(queue);
+    cvl_mat_free(tmp);
+}
+
+void cvl_canny(Matrix *src, Matrix *dst, int sigma, int lo, int hi) {
+    const int h = src->height;
+    const int w = src->width;
+
+    sigma = 0; // todo: used for Gaussian blur
+    // todo: implement cvl_gaussian_blur, or add blur type to cvl_blur
+
+    // 1 - Gaussian(less) Filter.
+    Matrix smoothed = cvl_mat_create(h, w);
+    cvl_blur(src, &smoothed, 3);
+
+    // 2 - Magnitude(Gx, Gy) & Orientation(Gx, Gy) from Sobel.
+    Matrix gx = cvl_mat_create(h, w);
+    Matrix gy = cvl_mat_create(h, w);
+    cvl_sobel(&smoothed, &gx, &gy);
+
+    Matrix mag = cvl_mat_create(h, w);
+    Matrix ang = cvl_mat_create(h, w);
+    cvl_mag(&mag, &gx, &gy);
+    cvl_ang(&ang, &gx, &gy);
+
+    // 3 - Non-max Suppression.
+    Matrix nms = cvl_mat_create(h, w);
+    cvl_nms(&mag, &ang, &nms);
+
+    // 4 - Hysteresis Thresholding.
+    cvl_ht(&nms, dst, lo, hi);
+
+    cvl_mat_free(nms);
+    cvl_mat_free(ang);
+    cvl_mat_free(mag);
+    cvl_mat_free(gy);
+    cvl_mat_free(gx);
+    cvl_mat_free(smoothed);
+}

@@ -27,3 +27,7 @@ void cvl_convolve(Matrix *src, Matrix *dst, Matrix *kernel);
 void cvl_blur(Matrix *src, Matrix *dst, int ksize);
 
 void cvl_median_blur(Matrix *src, Matrix *dst, int ksize);
+
+void cvl_sobel(Matrix *src, Matrix *gx, Matrix *gy);
+
+void cvl_canny(Matrix *src, Matrix *dst, int sigma, int lo, int hi);
