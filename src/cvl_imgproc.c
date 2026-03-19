@@ -640,3 +640,38 @@ void cvl_canny(Matrix *src, Matrix *dst, int sigma, int lo, int hi) {
     cvl_mat_free(gx);
     cvl_mat_free(smoothed);
 }
+
+// Convenience "_new" wrappers
+
+Matrix cvl_blur_new(Matrix *src, int ksize) {
+    Matrix smoothed = cvl_mat_create(src->height, src->width);
+    cvl_blur(src, &smoothed, ksize);
+    return smoothed;
+}
+
+Matrix cvl_sobel_mag(Matrix *src) {
+    Matrix g = cvl_mat_create(src->height, src->width);
+    Matrix gx = cvl_mat_create(src->height, src->width);
+    Matrix gy = cvl_mat_create(src->height, src->width);
+    cvl_sobel(src, &gx, &gy);
+    cvl_mag(&g, &gx, &gy);
+
+    return g;
+}
+
+Matrix cvl_sobel_angle(Matrix *src) {
+    Matrix a = cvl_mat_create(src->height, src->width);
+    Matrix gx = cvl_mat_create(src->height, src->width);
+    Matrix gy = cvl_mat_create(src->height, src->width);
+    cvl_sobel(src, &gx, &gy);
+    cvl_ang(&a, &gx, &gy);
+
+    return a;
+}
+
+Matrix cvl_canny_new(Matrix *src, int sigma, int lo, int hi) {
+    Matrix canny_edges = cvl_mat_create(src->height, src->width);
+    cvl_canny(src, &canny_edges, sigma, lo, hi);
+
+    return canny_edges;
+}

@@ -104,14 +104,22 @@ void p3_sobel(void) {
     cvl_sobel(&lena_smooth, &gx, &gy);
     
     Image horizontal = cvl_mat2img(gx, 0, 1);
-    Image vertical = cvl_mat2img(gy, 0, 1);
+    Image vertical = cvl_mat2img(gy, 0, 1);    
+    cvl_imwrite("./data/modified/sobel-lena-grads-horizontal.pgm", &horizontal);
+    cvl_imwrite("./data/modified/sobel-lena-grads-vertical.pgm", &vertical);
     
-    cvl_threshold(&horizontal, 128);
-    cvl_threshold(&vertical, 128);
+    Matrix mags = cvl_sobel_mag(&lena_smooth);
+    Matrix angs = cvl_sobel_angle(&lena_smooth);
+    Image mags_img = cvl_mat2img(mags, 0, 1);
+    Image angs_img = cvl_mat2img(angs, 0, 1);
+    cvl_imwrite("./data/modified/sobel-lena-magnitudes.pgm", &mags_img);
+    cvl_threshold(&angs_img, 3.14/2);
+    cvl_imwrite("./data/modified/sobel-lena-angles.pbm", &angs_img);
     
-    cvl_imwrite("./data/modified/sobel-lena_mags_horizontal.pbm", &horizontal);
-    cvl_imwrite("./data/modified/sobel-lena_mags_vertical.pbm", &vertical);
-    
+    cvl_img_free(angs_img);
+    cvl_img_free(mags_img);
+    cvl_mat_free(angs);
+    cvl_mat_free(mags);
     cvl_img_free(vertical);
     cvl_img_free(horizontal);
     cvl_mat_free(gy);
@@ -129,15 +137,13 @@ void p3_canny(void) {
     cvl_imwrite("./data/modified/lena.pbm", &img);
     
     Matrix lena = cvl_img2mat(img);
-    Matrix edges = cvl_mat_create(lena.height, lena.width);
-    cvl_canny(&lena, &edges, -1, 50, 120);
-    
-    Image lena_canny = cvl_mat2img(edges, 0, 1);
-    cvl_threshold(&lena_canny, 128);
-    cvl_imwrite("./data/modified/lena-canny.pbm", &lena_canny);
+    Matrix lena_edges = cvl_canny_new(&lena, -1, 50, 120);
 
-    cvl_img_free(lena_canny);
-    cvl_mat_free(edges);
+    Image lena_edges_img = cvl_mat2img(lena_edges, 0, 1);
+    cvl_imwrite("./data/modified/lena-canny.pgm", &lena_edges_img);
+
+    cvl_img_free(lena_edges_img);
+    cvl_mat_free(lena_edges);
     cvl_mat_free(lena);
     cvl_img_free(img);
 }
