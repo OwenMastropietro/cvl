@@ -119,9 +119,9 @@ static Image read_pnm(char *filename) {
                     uint16_t sum = (uint16_t)r + g + b;
                     uint8_t gray = (uint8_t)(sum / 3);
 
-                    p->r;
-                    p->g;
-                    p->b;
+                    p->r = r;
+                    p->g = g;
+                    p->b = b;
                     p->i = gray;
                     break;
                 }
