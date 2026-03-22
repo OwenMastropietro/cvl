@@ -99,56 +99,54 @@ Matrix cvl_img2mat(Image img) {
     return result;
 }
 
-// Convert a matrix to an image.
-// If scale == 0 then values remain unchanged (and clamped to [0, 255]).
-// If scale != 0 the values are scaled so that minimum value is zero and maximum is 255.
-// Setting the gamma value allows for exponential scaling, with gamma == 1.0 enabling linear scaling.
-Image cvl_mat2img(Matrix mx, int scale, double gamma) {
-    int m, n, intValue;
-    double dblValue, minVal = DBL_MAX, maxVal = -DBL_MAX;
-    Image result = cvl_img_create(mx.height, mx.width);
+// Converts a matrix to an image with scaling and gamma correction.
+// - scale == 0: values are 1/255 normalized before applying gamma.
+// - scale != 0: values are min/max normalized before applying gamma.
+// - gamma == 1.0: linear scaling (no change in contrast).
+// - gamma < 1.0: enhances darker values (brightens the image).
+// - gamma > 1.0: suppressess darker values (darkens the image).
+//
+// The final result is clamped to [0, 255].
+Image cvl_mat2img(Matrix mat, int scale, double gamma) {
+    const int h = mat.height;
+    const int w = mat.width;
+
+    double vmin = DBL_MAX;
+    double vmax = -DBL_MAX;
 
     if (scale) {
-        for (m = 0; m < mx.height; m++) {
-            for (n = 0; n < mx.width; n++) {
-                dblValue = mx.map[m][n];
-                if (dblValue < minVal)
-                    minVal = dblValue;
-                else if (dblValue > maxVal)
-                    maxVal = dblValue;
+        for (int i = 0; i < h; i++) {
+            for (int j = 0; j < w; j++) {
+                double v = mat.map[i][j];
+
+                if (v < vmin) vmin = v;
+                if (v > vmax) vmax = v;
             }
         }
-        if (maxVal - minVal < 1e-10) {
-            maxVal += 1.0;
+        if (vmax - vmin < 1e-10) vmax += 1.0;
+    }
+
+    double range = vmax - vmin;
+
+    Image img = cvl_img_create(h, w);
+
+    for (int i = 0; i < h; i++) {
+        for (int j = 0; j < w; j++) {
+            Pixel *p = &img.map[i][j];
+            double v = mat.map[i][j];
+
+            double norm = scale ? (v - vmin) / range : v / 255.0;
+            double out  = 255.0 * pow(norm, gamma);
+
+            out = fmin(fmax(out, 0.0), 255.0); // clamp to [0, 255]
+
+            uint8_t val = (uint8_t)(out + 0.5);
+
+			p->r = p->g = p->b = p->i = val;
         }
     }
 
-    // minVal = 0.0;
-    for (m = 0; m < mx.height; m++) {
-        for (n = 0; n < mx.width; n++) {
-            dblValue = mx.map[m][n];
-            if (scale) {
-                intValue = (int)(
-					255.0 * pow((dblValue - minVal) / (maxVal - minVal), gamma)
-					+ 0.5
-				);
-            } else {
-                intValue = (int)mx.map[m][n];
-            }
-            if (intValue < 0) {
-                intValue = 0;
-            } else if (intValue > 255) {
-                intValue = 255;
-            }
-
-			result.map[m][n].r = intValue;
-			result.map[m][n].g = intValue;
-			result.map[m][n].b = intValue;
-			result.map[m][n].i = intValue;
-        }
-    }
-
-    return result;
+    return img;
 }
 
 // Set color for pixel (vPos, hPos) in image img.
