@@ -23,8 +23,12 @@ typedef struct {
     double **map;
 } Matrix;
 
-// The supported file types using 1, 8, and 24 bits per pixel, respectively.
-typedef enum format { PBM, PGM, PPM } Format;
+// image formats
+typedef enum cvl_format {
+    CVL_FMT_PBM,
+    CVL_FMT_PGM,
+    CVL_FMT_PPM,
+} cvl_format;
 
 Image cvl_img_create(int height, int width);
 

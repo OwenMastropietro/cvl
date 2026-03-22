@@ -13,7 +13,7 @@ static Image read_pnm(char *filename) {
     char type[200], line[200];
     unsigned char *temp, output;
     Image img;
-    Format filetype;
+    int filetype;
 
     f = fopen(filename, "rb");
     if (!f) {
@@ -31,15 +31,15 @@ static Image read_pnm(char *filename) {
     }
     switch (type[1]) {
     case '4':
-        filetype = PBM;
+        filetype = CVL_FMT_PBM;
         bitsPerPixel = 1;
         break;
     case '5':
-        filetype = PGM;
+        filetype = CVL_FMT_PGM;
         bitsPerPixel = 8;
         break;
     default:
-        filetype = PPM;
+        filetype = CVL_FMT_PPM;
         bitsPerPixel = 24;
     }
 
@@ -48,7 +48,7 @@ static Image read_pnm(char *filename) {
         fgets(line, 200, f);
     }
     sscanf(line, "%d %d", &width, &height);
-    if (filetype != PBM) {
+    if (filetype != CVL_FMT_PBM) {
         fgets(line, 200, f);
         sscanf(line, "%d", &imax);
     }
@@ -73,21 +73,21 @@ static Image read_pnm(char *filename) {
             mempos =
                 ((bitsPerPixel * width + 7) / 8 * i + (bitsPerPixel * j) / 8);
             switch (filetype) {
-            case PBM:
+            case CVL_FMT_PBM:
                 output = 255 * (((temp[mempos] & (128 >> j % 8)) == 0));
                 img.map[i][j].r = output;
                 img.map[i][j].g = output;
                 img.map[i][j].b = output;
                 img.map[i][j].i = output;
                 break;
-            case PGM:
+            case CVL_FMT_PGM:
                 output = (unsigned char)((int)temp[mempos] * 255 / imax);
                 img.map[i][j].r = output;
                 img.map[i][j].g = output;
                 img.map[i][j].b = output;
                 img.map[i][j].i = output;
                 break;
-            case PPM:
+            case CVL_FMT_PPM:
                 img.map[i][j].r =
                     (unsigned char)((int)temp[mempos] * 255 / imax);
                 img.map[i][j].g =
