@@ -31,6 +31,15 @@ typedef enum cvl_format {
     CVL_FMT_PPM,
 } cvl_format;
 
+// thresholding modes
+typedef enum cvl_thresh_type {
+    CVL_THRESH_BINARY,
+    CVL_THRESH_BINARY_INV,
+    CVL_THRESH_TRUNC,
+    CVL_THRESH_TOZERO,
+    CVL_THRESH_TOZERO_INV,
+} cvl_thresh_type;
+
 Image cvl_img_create(int height, int width);
 
 void cvl_img_free(Image img);

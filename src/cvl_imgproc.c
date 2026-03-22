@@ -98,22 +98,41 @@ static inline int _clamp(int x, int lo, int hi) {
     return x;
 }
 
-// Changes all pixels below thresh to black (0), otherwise to white (255).
-void cvl_threshold(Image *img, int thresh) {
-    unsigned char r, g, b;
+// Applies a fixed-level threshold to each array element - determined by type.
+int cvl_threshold(Image *img, int thresh, int maxval, int type) {
+    if (!img->map) return 0;
+    if (!(0 <= thresh && thresh <= 255)) return 0;
+    if (!(0 <= maxval && maxval <= 255)) return 0;
 
-    for (int i = 0; i < img->height; ++i) {
-        for (int j = 0; j < img->width; ++j) {
-            r = img->map[i][j].r;
-            g = img->map[i][j].g;
-            b = img->map[i][j].b;
+    const int h = img->height;
+    const int w = img->width;
+    const uint8_t t = (uint8_t)thresh;
+    const uint8_t mv = (uint8_t)maxval;
 
-            int gray = 0.299 * r + 0.587 * g + 0.114 * b; // ITU-R BT.601-7
-            unsigned char bw = (gray < thresh) ? BLACK : WHITE;
-            // setPixel(*img, i, j, bw, bw, bw, bw);
-            img->map[i][j] = (Pixel){bw, bw, bw, bw};
+    for (int i = 0; i < h; ++i) {
+        for (int j = 0; j < w; ++j) {
+            uint8_t v = img->map[i][j].i;
+
+            switch (type) {
+                case CVL_THRESH_BINARY:     v = (v > t) ? mv : 0; break;
+                case CVL_THRESH_BINARY_INV: v = (v > t) ? 0 : mv; break;
+                case CVL_THRESH_TRUNC:      v = (v > t) ? t : v;  break;
+                case CVL_THRESH_TOZERO:     v = (v > t) ? v : 0;  break;
+                case CVL_THRESH_TOZERO_INV: v = (v > t) ? 0 : v;  break;
+            }
+
+            Pixel *p = &img->map[i][j];
+            p->r = p->g = p->b = p->i = v;
+            // todo: impl. cvl_cvtcolor and separate rgb manip.
         }
     }
+
+    return 1;
+}
+
+// Changes all pixels below thresh to black (0), otherwise to white (255).
+int cvl_binarize(Image *img, int thresh) {
+    return cvl_threshold(img, thresh, 255, CVL_THRESH_BINARY);
 }
 
 // Randomly flips binary pixels with probability p.

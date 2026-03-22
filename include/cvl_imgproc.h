@@ -4,7 +4,9 @@
 
 #include "cvl_io.h"
 
-void cvl_threshold(Image *img, int thresh);
+int cvl_threshold(Image *img, int thresh, int maxval, int type);
+
+int cvl_binarize(Image *img, int thresh);
 
 void cvl_add_noise(Image *img, double p);
 

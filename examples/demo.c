@@ -11,7 +11,7 @@
 void part_i(void) {
     Image img = cvl_imread("./data/original/text.pgm");
 
-    cvl_threshold(&img, 128);
+    cvl_binarize(&img, 128);
     cvl_imwrite("./data/modified/bw.pbm", &img);
 
     srand(42);
@@ -32,7 +32,7 @@ void part_ii(void) {
     Image img = cvl_imread("./data/original/text.pgm");
     Matrix mat = cvl_mat_create(img.height, img.width); // labels
 
-    cvl_threshold(&img, 128);
+    cvl_binarize(&img, 128);
     cvl_imwrite("./data/modified/bw.pbm", &img);
 
     int num_components = cvl_connected_components(&img, &mat, 4);
@@ -47,7 +47,7 @@ void part_iii(void) {
     Image img = cvl_imread("./data/original/text.pgm");
     Matrix mat = cvl_mat_create(img.height, img.width); // labels
 
-    cvl_threshold(&img, 128);
+    cvl_binarize(&img, 128);
     cvl_imwrite("./data/modified/bw.pbm", &img);
 
     int num_components = cvl_connected_components(&img, &mat, 4);
@@ -92,12 +92,11 @@ void p3_sobel(void) {
     Image img = cvl_imread("./data/original/lena.ppm");
     cvl_imwrite("./data/modified/lena.ppm", &img);
     
-    cvl_threshold(&img, 128);
+    cvl_binarize(&img, 128);
     cvl_imwrite("./data/modified/lena.pbm", &img);
     
     Matrix lena = cvl_img2mat(img);
-    Matrix lena_smooth = cvl_mat_create(lena.height, lena.width);
-    cvl_blur(&lena, &lena_smooth, 3);
+    Matrix lena_smooth = cvl_blur_new(&lena, 3);
     
     Matrix gx = cvl_mat_create(lena.height, lena.width);
     Matrix gy = cvl_mat_create(lena.height, lena.width);
@@ -113,7 +112,7 @@ void p3_sobel(void) {
     Image mags_img = cvl_mat2img(mags, 0, 1);
     Image angs_img = cvl_mat2img(angs, 0, 1);
     cvl_imwrite("./data/modified/sobel-lena-magnitudes.pgm", &mags_img);
-    cvl_threshold(&angs_img, 3.14/2);
+    cvl_binarize(&angs_img, 3.14/2);
     cvl_imwrite("./data/modified/sobel-lena-angles.pbm", &angs_img);
     
     cvl_img_free(angs_img);
@@ -133,7 +132,7 @@ void p3_canny(void) {
     Image img = cvl_imread("./data/original/lena.ppm");
     cvl_imwrite("./data/modified/lena.ppm", &img);
     
-    cvl_threshold(&img, 128);
+    cvl_binarize(&img, 128);
     cvl_imwrite("./data/modified/lena.pbm", &img);
     
     Matrix lena = cvl_img2mat(img);
