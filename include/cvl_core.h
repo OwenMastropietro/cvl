@@ -25,6 +25,7 @@ typedef struct {
 
 // image formats
 typedef enum cvl_format {
+    CVL_FMT_UNKNOWN,
     CVL_FMT_PBM,
     CVL_FMT_PGM,
     CVL_FMT_PPM,
