@@ -99,19 +99,20 @@ static inline int _clamp(int x, int lo, int hi) {
 }
 
 // Applies a fixed-level threshold to each array element - determined by type.
-int cvl_threshold(Image *img, int thresh, int maxval, int type) {
-    if (!img->map) return 0;
+int cvl_threshold(Image *src, Image *dst, int thresh, int maxval, int type) {
+    if (!src->map || !dst->map) return 0;
+    if (src->height != dst->height || src->width != dst->width) return 0;
     if (!(0 <= thresh && thresh <= 255)) return 0;
     if (!(0 <= maxval && maxval <= 255)) return 0;
 
-    const int h = img->height;
-    const int w = img->width;
+    const int h = src->height;
+    const int w = src->width;
     const uint8_t t = (uint8_t)thresh;
     const uint8_t mv = (uint8_t)maxval;
 
     for (int i = 0; i < h; ++i) {
         for (int j = 0; j < w; ++j) {
-            uint8_t v = img->map[i][j].i;
+            uint8_t v = src->map[i][j].i;
 
             switch (type) {
                 case CVL_THRESH_BINARY:     v = (v > t) ? mv : 0; break;
@@ -121,7 +122,7 @@ int cvl_threshold(Image *img, int thresh, int maxval, int type) {
                 case CVL_THRESH_TOZERO_INV: v = (v > t) ? 0 : v;  break;
             }
 
-            Pixel *p = &img->map[i][j];
+            Pixel *p = &dst->map[i][j];
             p->r = p->g = p->b = p->i = v;
             // todo: impl. cvl_cvtcolor and separate rgb manip.
         }
@@ -132,7 +133,7 @@ int cvl_threshold(Image *img, int thresh, int maxval, int type) {
 
 // Changes all pixels below thresh to black (0), otherwise to white (255).
 int cvl_binarize(Image *img, int thresh) {
-    return cvl_threshold(img, thresh, 255, CVL_THRESH_BINARY);
+    return cvl_threshold(img, img, thresh, 255, CVL_THRESH_BINARY);
 }
 
 // Randomly flips binary pixels with probability p.
@@ -661,6 +662,12 @@ void cvl_canny(Matrix *src, Matrix *dst, int sigma, int lo, int hi) {
 }
 
 // Convenience "_new" wrappers
+
+Image cvl_threshold_new(Image *src, int thresh, int maxval, int type) {
+    Image dst = cvl_img_create(src->height, src->width);
+    cvl_threshold(src, &dst, thresh, maxval, type);
+    return dst;
+}
 
 Matrix cvl_blur_new(Matrix *src, int ksize) {
     Matrix smoothed = cvl_mat_create(src->height, src->width);
