@@ -36,6 +36,12 @@ void cvl_canny(Matrix *src, Matrix *dst, int sigma, int lo, int hi);
 
 // Convenience "_new" wrappers
 
+Image cvl_threshold_new(Image *src, int thresh, int maxval, int type);
+
+Matrix cvl_correlate_new(Matrix *src, Matrix *kernel);
+
+Matrix cvl_convolve_new(Matrix *src, Matrix *kernel);
+
 Matrix cvl_blur_new(Matrix *src, int ksize);
 
 Matrix cvl_sobel_mag(Matrix *src);

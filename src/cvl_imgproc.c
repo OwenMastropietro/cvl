@@ -669,6 +669,18 @@ Image cvl_threshold_new(Image *src, int thresh, int maxval, int type) {
     return dst;
 }
 
+Matrix cvl_correlate_new(Matrix *src, Matrix *kernel) {
+    Matrix dst = cvl_mat_create(src->height, src->width);
+    cvl_correlate(src, &dst, kernel);
+    return dst;
+}
+
+Matrix cvl_convolve_new(Matrix *src, Matrix *kernel) {
+    Matrix dst = cvl_mat_create(src->height, src->width);
+    cvl_convolve(src, &dst, kernel);
+    return dst;
+}
+
 Matrix cvl_blur_new(Matrix *src, int ksize) {
     Matrix smoothed = cvl_mat_create(src->height, src->width);
     cvl_blur(src, &smoothed, ksize);
