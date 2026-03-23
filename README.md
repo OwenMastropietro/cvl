@@ -26,20 +26,30 @@ make test # run unit tests
 #include "cvl_io.h"
 
 int main(void) {
-    Image lena_img = cvl_imread("./data/original/lena.ppm");
-    cvl_threshold(&lena_img, 128);
-    
-    Matrix lena = cvl_img2mat(lena_img); // 8U --> 64F
-    Matrix edges = cvl_canny_new(&lena, 1.0, 50, 120);
+    Image img = cvl_imread("lena.ppm");
+    Image binary = cvl_binarize_new(&img, 128);
 
-    Image edges_img = cvl_mat2img(lena_edges, 0, 1);
-    cvl_imwrite("./data/modified/lena-canny.pgm", &lena_edges_img);
+    Matrix lena = cvl_img2mat(binary);
 
-    cvl_img_free(edges_img);
-    cvl_mat_free(edges);
-    cvl_mat_free(lena);
-    cvl_img_free(lena_img);
+    const int sigma = 1;
+    const int lo = 50;
+    const int hi = 120;
+    Matrix edges = cvl_canny_new(&lena, sigma, lo, hi);
+
+    Image edges_img = cvl_mat2img(edges, 0, 1);
+
+    cvl_imwrite("original.ppm", &img);
+    cvl_imwrite("binary.pbm", &binary);
+    cvl_imwrite("canny.pgm", &edges_img);
+
+    // free memory...
 
     return 0;
 }
 ```
+
+|          Original          |             Binary Threshold             |              Canny Edges               |
+| :------------------------: | :--------------------------------------: | :------------------------------------: |
+| ![lena](./assets/lena.png) | ![lena-binary](./assets/lena-binary.png) | ![lena-edges](./assets/lena-canny.png) |
+
+> see the [docs](https://owenmastropietro.github.io/projects/cvl/) for more examples and documentation.
