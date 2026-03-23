@@ -669,6 +669,12 @@ Image cvl_threshold_new(Image *src, int thresh, int maxval, int type) {
     return dst;
 }
 
+Image cvl_binarize_new(Image *src, int thresh) {
+    Image dst = cvl_img_copy(src);
+    cvl_binarize(&dst, thresh);
+    return dst;
+}
+
 Matrix cvl_correlate_new(Matrix *src, Matrix *kernel) {
     Matrix dst = cvl_mat_create(src->height, src->width);
     cvl_correlate(src, &dst, kernel);

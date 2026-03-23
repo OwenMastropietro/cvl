@@ -38,6 +38,8 @@ void cvl_canny(Matrix *src, Matrix *dst, int sigma, int lo, int hi);
 
 Image cvl_threshold_new(Image *src, int thresh, int maxval, int type);
 
+Image cvl_binarize_new(Image *src, int thresh);
+
 Matrix cvl_correlate_new(Matrix *src, Matrix *kernel);
 
 Matrix cvl_convolve_new(Matrix *src, Matrix *kernel);

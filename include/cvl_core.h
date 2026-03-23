@@ -42,6 +42,8 @@ typedef enum cvl_thresh_type {
 
 Image cvl_img_create(int height, int width);
 
+Image cvl_img_copy(Image *src);
+
 void cvl_img_free(Image img);
 
 Matrix cvl_mat_create(int height, int width);

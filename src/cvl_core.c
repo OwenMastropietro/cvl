@@ -31,6 +31,19 @@ Image cvl_img_create(int height, int width) {
     return img;
 }
 
+// Copy an input image.
+Image cvl_img_copy(Image *src) {
+    Image dst = cvl_img_create(src->height, src->width);
+
+    for (int i = 0; i < src->height; ++i) {
+        for (int j = 0; j < src->width; ++j) {
+            dst.map[i][j] = src->map[i][j];
+        }
+    }
+
+    return dst;
+}
+
 // Delete a previously created image and free its allocated memory on the heap.
 void cvl_img_free(Image img) {
     for (int i = 0; i < img.height; ++i) {
