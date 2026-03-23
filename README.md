@@ -1,6 +1,6 @@
-# CVL
+# <img src="./assets/cvl-logo.png" alt="logo" width="50" style="vertical-align: middle; margin-right: 10px;"> CVL
 
-_A Small **C**omputer **V**ision **L**ibrary in C._
+_A Small Computer Vision Library in C._
 
 [docs](https://owenmastropietro.github.io/projects/cvl/)
 
