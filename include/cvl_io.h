@@ -8,6 +8,14 @@
 
 #include "cvl_core.h"
 
-Image cvl_imread(char *filename);
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+Image cvl_imread(const char *filename);
 
 int cvl_imwrite(const char *filename, Image *img);
+
+#ifdef __cplusplus
+}
+#endif

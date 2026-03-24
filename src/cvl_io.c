@@ -29,7 +29,7 @@ static int detect_format(FILE *f) {
     return 0;
 }
 
-static Image read_pnm(char *filename) {
+static Image read_pnm(const char *filename) {
     Image img = { .height = 0, .width = 0, .map = NULL };
 
     FILE *f = fopen(filename, "rb");
@@ -61,6 +61,7 @@ static Image read_pnm(char *filename) {
     sscanf(line, "%d %d", &width, &height);
     if (width <= 0 || height <= 0) {
         fprintf(stderr, "Invalid image size in input file %s.\n", filename);
+        fclose(f);
         return img;
     }
 
@@ -78,6 +79,8 @@ static Image read_pnm(char *filename) {
     int bytes_read = (int)fread(data, 1, mapsize, f);
     if (bytes_read != mapsize) {
         fprintf(stderr, "Data missing in file %s.\n", filename);
+        free(data);
+        fclose(f);
         return img;
     }
 
@@ -206,7 +209,7 @@ static int write_ppm(const char *filename, Image *img) {
 }
 
 // Reads an image from a specified file.
-Image cvl_imread(char *filename) {
+Image cvl_imread(const char *filename) {
     return read_pnm(filename);
 }
 
