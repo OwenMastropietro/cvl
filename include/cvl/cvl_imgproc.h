@@ -2,7 +2,7 @@
 
 #pragma once
 
-#include "cvl_io.h"
+#include <cvl/cvl_io.h>
 
 #ifdef __cplusplus
 extern "C" {

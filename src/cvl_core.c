@@ -1,6 +1,8 @@
 #define _CRT_SECURE_NO_WARNINGS
 
-#include "cvl_io.h"
+#include <cvl/cvl_core.h>
+#include <cvl/cvl_io.h>
+
 #include <assert.h>
 #include <ctype.h>
 #include <float.h>

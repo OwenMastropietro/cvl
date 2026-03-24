@@ -18,13 +18,22 @@ target_include_directories(cvl PUBLIC
 target_compile_options(cvl PRIVATE -Wall -Wextra)
 
 # ------------------------
-# Examples
+# Example Programs
 # ------------------------
-add_executable(cvl_demo examples/demo.c)
-target_link_libraries(cvl_demo cvl)
+add_executable(cvl_cs136 examples/cs136.c)
+target_link_libraries(cvl_cs136 cvl)
+
+add_executable(cvl_canny examples/canny.c)
+target_link_libraries(cvl_canny cvl)
+
+add_executable(cvl_sobel examples/sobel.c)
+target_link_libraries(cvl_sobel cvl)
+
+add_executable(cvl_ccl examples/ccl.c)
+target_link_libraries(cvl_ccl cvl)
 
 # Optionally Build Tests.
-option(BUILD_TESTS "Build tests" ON)
+option(BUILD_TESTS "Build tests" OFF)
 
 if (BUILD_TESTS)
     enable_testing()

@@ -6,7 +6,7 @@
 
 #pragma once
 
-#include "cvl_core.h"
+#include <cvl/cvl_core.h>
 
 #ifdef __cplusplus
 extern "C" {

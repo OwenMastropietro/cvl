@@ -1,4 +1,5 @@
-#include "cvl_imgproc.h"
+#include <cvl/cvl_imgproc.h>
+
 #include <assert.h>
 #include <math.h>
 #include <stdbool.h>

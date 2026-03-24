@@ -12,14 +12,45 @@ _A Small Computer Vision Library in C._
 
 ## Usage
 
+> Build and run example programs.
+
 ```sh
-make run  # run the example program
-make test # run unit tests
+# Manual Compile & Execute.
+gcc examples/<example>.c src/* -Iinclude -o <example>
+./<example>
+
+# With CMake.
+cmake -B build -S .
+cmake --build build
+
+./build/<example>
 ```
 
-## Example
+> Build and run tests.
+
+```sh
+cmake -B build -S . -DBUILD_TESTS=ON
+cmake --build build
+
+ctest --test-dir build
+```
+
+## Example Programs
+
+> See the [docs](https://owenmastropietro.github.io/projects/cvl/) for more examples and documentation.
+
+| Executable  | Source File                              | Description                  |
+| ----------- | ---------------------------------------- | ---------------------------- |
+| `cvl_canny` | [`examples/canny.c`](./examples/canny.c) | Canny Edge Detection         |
+| `cvl_sobel` | [`examples/sobel.c`](./examples/sobel.c) | Sobel Filtering              |
+| `cvl_ccl`   | [`examples/ccl.c`](./examples/ccl.c)     | Connected Component Labeling |
+| `cvl_cs136` | [`examples/cs136.c`](./examples/cs136.c) | Assignments from CS136       |
+
+## Demonstration
 
 > Canny Edge Detection on Lena.
+>
+> See the [docs](https://owenmastropietro.github.io/projects/cvl/) for more demonstrations.
 
 ```c
 #include "cvl_imgproc.h"
@@ -32,8 +63,8 @@ int main(void) {
     Matrix lena = cvl_img2mat(binary);
 
     const int sigma = 1;
-    const int lo = 50;
-    const int hi = 120;
+    const int lo    = 50;
+    const int hi    = 120;
     Matrix edges = cvl_canny_new(&lena, sigma, lo, hi);
 
     Image edges_img = cvl_mat2img(edges, 0, 1);
@@ -52,4 +83,4 @@ int main(void) {
 | :------------------------: | :--------------------------------------: | :------------------------------------: |
 | ![lena](./assets/lena.png) | ![lena-binary](./assets/lena-binary.png) | ![lena-edges](./assets/lena-canny.png) |
 
-> see the [docs](https://owenmastropietro.github.io/projects/cvl/) for more examples and documentation.
+---
