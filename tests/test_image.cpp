@@ -1,4 +1,4 @@
-#include "cvl_core.h"
+#include <cvl/cvl.h>
 #include <gtest/gtest.h>
 
 TEST(ImageTest, CreateImage) {

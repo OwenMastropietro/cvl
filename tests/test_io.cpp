@@ -1,5 +1,4 @@
-#include "cvl_imgproc.h"
-#include "cvl_io.h"
+#include <cvl/cvl.h>
 #include <gtest/gtest.h>
 
 void test_bad_ext(void);

@@ -1,5 +1,4 @@
-#include "cvl_core.h"
-#include "cvl_imgproc.h"
+#include <cvl/cvl.h>
 #include <gtest/gtest.h>
 
 TEST(ImgProcTest, Correlate) {
