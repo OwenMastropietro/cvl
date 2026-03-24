@@ -8,6 +8,7 @@ FetchContent_MakeAvailable(googletest)
 
 add_executable(test_cvl
   test_image.cpp
+  test_imgproc.cpp
 )
 target_link_libraries(test_cvl PRIVATE
     cvl

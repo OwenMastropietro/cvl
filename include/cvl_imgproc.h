@@ -4,6 +4,10 @@
 
 #include "cvl_io.h"
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 int cvl_threshold(Image *img, Image *dst, int thresh, int maxval, int type);
 
 int cvl_binarize(Image *img, int thresh);
@@ -51,3 +55,7 @@ Matrix cvl_sobel_mag(Matrix *src);
 Matrix cvl_sobel_angle(Matrix *src);
 
 Matrix cvl_canny_new(Matrix *src, int sigma, int lo, int hi);
+
+#ifdef __cplusplus
+}
+#endif
