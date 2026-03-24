@@ -1,7 +1,6 @@
 .DS_Store
 
-*.pch
-*.out
+build/
 
 data/modified/*
 !data/modified/.gitinclude
