@@ -11,6 +11,12 @@
 
 // Create a new image of the given size and fill it with white pixels.
 Image cvl_img_create(int height, int width) {
+    // todo: zero-fill
+    return cvl_img_create_fill(height, width, WHITE);
+}
+
+// Create a new image of the given size and fill it with pixel value.
+Image cvl_img_create_fill(int height, int width, int pixel_value) {
     int i, j;
     Image img;
 
@@ -21,10 +27,10 @@ Image cvl_img_create(int height, int width) {
     for (i = 0; i < height; i++) {
         img.map[i] = (Pixel *)malloc(sizeof(Pixel) * width);
         for (j = 0; j < width; j++) {
-            img.map[i][j].r = 255;
-            img.map[i][j].g = 255;
-            img.map[i][j].b = 255;
-            img.map[i][j].i = 255;
+            img.map[i][j].r = pixel_value;
+            img.map[i][j].g = pixel_value;
+            img.map[i][j].b = pixel_value;
+            img.map[i][j].i = pixel_value;
         }
     }
 

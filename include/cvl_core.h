@@ -46,6 +46,8 @@ extern "C" {
 
 Image cvl_img_create(int height, int width);
 
+Image cvl_img_create_fill(int height, int width, int value);
+
 Image cvl_img_copy(Image *src);
 
 void cvl_img_free(Image img);
