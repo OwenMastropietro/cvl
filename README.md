@@ -53,8 +53,7 @@ ctest --test-dir build
 > See the [docs](https://owenmastropietro.github.io/projects/cvl/) for more demonstrations.
 
 ```c
-#include "cvl_imgproc.h"
-#include "cvl_io.h"
+#include <cvl/cvl.h>
 
 int main(void) {
     Image img = cvl_imread("lena.ppm");
