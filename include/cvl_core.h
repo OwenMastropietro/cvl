@@ -40,6 +40,10 @@ typedef enum cvl_thresh_type {
     CVL_THRESH_TOZERO_INV,
 } cvl_thresh_type;
 
+#ifdef __cplusplus
+extern "C" {
+#endif
+
 Image cvl_img_create(int height, int width);
 
 Image cvl_img_copy(Image *src);
@@ -74,3 +78,7 @@ void rectangle(Image img, int v1, int h1, int v2, int h2, int width, int dash,
 
 void ellipse(Image img, int vCenter, int hCenter, int vRadius, int hRadius,
              int width, int dash, int gap, int r, int g, int b, int i);
+
+#ifdef __cplusplus
+}
+#endif

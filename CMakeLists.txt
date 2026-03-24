@@ -22,3 +22,11 @@ target_compile_options(cvl PRIVATE -Wall -Wextra)
 # ------------------------
 add_executable(cvl_demo examples/demo.c)
 target_link_libraries(cvl_demo cvl)
+
+# Optionally Build Tests.
+option(BUILD_TESTS "Build tests" ON)
+
+if (BUILD_TESTS)
+    enable_testing()
+    add_subdirectory(tests)
+endif()
