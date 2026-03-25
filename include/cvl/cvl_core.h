@@ -1,5 +1,7 @@
 #pragma once
 
+#include <stdint.h>
+
 #define BLACK 0   // off - "absense of all color"
 #define WHITE 255 // on - "presence of all color"
 #define SQR(x) ((x) * (x))
@@ -10,7 +12,7 @@
 #define INVERT -2
 
 typedef struct {
-    unsigned char r, g, b, i;
+    uint8_t r, g, b, i;
 } Pixel;
 
 typedef struct {

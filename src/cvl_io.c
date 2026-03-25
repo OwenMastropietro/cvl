@@ -38,7 +38,6 @@ static Image read_pnm(const char *filename) {
     if (!f) return img;
 
     cvl_format_t fmt = detect_format(f);
-    if (fmt == CVL_FMT_UNKNOWN) return img;
 
     // stride = width * channels * sizeof(uint8_t) (1)
     // bpp = depth * channels
@@ -47,6 +46,7 @@ static Image read_pnm(const char *filename) {
         case CVL_FMT_PBM: bpp = 1; break;
         case CVL_FMT_PGM: bpp = 8; break;
         case CVL_FMT_PPM: bpp = 24; break;
+        case CVL_FMT_UNKNOWN: return img; // error
     }
 
     // skip comments
@@ -58,7 +58,7 @@ static Image read_pnm(const char *filename) {
 
     int width, height;
     sscanf(line, "%d %d", &width, &height);
-    if (!(width <= 0 || height <= 0)) {
+    if (width <= 0 || height <= 0) {
         fclose(f);
         return img;
     }
@@ -88,6 +88,7 @@ static Image read_pnm(const char *filename) {
         case CVL_FMT_PBM: stride = (width + 7) / 8; break;
         case CVL_FMT_PGM: stride = width;           break;
         case CVL_FMT_PPM: stride = width * 3;       break;
+        case CVL_FMT_UNKNOWN: assert(0);
     }
 
     img = cvl_img_create(height, width);
@@ -125,6 +126,7 @@ static Image read_pnm(const char *filename) {
                     p->i = gray;
                     break;
                 }
+                case CVL_FMT_UNKNOWN: assert(0);
             }
 
             // todo: cvl_imread_modes / cvl_imread(filename, mode)

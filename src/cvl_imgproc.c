@@ -148,7 +148,7 @@ void cvl_add_noise(Image *img, double p) {
 
             double r = (double)rand() / RAND_MAX;
             if (r < p) {
-                unsigned char bw = (pixel == BLACK) ? WHITE : BLACK;
+                uint8_t bw = (pixel == BLACK) ? WHITE : BLACK;
                 img->map[i][j] = (Pixel){bw, bw, bw, bw};
             }
         }

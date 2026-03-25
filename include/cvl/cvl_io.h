@@ -7,6 +7,7 @@
 #pragma once
 
 #include <cvl/cvl_core.h>
+#include <cvl/cvl_error.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -14,7 +15,7 @@ extern "C" {
 
 Image cvl_imread(const char *filename);
 
-int cvl_imwrite(const char *filename, Image *img);
+cvl_status_t cvl_imwrite(const char *filename, Image *img);
 
 #ifdef __cplusplus
 }

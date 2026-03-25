@@ -33,7 +33,7 @@ TEST(IOTest, ReadImage) {
 void test_bad_ext(void) {
     Image img = cvl_img_create(5, 10);
 
-    EXPECT_EQ(cvl_imwrite("invalid.ext", &img), -1);
+    ASSERT_TRUE(cvl_imwrite("invalid.ext", &img) == CVL_ERR_FILE_IO);
 
     cvl_img_free(img);
 }
@@ -41,7 +41,7 @@ void test_bad_ext(void) {
 void test_write_pbm(void) {
     Image img = cvl_img_create(5, 10);
 
-    ASSERT_EQ(cvl_imwrite("test.pbm", &img), 0);
+    ASSERT_TRUE(cvl_imwrite("test.pbm", &img) == CVL_OK);
 
     FILE *f = fopen("test.pbm", "rb");
     ASSERT_TRUE(f);
@@ -64,7 +64,7 @@ void test_write_pbm(void) {
 void test_write_pgm(void) {
     Image img = cvl_img_create(5, 10);
 
-    ASSERT_TRUE(cvl_imwrite("test_img.pgm", &img) == 0);
+    ASSERT_TRUE(cvl_imwrite("test_img.pgm", &img) == CVL_OK);
 
     FILE *f = fopen("test_img.pgm", "rb");
     ASSERT_TRUE(f);
@@ -87,7 +87,7 @@ void test_write_pgm(void) {
 void test_write_ppm(void) {
     Image img = cvl_img_create(5, 10);
 
-    ASSERT_TRUE(cvl_imwrite("test_img.ppm", &img) == 0);
+    ASSERT_TRUE(cvl_imwrite("test_img.ppm", &img) == CVL_OK);
 
     FILE *f = fopen("test_img.ppm", "rb");
     ASSERT_TRUE(f);
