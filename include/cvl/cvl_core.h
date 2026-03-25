@@ -24,12 +24,12 @@ typedef struct {
 } Matrix;
 
 // image formats
-typedef enum cvl_format {
+typedef enum cvl_format_t {
     CVL_FMT_UNKNOWN,
     CVL_FMT_PBM,
     CVL_FMT_PGM,
     CVL_FMT_PPM,
-} cvl_format;
+} cvl_format_t;
 
 // thresholding modes
 typedef enum cvl_thresh_type {

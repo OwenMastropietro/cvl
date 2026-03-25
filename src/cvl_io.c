@@ -1,3 +1,4 @@
+#include <cvl/cvl_error.h>
 #include <cvl/cvl_io.h>
 
 #include <assert.h>
@@ -8,7 +9,7 @@
 #include <stdlib.h>
 #include <string.h>
 
-static int detect_format(FILE *f) {
+static cvl_format_t detect_format(FILE *f) {
     assert(f);
 
     unsigned char buf[8];
@@ -25,22 +26,19 @@ static int detect_format(FILE *f) {
     if (buf[0] == 'P' && buf[1] == '5') return CVL_FMT_PGM;
     if (buf[0] == 'P' && buf[1] == '6') return CVL_FMT_PPM;
 
-    fprintf(stderr, "CVL only supports binary PNM formats (i.e., PBM, PGM, PPM).\n");
+    // cvl_perrorf(CVL_ERR_FILE_IO, "CVL only supports binary PNM formats (i.e., PBM, PGM, PPM).");
 
-    return 0;
+    return CVL_FMT_UNKNOWN;
 }
 
 static Image read_pnm(const char *filename) {
     Image img = { .height = 0, .width = 0, .map = NULL };
 
     FILE *f = fopen(filename, "rb");
-    if (!f) {
-        fprintf(stderr, "Can't open input file %s.\n", filename);
-        return img;
-    }
+    if (!f) return img;
 
-    int fmt = detect_format(f);
-    assert(fmt);
+    cvl_format_t fmt = detect_format(f);
+    if (fmt == CVL_FMT_UNKNOWN) return img;
 
     // stride = width * channels * sizeof(uint8_t) (1)
     // bpp = depth * channels
@@ -60,8 +58,7 @@ static Image read_pnm(const char *filename) {
 
     int width, height;
     sscanf(line, "%d %d", &width, &height);
-    if (width <= 0 || height <= 0) {
-        fprintf(stderr, "Invalid image size in input file %s.\n", filename);
+    if (!(width <= 0 || height <= 0)) {
         fclose(f);
         return img;
     }
@@ -75,11 +72,10 @@ static Image read_pnm(const char *filename) {
     int mapsize = (bpp * width + 7) / 8 * height;
     
     uint8_t *data = malloc(mapsize);
-    assert(data);
+    if (!data) return img;
 
     int bytes_read = (int)fread(data, 1, mapsize, f);
     if (bytes_read != mapsize) {
-        fprintf(stderr, "Data missing in file %s.\n", filename);
         free(data);
         fclose(f);
         return img;
@@ -141,19 +137,23 @@ static Image read_pnm(const char *filename) {
     return img;
 }
 
-static int write_pbm(const char *filename, Image *img) {
+static cvl_status_t write_pbm(const char *filename, Image *img) {
     FILE *f = fopen(filename, "wb");
-    assert(f);
+    if (!f) return CVL_ERR_FILE_IO;
 
     fprintf(f, "P4\n%d %d\n", img->width, img->height);
 
     int rowbytes = (img->width + 7) / 8;
-    unsigned char *row = calloc(rowbytes, 1);
-    assert(row);
+    uint8_t *row = calloc(rowbytes, 1);
+    if (!row) return CVL_ERR_OUT_OF_MEMORY;
+
     for (int i = 0; i < img->height; ++i) {
         memset(row, 0, rowbytes);
         for (int j = 0; j < img->width; ++j) {
-            assert(img->map[i][j].i == BLACK || img->map[i][j].i == WHITE);
+            if (!(img->map[i][j].i == BLACK || img->map[i][j].i == WHITE)) {
+                // todo: apply threshold instead?
+                return cvl_perrorf(CVL_ERR_INTERNAL, "PBM is binary, fool");
+            }
 
             if (img->map[i][j].i == BLACK) { // hawk tuah, BLACK is 0 fool
                 row[j / 8] |= 0x80 >> (j % 8);
@@ -164,17 +164,18 @@ static int write_pbm(const char *filename, Image *img) {
     free(row);
     fclose(f);
 
-    return 0;
+    return CVL_OK;
 }
 
-static int write_pgm(const char *filename, Image *img) {
+static cvl_status_t write_pgm(const char *filename, Image *img) {
     FILE *f = fopen(filename, "wb");
-    assert(f);
+    if (!f) return CVL_ERR_FILE_IO;
 
     fprintf(f, "P5\n%d %d\n255\n", img->width, img->height);
 
-    unsigned char *row = malloc(img->width);
-    assert(row);
+    uint8_t *row = malloc(img->width);
+    if(!row) return CVL_ERR_OUT_OF_MEMORY;
+
     for (int i = 0; i < img->height; ++i) {
         for (int j = 0; j < img->width; ++j) {
             row[j] = img->map[i][j].i;
@@ -184,17 +185,18 @@ static int write_pgm(const char *filename, Image *img) {
     free(row);
     fclose(f);
 
-    return 0;
+    return CVL_OK;
 }
 
-static int write_ppm(const char *filename, Image *img) {
+static cvl_status_t write_ppm(const char *filename, Image *img) {
     FILE *f = fopen(filename, "wb");
-    assert(f);
+    if (!f) return CVL_ERR_FILE_IO;
 
     fprintf(f, "P6\n%d %d\n255\n", img->width, img->height);
 
-    unsigned char *row = malloc(3 * img->width);
-    assert(row);
+    uint8_t *row = malloc(3 * img->width);
+    if(!row) return CVL_ERR_OUT_OF_MEMORY;
+
     for (int i = 0; i < img->height; ++i) {
         for (int j = 0; j < img->width; ++j) {
             row[3 * j + 0] = img->map[i][j].r;
@@ -206,7 +208,7 @@ static int write_ppm(const char *filename, Image *img) {
     free(row);
     fclose(f);
 
-    return 0;
+    return CVL_OK;
 }
 
 // Reads an image from a specified file.
@@ -215,11 +217,13 @@ Image cvl_imread(const char *filename) {
 }
 
 // Saves an image to a specified file. The image format is determined by the file extension.
-int cvl_imwrite(const char *filename, Image *img) {
-    assert(img->height > 0 && img->width > 0);
+cvl_status_t cvl_imwrite(const char *filename, Image *img) {
+    if (!img) return CVL_ERR_INVALID_ARG;
+    if (!img->map) return CVL_ERR_EMPTY;
+    if(img->height <= 0 || img->width <= 0) return CVL_ERR_INVALID_DIM;
 
     const char *ext = strrchr(filename, '.');
-    assert(ext);
+    if (!ext) return CVL_ERR_INTERNAL;
 
     if (strcmp(ext, ".pbm") == 0) {
         return write_pbm(filename, img);
@@ -233,6 +237,5 @@ int cvl_imwrite(const char *filename, Image *img) {
         return write_ppm(filename, img);
     }
 
-    fprintf(stderr, "Unsupported format\n");
-    return -1;
+    return CVL_ERR_FILE_IO;
 }

@@ -8,6 +8,7 @@ add_library(cvl
     src/cvl_core.c
     src/cvl_imgproc.c
     src/cvl_io.c
+    src/cvl_error.c
 )
 
 target_include_directories(cvl PUBLIC
