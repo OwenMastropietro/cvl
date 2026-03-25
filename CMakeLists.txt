@@ -11,6 +11,8 @@ add_library(cvl
     src/cvl_error.c
 )
 
+target_link_libraries(cvl PUBLIC m)
+
 target_include_directories(cvl PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
     # todo: install interface

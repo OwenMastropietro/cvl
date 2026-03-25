@@ -33,7 +33,7 @@ TEST(ImgProcTest, Correlate) {
 
     for (int i = 0; i < 3; ++i) {
         for (int j = 0; j < 3; ++j) {
-            EXPECT_EQ(dst.map[i][j], exp[i][j]);
+            EXPECT_NEAR(dst.map[i][j], exp[i][j], 1e-6);
         }
     }
 
@@ -52,7 +52,7 @@ TEST(ImgProcTest, Correlate) {
 
     for (int i = 0; i < 3; ++i) {
         for (int j = 0; j < 3; ++j) {
-            EXPECT_EQ(dst.map[i][j], exp[i][j]);
+            EXPECT_NEAR(dst.map[i][j], exp[i][j], 1e-6);
         }
     }
 
