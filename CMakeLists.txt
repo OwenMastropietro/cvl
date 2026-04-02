@@ -7,6 +7,7 @@ set(CMAKE_C_STANDARD 11)
 add_library(cvl
     src/cvl_core.c
     src/cvl_imgproc.c
+    src/cvl_hough.c
     src/cvl_io.c
     src/cvl_error.c
     src/cvl_draw.c
@@ -29,6 +30,9 @@ target_link_libraries(cvl_cs136 cvl)
 
 add_executable(cvl_canny examples/canny.c)
 target_link_libraries(cvl_canny cvl)
+
+add_executable(cvl_hough examples/hough.c)
+target_link_libraries(cvl_hough cvl)
 
 add_executable(cvl_sobel examples/sobel.c)
 target_link_libraries(cvl_sobel cvl)
