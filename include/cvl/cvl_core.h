@@ -69,22 +69,6 @@ Matrix cvl_img2mat(Image img);
 
 Image cvl_mat2img(Matrix mx, int scale, double gamma);
 
-// todo: idk where to put these
-
-void cvl_set_pixel(Image img, int row, int col, int r, int g, int b, int i);
-
-void cvl_draw_ellipse_filled(Image img, Point center, Point radius, int r, int g, int b, int i);
-
-void cvl_draw_rectangle_filled(Image img, Point p1, Point p2, int r, int g, int b, int i);
-
-void cvl_draw_line(Image img, Point p1, Point p2, int width, int dash, int gap, int r, int g, int b, int i);
-
-void cvl_draw_line_solid(Image img, Point p1, Point p2, int r, int g, int b, int i);
-
-void cvl_draw_rectangle(Image img, Point p1, Point p2, int width, int dash, int gap, int r, int g, int b, int i);
-
-void cvl_draw_ellipse(Image img, Point center, Point radius, int width, int dash, int gap, int r, int g, int b, int i);
-
 #ifdef __cplusplus
 }
 #endif
