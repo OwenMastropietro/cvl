@@ -9,6 +9,7 @@ add_library(cvl
     src/cvl_imgproc.c
     src/cvl_io.c
     src/cvl_error.c
+    src/cvl_draw.c
 )
 
 target_link_libraries(cvl PUBLIC m)
