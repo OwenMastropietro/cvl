@@ -69,6 +69,8 @@ Matrix cvl_img2mat(Image img);
 
 Image cvl_mat2img(Matrix mx, int scale, double gamma);
 
+void cvl_set_pixel(Image img, int row, int col, int r, int g, int b, int i);
+
 #ifdef __cplusplus
 }
 #endif
