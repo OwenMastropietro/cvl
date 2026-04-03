@@ -704,16 +704,12 @@ static void cvl_ht(Matrix *src, Matrix *dst, int lo, int hi) {
     cvl_mat_free(tmp);
 }
 
-void cvl_canny(Matrix *src, Matrix *dst, int sigma, int lo, int hi) {
+void cvl_canny(Matrix *src, Matrix *dst, double sigma, int lo, int hi) {
     const int h = src->height;
     const int w = src->width;
 
-    sigma = 0; // todo: used for Gaussian blur
-    // todo: implement cvl_gaussian_blur, or add blur type to cvl_blur
-
     // 1 - Gaussian(less) Filter.
-    Matrix smoothed = cvl_mat_create(h, w);
-    cvl_blur(src, &smoothed, 3);
+    Matrix smoothed = cvl_gaussian_blur_new(src, sigma);
 
     // 2 - Magnitude(Gx, Gy) & Orientation(Gx, Gy) from Sobel.
     Matrix gx = cvl_mat_create(h, w);
@@ -804,7 +800,7 @@ Matrix cvl_sobel_angle(Matrix *src) {
     return a;
 }
 
-Matrix cvl_canny_new(Matrix *src, int sigma, int lo, int hi) {
+Matrix cvl_canny_new(Matrix *src, double sigma, int lo, int hi) {
     Matrix canny_edges = cvl_mat_create(src->height, src->width);
     cvl_canny(src, &canny_edges, sigma, lo, hi);
 

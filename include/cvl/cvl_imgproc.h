@@ -38,7 +38,7 @@ void cvl_gaussian_blur(Matrix *src, Matrix *dst, double sigma);
 
 void cvl_sobel(Matrix *src, Matrix *gx, Matrix *gy);
 
-void cvl_canny(Matrix *src, Matrix *dst, int sigma, int lo, int hi);
+void cvl_canny(Matrix *src, Matrix *dst, double sigma, int lo, int hi);
 
 // Convenience "_new" wrappers
 
@@ -60,7 +60,7 @@ Matrix cvl_sobel_mag(Matrix *src);
 
 Matrix cvl_sobel_angle(Matrix *src);
 
-Matrix cvl_canny_new(Matrix *src, int sigma, int lo, int hi);
+Matrix cvl_canny_new(Matrix *src, double sigma, int lo, int hi);
 
 #ifdef __cplusplus
 }

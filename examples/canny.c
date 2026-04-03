@@ -8,16 +8,16 @@ int main(void) {
 
     Matrix lena = cvl_img2mat(binary);
 
-    const int sigma = 1;
+    const double sigma = 1;
     const int lo = 50;
     const int hi = 120;
     Matrix edges = cvl_canny_new(&lena, sigma, lo, hi);
 
     Image edges_img = cvl_mat2img(edges, 0, 1);
 
-    cvl_imwrite("./data/modified/original.ppm", &img);
-    cvl_imwrite("./data/modified/binary.pbm", &binary);
-    cvl_imwrite("./data/modified/canny-edges.pgm", &edges_img);
+    cvl_imwrite("./data/modified/1-original.ppm", &img);
+    cvl_imwrite("./data/modified/2-binary.pbm", &binary);
+    cvl_imwrite("./data/modified/3-canny-edges.pgm", &edges_img);
 
     cvl_img_free(edges_img);
     cvl_mat_free(edges);
