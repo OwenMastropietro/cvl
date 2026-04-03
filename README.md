@@ -41,6 +41,7 @@ ctest --test-dir build
 
 | Executable  | Source File                              | Description                  |
 | ----------- | ---------------------------------------- | ---------------------------- |
+| `cvl_hough` | [`examples/hough.c`](./examples/hough.c) | Hough Line Detection         |
 | `cvl_canny` | [`examples/canny.c`](./examples/canny.c) | Canny Edge Detection         |
 | `cvl_sobel` | [`examples/sobel.c`](./examples/sobel.c) | Sobel Filtering              |
 | `cvl_ccl`   | [`examples/ccl.c`](./examples/ccl.c)     | Connected Component Labeling |
