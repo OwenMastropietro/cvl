@@ -40,6 +40,9 @@ target_link_libraries(cvl_sobel cvl)
 add_executable(cvl_ccl examples/ccl.c)
 target_link_libraries(cvl_ccl cvl)
 
+add_executable(cvl_blur examples/blur.c)
+target_link_libraries(cvl_blur cvl)
+
 # Optionally Build Tests.
 option(BUILD_TESTS "Build tests" OFF)
 

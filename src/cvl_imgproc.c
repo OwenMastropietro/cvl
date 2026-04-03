@@ -360,33 +360,18 @@ void cvl_correlate(Matrix *src, Matrix *dst, Matrix *kernel) {
 
 // Convolve src with kernel using zero padding.
 void cvl_convolve(Matrix *src, Matrix *dst, Matrix *kernel) {
-    // G(r, c) = \sum_{i=-m}^{m} \sum_{j=-n}^{n} K(i, j) * I(r - i), c - j)
-    assert(src->height == dst->height && src->width == dst->width);
+    const int h = kernel->height;
+    const int w = kernel->width;
+    Matrix flipped = cvl_mat_create(h, w);
 
-    int h = src->height;
-    int w = src->width;
-
-    int ar = floor(kernel->height / 2.0); // anchor (row)
-    int ac = floor(kernel->width / 2.0);  // anchor (column)
-
-    for (int r = 0; r < h; ++r) {
-        for (int c = 0; c < w; ++c) {
-            double ws = 0.0; // weighted sum
-
-            for (int i = 0; i < kernel->height; ++i) {
-                for (int j = 0; j < kernel->width; ++j) {
-                    int rr = r - i - ar; // Dua Lipa
-                    int cc = c - j - ac; // Dua Lipa
-                    bool in_bounds = (0 <= rr && rr < h) && (0 <= cc && cc < w);
-                    if (in_bounds) { // BORDER_CONSTANT
-                        ws += kernel->map[i][j] * src->map[rr][cc];
-                    }
-                }
-            }
-
-            dst->map[r][c] = ws;
+    for (int i = 0; i < h; ++i) {
+        for (int j = 0; j < w; ++j) {
+            flipped.map[i][j] = kernel->map[h - 1 - i][w - 1 - j];
         }
     }
+
+    cvl_correlate(src, dst, &flipped);
+    cvl_mat_free(flipped);
 }
 
 // Apply mean blur using normalized ksize * ksize uniformly kernel.
@@ -403,6 +388,99 @@ void cvl_blur(Matrix *src, Matrix *dst, int ksize) {
 
     cvl_convolve(src, dst, &kernel);
 
+    cvl_mat_free(kernel);
+}
+
+// Apply 1D horizontal convolution.
+static void cvl_convolve_x(Matrix *src, Matrix *dst, Matrix *kernel) {
+    const int h = src->height;
+    const int w = src->width;
+    const int ksize = kernel->width;
+    const int radius = ksize / 2;
+
+    for (int y = 0; y < h; ++y) {
+        for (int x = 0; x < w; ++x) {
+            double sum = 0.0;
+            for (int k = -radius; k <= radius; ++k) {
+                int xx = _clamp(x + k, 0, w - 1);
+                sum += src->map[y][xx] * kernel->map[0][k + radius];
+            }
+            dst->map[y][x] = sum;
+        }
+    }
+}
+
+// Apply 1D vertical convolution.
+static void cvl_convolve_y(Matrix *src, Matrix *dst, Matrix *kernel) {
+    const int h = src->height;
+    const int w = src->width;
+    const int ksize = kernel->width;
+    const int radius = ksize / 2;
+
+    for (int y = 0; y < h; ++y) {
+        for (int x = 0; x < w; ++x) {
+            double sum = 0.0;
+            for (int k = -radius; k <= radius; ++k) {
+                int yy = _clamp(y + k, 0, h - 1);
+                sum += src->map[yy][x] * kernel->map[0][k + radius];
+            }
+            dst->map[y][x] = sum;
+        }
+    }
+}
+
+// Returns a normalized 1D Gaussian kernel.
+static Matrix cvl_gaussian_kernel(int ksize, double sigma) {
+    if (ksize < 1 || ksize % 2 == 0) {
+        ksize = 5;
+    }
+    if (sigma <= 0.0) { // compute from ksize
+        sigma = 0.3 * ((ksize - 1) * 0.5 - 1) + 0.8; // opencv heuristic
+    }
+
+    Matrix kernel = cvl_mat_create(1, ksize);
+
+    const int radius = ksize / 2;
+    double sum = 0.0;
+
+    for (int x = -radius; x < radius; ++x) {
+        double gx = exp(-(x * x) / (2.0 * sigma * sigma));
+        kernel.map[0][x + radius] = gx;
+        sum += gx;
+    }
+
+    for (int x = 0; x < ksize; ++x) {
+        kernel.map[0][x] /= sum;
+    }
+
+    return kernel;
+}
+
+/**
+ * Blurs an image/matrix using a Gaussian kernel defined by sigma.
+ * 
+ * @param src Input matrix.
+ * @param dst Output matrix (blurred).
+ * @param sigma Gaussian kernel standard deviation.
+ * 
+ * @todo ksize?
+ * I don't like handling both...
+ * but I don't like not having kszie...
+ * but it makes more sense (I think) to specify sigma)
+ * @todo sigma_x & sigma_y?
+ */
+void cvl_gaussian_blur(Matrix *src, Matrix *dst, double sigma) {
+    const double radius = ceil(3.0 * sigma);
+    const int ksize = 2 * radius + 1;
+
+    Matrix kernel = cvl_gaussian_kernel(ksize, sigma);
+
+    // todo: sepFilter2D?
+    Matrix tmp = cvl_mat_create(src->height, src->width);
+    cvl_convolve_x(src, &tmp, &kernel);
+    cvl_convolve_y(&tmp, dst, &kernel);
+
+    cvl_mat_free(tmp);
     cvl_mat_free(kernel);
 }
 
@@ -689,9 +767,21 @@ Matrix cvl_convolve_new(Matrix *src, Matrix *kernel) {
 }
 
 Matrix cvl_blur_new(Matrix *src, int ksize) {
-    Matrix smoothed = cvl_mat_create(src->height, src->width);
-    cvl_blur(src, &smoothed, ksize);
-    return smoothed;
+    Matrix dst = cvl_mat_create(src->height, src->width);
+    cvl_blur(src, &dst, ksize);
+    return dst;
+}
+
+Matrix cvl_gaussian_blur_new(Matrix *src, double sigma) {
+    Matrix dst = cvl_mat_create(src->height, src->width);
+    cvl_gaussian_blur(src, &dst, sigma);
+    return dst;
+}
+
+Matrix cvl_median_blur_new(Matrix *src, int ksize) {
+    Matrix dst = cvl_mat_create(src->height, src->width);
+    cvl_median_blur(src, &dst, ksize);
+    return dst;
 }
 
 Matrix cvl_sobel_mag(Matrix *src) {

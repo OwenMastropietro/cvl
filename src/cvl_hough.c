@@ -1,5 +1,6 @@
-#include <assert.h>
 #include <cvl/cvl_hough.h>
+#include <cvl/cvl_draw.h>
+#include <assert.h>
 #include <math.h>
 #include <stdio.h>
 #include <stdlib.h>
