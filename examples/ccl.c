@@ -10,7 +10,7 @@ int main(void) {
 
     Matrix labels = cvl_mat_create(img.height, img.width);
 
-    cvl_imwrite("original.pbm", &img);
+    cvl_imwrite("./data/modified/1-original.pbm", &img);
 
     // Count connected components.
     int num_components = cvl_connected_components(&img, &labels, 4);
@@ -20,7 +20,7 @@ int main(void) {
     num_components = cvl_color_components(&img, &labels, 100);
     printf("\nNumber of Components: %d\n", num_components);
 
-    cvl_imwrite("labeled-components.ppm", &img);
+    cvl_imwrite("./data/modified/2-labeled-components.ppm", &img);
 
     cvl_mat_free(labels);
     cvl_img_free(img);

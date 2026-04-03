@@ -374,21 +374,28 @@ void cvl_convolve(Matrix *src, Matrix *dst, Matrix *kernel) {
     cvl_mat_free(flipped);
 }
 
-// Apply mean blur using normalized ksize * ksize uniformly kernel.
-void cvl_blur(Matrix *src, Matrix *dst, int ksize) {
+// Blurs an image/matrix using a uniform kernel.
+void cvl_blur_box(Matrix *src, Matrix *dst, int ksize, bool normalize) {
     assert(src->height == dst->height && src->width == dst->width);
 
-    double v = 1.0 / (ksize * ksize);
+    const double norm = normalize ? 1.0 / (ksize * ksize) : 1.0;
+
     Matrix kernel = cvl_mat_create(ksize, ksize);
+
     for (int i = 0; i < kernel.height; ++i) {
         for (int j = 0; j < kernel.width; ++j) {
-            kernel.map[i][j] = v;
+            kernel.map[i][j] = norm;
         }
     }
 
     cvl_convolve(src, dst, &kernel);
 
     cvl_mat_free(kernel);
+}
+
+// Blurs an image/matrix using a normalized uniform kernel.
+void cvl_blur_mean(Matrix *src, Matrix *dst, int ksize) {
+    cvl_blur_box(src, dst, ksize, true);
 }
 
 // Apply 1D horizontal convolution.
@@ -469,7 +476,7 @@ static Matrix cvl_gaussian_kernel(int ksize, double sigma) {
  * but it makes more sense (I think) to specify sigma)
  * @todo sigma_x & sigma_y?
  */
-void cvl_gaussian_blur(Matrix *src, Matrix *dst, double sigma) {
+void cvl_blur_gauss(Matrix *src, Matrix *dst, double sigma) {
     const double radius = ceil(3.0 * sigma);
     const int ksize = 2 * radius + 1;
 
@@ -485,7 +492,7 @@ void cvl_gaussian_blur(Matrix *src, Matrix *dst, double sigma) {
 }
 
 // Apply median blur using replicated outlier pixel values.
-void cvl_median_blur(Matrix *src, Matrix *dst, int ksize) {
+void cvl_blur_median(Matrix *src, Matrix *dst, int ksize) {
     assert(src->height == dst->height && src->width == dst->width);
     assert(ksize % 2 == 1);
 
@@ -709,7 +716,7 @@ void cvl_canny(Matrix *src, Matrix *dst, double sigma, int lo, int hi) {
     const int w = src->width;
 
     // 1 - Gaussian(less) Filter.
-    Matrix smoothed = cvl_gaussian_blur_new(src, sigma);
+    Matrix smoothed = cvl_blur_gauss_new(src, sigma);
 
     // 2 - Magnitude(Gx, Gy) & Orientation(Gx, Gy) from Sobel.
     Matrix gx = cvl_mat_create(h, w);
@@ -762,21 +769,27 @@ Matrix cvl_convolve_new(Matrix *src, Matrix *kernel) {
     return dst;
 }
 
-Matrix cvl_blur_new(Matrix *src, int ksize) {
+Matrix cvl_blur_box_new(Matrix *src, int ksize, bool normalize) {
     Matrix dst = cvl_mat_create(src->height, src->width);
-    cvl_blur(src, &dst, ksize);
+    cvl_blur_box(src, &dst, ksize, normalize);
     return dst;
 }
 
-Matrix cvl_gaussian_blur_new(Matrix *src, double sigma) {
+Matrix cvl_blur_mean_new(Matrix *src, int ksize) {
     Matrix dst = cvl_mat_create(src->height, src->width);
-    cvl_gaussian_blur(src, &dst, sigma);
+    cvl_blur_mean(src, &dst, ksize);
     return dst;
 }
 
-Matrix cvl_median_blur_new(Matrix *src, int ksize) {
+Matrix cvl_blur_gauss_new(Matrix *src, double sigma) {
     Matrix dst = cvl_mat_create(src->height, src->width);
-    cvl_median_blur(src, &dst, ksize);
+    cvl_blur_gauss(src, &dst, sigma);
+    return dst;
+}
+
+Matrix cvl_blur_median_new(Matrix *src, int ksize) {
+    Matrix dst = cvl_mat_create(src->height, src->width);
+    cvl_blur_median(src, &dst, ksize);
     return dst;
 }
 

@@ -3,6 +3,7 @@
 #pragma once
 
 #include <cvl/cvl_io.h>
+#include <stdbool.h>
 
 #ifdef __cplusplus
 extern "C" {
@@ -30,11 +31,13 @@ void cvl_correlate(Matrix *src, Matrix *dst, Matrix *kernel);
 
 void cvl_convolve(Matrix *src, Matrix *dst, Matrix *kernel);
 
-void cvl_blur(Matrix *src, Matrix *dst, int ksize);
+void cvl_blur_box(Matrix *src, Matrix *dst, int ksize, bool normalize);
 
-void cvl_median_blur(Matrix *src, Matrix *dst, int ksize);
+void cvl_blur_mean(Matrix *src, Matrix *dst, int ksize);
 
-void cvl_gaussian_blur(Matrix *src, Matrix *dst, double sigma);
+void cvl_blur_gauss(Matrix *src, Matrix *dst, double sigma);
+
+void cvl_blur_median(Matrix *src, Matrix *dst, int ksize);
 
 void cvl_sobel(Matrix *src, Matrix *gx, Matrix *gy);
 
@@ -50,11 +53,13 @@ Matrix cvl_correlate_new(Matrix *src, Matrix *kernel);
 
 Matrix cvl_convolve_new(Matrix *src, Matrix *kernel);
 
-Matrix cvl_blur_new(Matrix *src, int ksize);
+Matrix cvl_blur_box_new(Matrix *src, int ksize, bool normalize);
 
-Matrix cvl_gaussian_blur_new(Matrix *src, double sigma);
+Matrix cvl_blur_mean_new(Matrix *src, int ksize);
 
-Matrix cvl_median_blur_new(Matrix *src, int ksize);
+Matrix cvl_blur_gauss_new(Matrix *src, double sigma);
+
+Matrix cvl_blur_median_new(Matrix *src, int ksize);
 
 Matrix cvl_sobel_mag(Matrix *src);
 

@@ -9,7 +9,7 @@ int main(void) {
     Image binary = cvl_binarize_new(&img, 128);
 
     Matrix lena = cvl_img2mat(binary);
-    Matrix lena_smooth = cvl_blur_new(&lena, 3);
+    Matrix lena_smooth = cvl_blur_gauss_new(&lena, 1);
 
     Matrix gx = cvl_mat_create(lena.height, lena.width);
     Matrix gy = cvl_mat_create(lena.height, lena.width);
@@ -26,12 +26,12 @@ int main(void) {
     Image angs_img = cvl_mat2img(angs, 0, 1);
     cvl_binarize(&angs_img, M_PI / 2);
 
-    cvl_imwrite("./data/modified/original.ppm", &img);
-    cvl_imwrite("./data/modified/binary.pbm", &binary);
-    cvl_imwrite("./data/modified/mags.pgm", &mags_img);
-    cvl_imwrite("./data/modified/angles.pgm", &angs_img);
-    cvl_imwrite("./data/modified/grads-horizontal.pgm", &gx_img);
-    cvl_imwrite("./data/modified/grads-vertical.pgm", &gy_img);
+    cvl_imwrite("./data/modified/1-original.ppm", &img);
+    cvl_imwrite("./data/modified/2-binary.pbm", &binary);
+    cvl_imwrite("./data/modified/3-mags.pgm", &mags_img);
+    cvl_imwrite("./data/modified/4-angles.pgm", &angs_img);
+    cvl_imwrite("./data/modified/5-grads-horizontal.pgm", &gx_img);
+    cvl_imwrite("./data/modified/6-grads-vertical.pgm", &gy_img);
 
     cvl_img_free(angs_img);
     cvl_img_free(mags_img);

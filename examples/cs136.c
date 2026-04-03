@@ -66,22 +66,24 @@ void p2(void) {
     Image img = cvl_imread("./data/original/sample.ppm");
 
     Matrix src = cvl_img2mat(img);
+    Image src_img = cvl_mat2img(src, 0, 1.0);
 
-    Matrix mean = cvl_blur_new(&src, 3);
+    Matrix mean = cvl_blur_mean_new(&src, 3);
     Image mean_img = cvl_mat2img(mean, 0, 1.0);
 
-    Matrix median = cvl_mat_create(img.height, img.width);
+    Matrix median = cvl_blur_median_new(&src, 3);
     Image median_img = cvl_mat2img(median, 0, 1.0);
-    cvl_median_blur(&src, &median, 3);
 
-    cvl_imwrite("./data/modified/original.pgm", &img);
-    cvl_imwrite("./data/modified/mean.pgm", &mean_img);
-    cvl_imwrite("./data/modified/median.pgm", &median_img);
+    cvl_imwrite("./data/modified/1-original.pgm", &src_img);
+    cvl_imwrite("./data/modified/2-mean.pgm", &mean_img);
+    cvl_imwrite("./data/modified/3-median.pgm", &median_img);
 
+    // cleanup
     cvl_img_free(median_img);
     cvl_mat_free(median);
     cvl_img_free(mean_img);
     cvl_mat_free(mean);
+    cvl_img_free(src_img);
     cvl_mat_free(src);
     cvl_img_free(img);
 }
@@ -92,7 +94,7 @@ void p3_i(void) {
     Image binary = cvl_binarize_new(&img, 128);
 
     Matrix lena = cvl_img2mat(binary);
-    Matrix lena_smooth = cvl_blur_new(&lena, 3);
+    Matrix lena_smooth = cvl_blur_gauss_new(&lena, 1);
 
     Matrix gx = cvl_mat_create(lena.height, lena.width);
     Matrix gy = cvl_mat_create(lena.height, lena.width);
