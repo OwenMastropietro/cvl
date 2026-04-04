@@ -13,6 +13,16 @@ static int _cmp(const void *a, const void *b) {
     return (vb > va) - (vb < va);
 }
 
+static int _lines_are_similar(cvl_hough_line_t a, cvl_hough_line_t b, double rho_thresh, double theta_thresh) {
+    double drho = fabs(a.rho - b.rho);
+    double dtheta = fabs(a.theta - b.theta);
+
+    if(dtheta > M_PI) dtheta = 2.0 * M_PI - dtheta;
+    dtheta = fmin(dtheta, M_PI - dtheta);
+
+    return (drho < rho_thresh) && (dtheta < theta_thresh);
+}
+
 int cvl_hough_lines(const Matrix *edges, cvl_hough_lines_t *dst, double drho, double dtheta, int thresh) {
     assert(edges && edges->map);
 
@@ -40,12 +50,11 @@ int cvl_hough_lines(const Matrix *edges, cvl_hough_lines_t *dst, double drho, do
     // Voting.
     for (int i = 0; i < h; ++i) {
         for (int j = 0; j < w; ++j) {
-            if (edges->map[i][j] <= 0.0)
-                continue;
+            if (edges->map[i][j] <= 0.0) continue;
 
             for (int t = 0; t < ntheta; ++t) {
-                double rho = j * _cos[t] + i * _sin[t];
-                int r = (int)((rho + rho_max) / drho);
+                double rho = (double)j * _cos[t] + (double)i * _sin[t];
+                int r = (int)round((rho + rho_max) / drho);
 
                 if (0 <= r && r < nrho) {
                     acc.map[r][t] += 1.0;
@@ -55,7 +64,7 @@ int cvl_hough_lines(const Matrix *edges, cvl_hough_lines_t *dst, double drho, do
     }
 
     // Find Peaks.
-    size_t cap = nrho * ntheta;
+    size_t cap = (size_t)nrho * ntheta / 4;
     cvl_hough_line_t *candidates = malloc(cap * sizeof(cvl_hough_line_t));
     assert(candidates);
 
@@ -66,9 +75,11 @@ int cvl_hough_lines(const Matrix *edges, cvl_hough_lines_t *dst, double drho, do
             double v = acc.map[r][t];
             if (v < thresh) continue;
 
-            // 4-neighborhood local max
-            if (v >= acc.map[r - 1][t] && v >= acc.map[r + 1][t] &&
-                v >= acc.map[r][t - 1] && v >= acc.map[r][t + 1]) {
+            if ( // 8-neighborhood local max
+                v >= acc.map[r - 1][t - 1] && v >= acc.map[r - 1][t] && v >= acc.map[r - 1][t + 1] &&
+                v >= acc.map[r]    [t - 1] && v >= acc.map[r]    [t] && v >= acc.map[r]    [t + 1] &&
+                v >= acc.map[r - 1][t - 1] && v >= acc.map[r + 1][t] && v >= acc.map[r + 1][t + 1]
+            ) {
                 double rho = r * drho - rho_max;
                 double theta = t * dtheta;
 
@@ -83,19 +94,36 @@ int cvl_hough_lines(const Matrix *edges, cvl_hough_lines_t *dst, double drho, do
 
     qsort(candidates, count, sizeof(cvl_hough_line_t), _cmp);
 
-    size_t nlines = count;
-    // size_t nlines = (count < max_lines) ? count : max_lines;
+    double thresh_rho = drho * 2.0;
+    double thresh_theta = dtheta * 2.0;
+
+    int *suppressed = calloc(count, sizeof(int));
+    cvl_hough_line_t *lines = malloc(count * sizeof(cvl_hough_line_t));
+    size_t nlines = 0;
+
+    for (size_t i = 0; i < count; ++i) {
+        if (suppressed[i]) continue;
+    
+        lines[nlines++] = candidates[i];
+
+        for (size_t j = i + 1; j < count; ++j) {
+            if (!suppressed[j] && _lines_are_similar(candidates[i], candidates[j], thresh_rho, thresh_theta)) {
+                suppressed[j] = 1;
+            }
+        }
+    }
 
     dst->size = nlines;
     dst->lines = malloc(nlines * sizeof(cvl_hough_line_t));
     assert(dst->lines);
 
-    memcpy(dst->lines, candidates, nlines * sizeof(cvl_hough_line_t));
+    memcpy(dst->lines, lines, nlines * sizeof(cvl_hough_line_t));
 
     cvl_mat_free(acc);
     free(_cos);
     free(_sin);
     free(candidates);
+    free(lines);
 
     return (int)nlines;
 }
