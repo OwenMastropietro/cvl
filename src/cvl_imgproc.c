@@ -550,6 +550,25 @@ void cvl_sobel(Matrix *src, Matrix *gx, Matrix *gy) {
     cvl_convolve(src, gy, &ykernel);
 }
 
+void cvl_laplacian(const Matrix *src, Matrix *dst) {
+    // double vals[] = { // 4-neighborhood
+    //     0,  1, 0,
+    //     1, -4, 1,
+    //     0,  1, 0,
+    // };
+    double vals[] = { // 8-neighborhood
+        1,  1, 1,
+        1, -8, 1,
+        1,  1, 1,
+    };
+
+    Matrix kernel = cvl_mat_create_from(vals, 3, 3);
+
+    cvl_convolve(src, dst, &kernel);
+
+    cvl_mat_free(kernel);
+}
+
 static void cvl_mag(Matrix *g, Matrix *gx, Matrix *gy) {
     for (int i = 0; i < g->height; ++i) {
         for (int j = 0; j < g->width; ++j) {
@@ -811,6 +830,12 @@ Matrix cvl_sobel_angle(Matrix *src) {
     cvl_ang(&a, &gx, &gy);
 
     return a;
+}
+
+Matrix cvl_laplacian_new(const Matrix *src) {
+    Matrix dst = cvl_mat_create(src->height, src->width);
+    cvl_laplacian(src, &dst);
+    return dst;
 }
 
 Matrix cvl_canny_new(Matrix *src, double sigma, int lo, int hi) {

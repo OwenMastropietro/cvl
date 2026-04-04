@@ -43,6 +43,9 @@ target_link_libraries(cvl_ccl cvl)
 add_executable(cvl_blur examples/blur.c)
 target_link_libraries(cvl_blur cvl)
 
+add_executable(cvl_laplacian examples/laplacian.c)
+target_link_libraries(cvl_laplacian cvl)
+
 # Optionally Build Tests.
 option(BUILD_TESTS "Build tests" OFF)
 

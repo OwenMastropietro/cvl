@@ -39,13 +39,14 @@ ctest --test-dir build
 
 > See the [docs](https://owenmastropietro.github.io/projects/cvl/) for more examples and documentation.
 
-| Executable  | Source File                              | Description                  |
-| ----------- | ---------------------------------------- | ---------------------------- |
-| `cvl_hough` | [`examples/hough.c`](./examples/hough.c) | Hough Line Detection         |
-| `cvl_canny` | [`examples/canny.c`](./examples/canny.c) | Canny Edge Detection         |
-| `cvl_sobel` | [`examples/sobel.c`](./examples/sobel.c) | Sobel Filtering              |
-| `cvl_ccl`   | [`examples/ccl.c`](./examples/ccl.c)     | Connected Component Labeling |
-| `cvl_cs136` | [`examples/cs136.c`](./examples/cs136.c) | Assignments from CS136       |
+| Executable      | Source File                                      | Description                  |
+| --------------- | ------------------------------------------------ | ---------------------------- |
+| `cvl_hough`     | [`examples/hough.c`](./examples/hough.c)         | Hough Line Detection         |
+| `cvl_sobel`     | [`examples/sobel.c`](./examples/sobel.c)         | Sobel Filtering              |
+| `cvl_canny`     | [`examples/canny.c`](./examples/canny.c)         | Canny Edge Detection         |
+| `cvl_laplacian` | [`examples/laplacian.c`](./examples/laplacian.c) | laplacian Edge Detection     |
+| `cvl_ccl`       | [`examples/ccl.c`](./examples/ccl.c)             | Connected Component Labeling |
+| `cvl_cs136`     | [`examples/cs136.c`](./examples/cs136.c)         | Assignments from CS136       |
 
 ## Demonstration
 

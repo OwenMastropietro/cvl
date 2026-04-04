@@ -41,6 +41,8 @@ void cvl_blur_median(Matrix *src, Matrix *dst, int ksize);
 
 void cvl_sobel(Matrix *src, Matrix *gx, Matrix *gy);
 
+void cvl_laplacian(const Matrix *src, Matrix *dst);
+
 void cvl_canny(Matrix *src, Matrix *dst, double sigma, int lo, int hi);
 
 // Convenience "_new" wrappers
@@ -64,6 +66,8 @@ Matrix cvl_blur_median_new(Matrix *src, int ksize);
 Matrix cvl_sobel_mag(Matrix *src);
 
 Matrix cvl_sobel_angle(Matrix *src);
+
+Matrix cvl_laplacian_new(const Matrix *src);
 
 Matrix cvl_canny_new(Matrix *src, double sigma, int lo, int hi);
 
