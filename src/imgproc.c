@@ -834,6 +834,93 @@ cvl_Mat cvl_convolve_new(const cvl_Mat *src, cvl_Mat *kernel) {
     return dst;
 }
 
+// Applies 1D horizontal convolution.
+static void _convolve_x(const cvl_Mat *src, cvl_Mat *dst, const cvl_Mat *kernel) {
+    assert(src->depth == CVL_FLOAT64 && dst->depth == CVL_FLOAT64);
+
+    const int h = src->height;
+    const int w = src->width;
+    const int chs = src->channels;
+
+    const int radius = kernel->width / 2;
+    double *kdata = kernel->data;
+
+    for (int y = 0; y < h; ++y) {
+        double *srow = cvl_row_f64(src, y);
+        double *drow = cvl_row_f64(dst, y);
+
+        for (int x = 0; x < w; ++x) {
+            for (int ch = 0; ch < chs; ++ch) {
+                double sum = 0.0;
+
+                for (int k = -radius; k <= radius; ++k) {
+                    int xx = x + k;
+                    xx = _clamp(xx, 0, w - 1); // BOARDER_REPLICATE
+                    // if (xx < 0|| xx >= w) continue; // BOARDER_CONSTANT
+                    sum += kdata[k + radius] * srow[xx * chs + ch];
+                }
+
+                drow[x * chs + ch] = sum;
+            }
+        }
+    }
+}
+
+// Applies 1D vertical convolution.
+static void _convolve_y(const cvl_Mat *src, cvl_Mat *dst, const cvl_Mat *kernel) {
+    assert(src->depth == CVL_FLOAT64 && dst->depth == CVL_FLOAT64);
+
+    const int w = src->width;
+    const int h = src->height;
+    const int chs = src->channels;
+
+    const int radius = kernel->width / 2;
+    double *kdata = kernel->data;
+
+    for (int y = 0; y < h; ++y) {
+        double *drow = cvl_row_f64(dst, y);
+
+        for (int x = 0; x < w; ++x) {
+            for (int ch = 0; ch < chs; ++ch) {
+                double sum = 0.0;
+
+                for (int k = -radius; k < radius; ++k) {
+                    int yy = y + k;
+                    yy = _clamp(yy, 0, h - 1); // BOARDER_REPLICATE
+                    // if (yy < 0 || yy >= h) continue; // BOARDER_CONSTANT
+
+                    double *srow = cvl_row_f64(src, yy);
+                    sum += kdata[k + radius] * srow[x * chs + ch];
+                }
+
+                drow[x * chs + ch] = sum;
+            }
+        }
+    }
+}
+
+/**
+ * Applies a separable linear filter to an image.
+ * 
+ * First, every row of src is convolved with the horizontal kernel,
+ * then every column of the result is convolved with the vertical kernel.
+ * 
+ * @param src Input matrix.
+ * @param dst Output matrix.
+ * @param kx Horizontal kernel.
+ * @param ky Vertical kernel.
+ */
+void cvl_convolve_sep(const cvl_Mat *src, cvl_Mat *dst, cvl_Mat *kx, cvl_Mat *ky) {
+    // todo: impl. _is_separable(kernel)
+
+    cvl_Mat tmp = cvl_mat_create(src->height, src->width, src->channels, CVL_FLOAT64);
+
+    _convolve_x(src, &tmp, kx);
+    _convolve_y(&tmp, dst, ky);
+
+    cvl_mat_free(&tmp);
+}
+
 // ==========================
 // Blurring / Smoothing
 // ==========================
@@ -867,6 +954,85 @@ void cvl_blur_mean(const cvl_Mat *src, cvl_Mat *dst, int ksize) {
 cvl_Mat cvl_blur_mean_new(const cvl_Mat *src, int ksize) {
     cvl_Mat dst = cvl_mat_create(src->height, src->width, src->channels, src->depth);
     cvl_blur_mean(src, &dst, ksize);
+    return dst;
+}
+
+// Returns a normalized 1D Gaussian kernel.
+static cvl_Mat _gauss_kernel(int ksize, double sigma) {
+    if (ksize < 1 || ksize % 2 == 0) {
+        ksize = 5;
+    }
+
+    if (sigma <= 0.0) { // compute from ksize
+        sigma = 0.3 * ((ksize - 1) * 0.5 - 1) + 0.8; // from opencv
+    }
+
+    cvl_Mat kernel = cvl_mat_create(1, ksize, 1, CVL_FLOAT64);
+    double *k = kernel.data;
+
+    const int radius = ksize / 2;
+    double sum = 0.0;
+
+    for (int x = -radius; x < radius; ++x) {
+        double gx = exp(-(x * x) / (2.0 * sigma * sigma));
+        k[x + radius] = gx;
+        sum += gx;
+    }
+
+    for (int x = 0; x < ksize; ++x) {
+        k[x] /= sum;
+    }
+
+    return kernel;
+}
+
+/**
+ * Applies Gaussian blur using a kernel defined by ksize and/or sigma.
+ * 
+ * @param src Input matrix.
+ * @param dst Output matrix (blurred).
+ * @param ksize Kernel size (if 0, derived from sigma).
+ * @param sigma Standard deviation of the Gaussian kernel (if 0, derived from ksize).
+ */
+void cvl_blur_gauss(const cvl_Mat *src, cvl_Mat *dst, int ksize, double sigma) {
+    assert(ksize > 0.0 || sigma > 0.0);
+
+    if (ksize > 0.0 && sigma <= 0.0) { // compute sigma from ksize
+        sigma = 0.3 * ((ksize - 1) * 0.5 - 1) + 0.8; // from opencv
+    }
+    if (sigma > 0.0 && ksize <= 0.0) { // compute ksize from sigma
+        ksize = 2 * ceil(3.0 * sigma) + 1;
+    }
+
+
+    // Convert to f64.
+    cvl_Mat src_f64 = cvl_mat_create(src->height, src->width, src->channels, CVL_FLOAT64);
+    cvl_Mat dst_f64 = cvl_mat_create(src->height, src->width, src->channels, CVL_FLOAT64);
+
+    cvl_cvt_depth(src, &src_f64, CVL_FLOAT64, 1.0, 0.0);
+
+    cvl_Mat kernel = _gauss_kernel(ksize, sigma);
+    cvl_convolve_sep(&src_f64, &dst_f64, &kernel, &kernel);
+
+    cvl_cvt_depth(&dst_f64, dst, dst->depth, 1.0, 0.0);
+
+    cvl_mat_free(&kernel);
+    cvl_mat_free(&dst_f64);
+    cvl_mat_free(&src_f64);
+}
+
+/**
+ * Applies Gaussian blur using a kernel defined by ksize and/or sigma.
+ * 
+ * @param src Input matrix.
+ * @param ksize Kernel size (if 0, derived from sigma).
+ * @param sigma Standard deviation of the Gaussian kernel (if 0, derived from ksize).
+ * 
+ * @returns Blurred matrix.
+ */
+cvl_Mat cvl_blur_gauss_new(const cvl_Mat *src, int ksize, double sigma) {
+    cvl_Mat dst = cvl_mat_create(src->height, src->width, src->channels, src->depth);
+    cvl_blur_gauss(src, &dst, ksize, sigma);
     return dst;
 }
 

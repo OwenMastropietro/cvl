@@ -33,11 +33,13 @@ void cvl_correlate(const cvl_Mat *src, cvl_Mat *dst, cvl_Mat *kernel);
 
 void cvl_convolve(const cvl_Mat *src, cvl_Mat *dst, cvl_Mat *kernel);
 
+void cvl_convolve_sep(const cvl_Mat *src, cvl_Mat *dst, cvl_Mat *kx, cvl_Mat *ky);
+
 void cvl_blur_box(const cvl_Mat *src, cvl_Mat *dst, int ksize, bool normalize);
 
 void cvl_blur_mean(const cvl_Mat *src, cvl_Mat *dst, int ksize);
 
-// void cvl_blur_gauss(cvl_Mat *src, cvl_Mat *dst, double sigma);
+void cvl_blur_gauss(const cvl_Mat *src, cvl_Mat *dst, int ksize, double sigma);
 
 void cvl_blur_median(const cvl_Mat *src, cvl_Mat *dst, int ksize);
 
@@ -65,7 +67,7 @@ cvl_Mat cvl_blur_box_new(const cvl_Mat *src, int ksize, bool normalize);
 
 cvl_Mat cvl_blur_mean_new(const cvl_Mat *src, int ksize);
 
-// cvl_Mat cvl_blur_gauss_new(const cvl_Mat *src, double sigma);
+cvl_Mat cvl_blur_gauss_new(const cvl_Mat *src, int ksize, double sigma);
 
 cvl_Mat cvl_blur_median_new(const cvl_Mat *src, int ksize);
 
