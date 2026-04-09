@@ -44,10 +44,10 @@ typedef enum cvl_format_t {
 
 // pixel depth
 typedef enum cvl_depth_t {
-    CVL_INT32,
-    CVL_UINT8,
-    CVL_FLOAT32,
-    CVL_FLOAT64,
+    CVL_UINT8,   // 8-bit unsigned integer (todo: rename: CVL_8U)
+    CVL_32S,     // 32-bit signed integer
+    CVL_FLOAT32, // 32-bit floating point
+    CVL_FLOAT64, // 64-bit floating point
 } cvl_depth_t;
 
 // color conversion codes
@@ -91,6 +91,8 @@ uint8_t *cvl_mat_row(cvl_Mat *mat, int r);
 uint8_t *cvl_row_u8(cvl_Mat *mat, int r);
 
 double *cvl_row_f64(cvl_Mat *mat, int r);
+
+int32_t *cvl_row_i32(cvl_Mat *mat, int r);
 
 #ifdef __cplusplus
 }

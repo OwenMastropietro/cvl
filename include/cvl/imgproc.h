@@ -25,9 +25,9 @@ void cvl_expand(cvl_Mat *img);
 
 void cvl_shrink(cvl_Mat *img);
 
-int cvl_connected_components(cvl_Mat *img, cvl_Mat *labels, int connectivity);
+int cvl_connected_components(const cvl_Mat *src, cvl_Mat *labels, int connectivity);
 
-int cvl_color_components(cvl_Mat *img, cvl_Mat *labels, int thresh);
+int cvl_color_components(cvl_Mat *dst, const cvl_Mat *labels, int thresh);
 
 void cvl_correlate(const cvl_Mat *src, cvl_Mat *dst, cvl_Mat *kernel);
 

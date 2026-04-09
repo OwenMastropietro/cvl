@@ -31,41 +31,47 @@ void p1_i(void) {
     cvl_mat_free(&img);
 }
 
-// Connected Component Labeling.
+// CCL - Count Components.
 void p1_ii(void) {
+    // Load Input Image.
     cvl_Mat img = cvl_imread("./data/original/text.pgm");
-    cvl_Mat labels = cvl_mat_create(img.height, img.width, 1, CVL_INT32);
 
-    cvl_imwrite("./data/modified/text_bw.pgm", &img);
-    cvl_threshold(&img, 128, 255, CVL_THRESH_BINARY);
-    cvl_imwrite("./data/modified/text_bw.pbm", &img);
+    // Initialize Labels Container.
+    cvl_Mat labels = cvl_mat_create(img.height, img.width, 1, CVL_32S);
 
-    int num_components = cvl_connected_components(&img, &labels, 4);
+    // Label Components.
+    int num_components = 0;
+    num_components = cvl_connected_components(&img, &labels, 4);
+
     printf("\nNumber of Components: %d\n", num_components);
 
     cvl_mat_free(&labels);
     cvl_mat_free(&img);
 }
 
-// Count & Color Components (according to a threshold).
+// CCL - Count & Color Components (according to a threshold).
 void p1_iii(void) {
+    // Load Input Image.
     cvl_Mat img = cvl_imread("./data/original/text.pgm");
-    cvl_Mat labels = cvl_mat_create(img.height, img.width, 1, CVL_INT32);
-    cvl_Mat colored = {0};
 
-    cvl_threshold(&img, 128, 255, CVL_THRESH_BINARY);
-    cvl_imwrite("./data/modified/text_bw.pbm", &img);
+    // Initialize Labels Container.
+    cvl_Mat labels = cvl_mat_create(img.height, img.width, 1, CVL_32S);
 
+    // Label Components.
     int num_components = cvl_connected_components(&img, &labels, 4);
     printf("\nNumber of Components: %d\n", num_components);
 
-    cvl_cvt_color(&img, &colored, CVL_COLOR_GRAY2RGB);
-    num_components = cvl_color_components(&colored, &labels, 20);
+    // Color Labeled Components.
+    cvl_Mat components = cvl_cvt_color_new(&img, CVL_COLOR_GRAY2RGB);
+    num_components = cvl_color_components(&components, &labels, 100);
     printf("\nNumber of Components: %d\n", num_components);
 
-    cvl_imwrite("./data/modified/text_colored.ppm", &colored);
+    // Save Results.
+    cvl_imwrite("./data/modified/1-original.pgm", &img);
+    cvl_imwrite("./data/modified/2-components.ppm", &components);
 
-    cvl_mat_free(&colored);
+    // Cleanup.
+    cvl_mat_free(&components);
     cvl_mat_free(&labels);
     cvl_mat_free(&img);
 }

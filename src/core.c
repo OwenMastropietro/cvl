@@ -12,8 +12,8 @@
 
 size_t cvl_elem_size(cvl_depth_t depth) {
     switch (depth) {
-        case CVL_INT32:   return sizeof(int);
         case CVL_UINT8:   return sizeof(uint8_t);
+        case CVL_32S:     return sizeof(int32_t);
         case CVL_FLOAT32: return sizeof(float);
         case CVL_FLOAT64: return sizeof(double);
     }
@@ -111,4 +111,9 @@ uint8_t *cvl_row_u8(cvl_Mat *mat, int r) {
 double *cvl_row_f64(cvl_Mat *mat, int r) {
     assert(mat->depth == CVL_FLOAT64);
     return (double *)cvl_mat_row(mat, r);
+}
+
+int32_t *cvl_row_i32(cvl_Mat *mat, int r) {
+    assert(mat->depth == CVL_32S);
+    return (int32_t *)cvl_mat_row(mat, r);
 }

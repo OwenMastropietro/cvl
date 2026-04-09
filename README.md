@@ -39,11 +39,12 @@ ctest --test-dir build
 
 > See the [docs](https://owenmastropietro.github.io/projects/cvl/) for more examples and documentation.
 
-| Executable      | Source File                                      | Description            |
-| --------------- | ------------------------------------------------ | ---------------------- |
-| `cvl_color`     | [`examples/color.c`](./examples/color.c)         | Color Conversion       |
-| `cvl_threshold` | [`examples/threshold.c`](./examples/threshold.c) | Thresholding           |
-| `cvl_blur`      | [`examples/blur.c`](./examples/blur.c)           | Blurring / Smoothing   |
-| `cvl_cs136`     | [`examples/cs136.c`](./examples/cs136.c)         | Assignments from CS136 |
+| Executable      | Source File                                      | Description                  |
+| --------------- | ------------------------------------------------ | ---------------------------- |
+| `cvl_color`     | [`examples/color.c`](./examples/color.c)         | Color Conversion             |
+| `cvl_threshold` | [`examples/threshold.c`](./examples/threshold.c) | Thresholding                 |
+| `cvl_blur`      | [`examples/blur.c`](./examples/blur.c)           | Blurring / Smoothing         |
+| `cvl_ccl`       | [`examples/ccl.c`](./examples/ccl.c)             | Connected Component Labeling |
+| `cvl_cs136`     | [`examples/cs136.c`](./examples/cs136.c)         | Assignments from CS136       |
 
 ---

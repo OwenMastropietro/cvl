@@ -11,11 +11,11 @@
 // ==========================
 
 typedef struct {
-    int parent;
+    int32_t parent;
 } UFNode;
 
 // Find root via path compression.
-static int uf_find(UFNode *uf, int x) {
+static int32_t uf_find(UFNode *uf, int x) {
     if (uf[x].parent != x) {
         uf[x].parent = uf_find(uf, uf[x].parent);
     }
@@ -24,9 +24,9 @@ static int uf_find(UFNode *uf, int x) {
 }
 
 // Union two (equivalent) sets by roots.
-static void uf_union(UFNode *uf, int a, int b) {
-    int ra = uf_find(uf, a);
-    int rb = uf_find(uf, b);
+static void uf_union(UFNode *uf, int32_t a, int32_t b) {
+    int32_t ra = uf_find(uf, a);
+    int32_t rb = uf_find(uf, b);
     if (ra != rb) {
         uf[rb].parent = ra;
     }
@@ -576,40 +576,36 @@ void cvl_shrink(cvl_Mat *img) { _morph(img, WHITE); }
 // ==========================
 
 // Performs Connected Component Labeling. Returns number of components found.
-int cvl_connected_components(cvl_Mat *img, cvl_Mat *labels, int connectivity) {
-    assert(img && img->data);
+int cvl_connected_components(const cvl_Mat *src, cvl_Mat *labels, int connectivity) {
+    assert(src && src->data);
     assert(labels && labels->data);
-    assert(img->height == labels->height && img->width == labels->width);
-    assert(img->channels == 1 && labels->channels == 1);
-    assert(img->depth == CVL_UINT8 && labels->depth == CVL_INT32);
+    assert(src->height == labels->height && src->width == labels->width);
+    assert(src->channels == 1 && labels->channels == 1);
+    assert(src->depth == CVL_UINT8 && labels->depth == CVL_32S);
     assert(connectivity == 4 || connectivity == 8);
 
-    const int h = img->height;
-    const int w = img->width;
+    const int h = src->height;
+    const int w = src->width;
 
-    uint8_t *idata = img->data;
-    int *ldata = (int *)labels->data;
+    size_t max_label = (size_t)h * w + 1;
+    assert(max_label < INT32_MAX);
 
-    size_t istride = img->stride;
-    size_t lstride = labels->stride;
-
-    UFNode *uf = malloc((h * w + 1) * sizeof(UFNode));
+    UFNode *uf = malloc(max_label * sizeof(UFNode));
     assert(uf);
 
     int dh[] = {-1, 0, -1, -1}; // |- 0 -| or |0 0 0|
-    int dw[] = {0, -1, -1, 1};  // |0 - -|    |0 - -|
+    int dw[] = { 0, -1, -1, 1}; // |0 - -|    |0 - -|
     const int n_neighbors = (connectivity == 4) ? 2 : 4;
 
-    int next_label = 1;
+    int32_t next_label = 1;
 
     // Pass I - Assign Labels and Equivalences.
     for (int i = 0; i < h; ++i) {
-        uint8_t *irow = idata + i * istride;
-        int *lrow = (int *)((uint8_t *)ldata + i * lstride);
+        uint8_t *srow = cvl_row_u8(src, i);
+        int32_t *lrow = cvl_row_i32(labels, i);
 
         for (int j = 0; j < w; ++j) {
-            if (irow[j] == WHITE)
-                continue;
+            if (srow[j] == WHITE) continue;
 
             int count = 0;
             int neighbor_labels[4];
@@ -618,10 +614,9 @@ int cvl_connected_components(cvl_Mat *img, cvl_Mat *labels, int connectivity) {
                 int nj = j + dw[k];
 
                 bool in_bounds = (0 <= ni && ni < h) && (0 <= nj && nj < w);
-                if (!in_bounds)
-                    continue;
+                if (!in_bounds) continue;
 
-                int *nrow = (int *)((uint8_t *)ldata + ni * lstride);
+                int32_t *nrow = cvl_row_i32(labels, ni);
                 if (nrow[nj] > 0) {
                     neighbor_labels[count++] = nrow[nj];
                 }
@@ -632,7 +627,7 @@ int cvl_connected_components(cvl_Mat *img, cvl_Mat *labels, int connectivity) {
                 uf[next_label].parent = next_label;
                 next_label++;
             } else { // assign exsisting label and mark equivalence
-                int min_label = neighbor_labels[0];
+                int32_t min_label = neighbor_labels[0];
                 for (int k = 0; k < count; ++k) {
                     if (neighbor_labels[k] < min_label) {
                         min_label = neighbor_labels[k];
@@ -649,12 +644,11 @@ int cvl_connected_components(cvl_Mat *img, cvl_Mat *labels, int connectivity) {
 
     // Pass II - Reconcile Equivalences.
     for (int i = 0; i < h; ++i) {
-        int *lrow = (int *)((uint8_t *)ldata + i * lstride);
+        int32_t *lrow = cvl_row_i32(labels, i);
 
         for (int j = 0; j < w; ++j) {
-            int label = lrow[j];
-            if (label > 0) {
-                lrow[j] = uf_find(uf, label);
+            if (lrow[j] > 0) {
+                lrow[j] = uf_find(uf, lrow[j]);
             }
         }
     }
@@ -664,12 +658,11 @@ int cvl_connected_components(cvl_Mat *img, cvl_Mat *labels, int connectivity) {
     assert(seen);
     int num_components = 0;
     for (int i = 0; i < h; ++i) {
-        int *lrow = (int *)((uint8_t *)ldata + i * lstride);
+        int32_t *lrow = cvl_row_i32(labels, i);
 
         for (int j = 0; j < w; ++j) {
-            int label = lrow[j];
-            if (label > 0 && !seen[label]) {
-                seen[label] = true;
+            if (lrow[j] > 0 && !seen[lrow[j]]) {
+                seen[lrow[j]] = true;
                 num_components++;
             }
         }
@@ -682,44 +675,39 @@ int cvl_connected_components(cvl_Mat *img, cvl_Mat *labels, int connectivity) {
 }
 
 // Colors components larger than thresh. Returns the number of such components.
-int cvl_color_components(cvl_Mat *img, cvl_Mat *labels, int thresh) {
+int cvl_color_components(cvl_Mat *img, const cvl_Mat *labels, int thresh) {
     assert(img && img->data);
     assert(labels && labels->data);
     assert(img->height == labels->height && img->width == labels->width);
     assert(img->channels == 3);
     assert(labels->channels == 1);
-    assert(img->depth == CVL_UINT8 && labels->depth == CVL_INT32);
+    assert(img->depth == CVL_UINT8 && labels->depth == CVL_32S);
+    assert(thresh >= 0);
 
     const int h = img->height;
     const int w = img->width;
     const int ch = img->channels;
 
-    uint8_t *idata = img->data;
-    int *ldata = labels->data;
+    size_t max_label = (size_t)h * w + 1;
+    assert(max_label < INT32_MAX);
 
-    size_t lstride = labels->stride;
-    size_t istride = img->stride;
-
-    int max_label = h * w + 1;
-
-    int count = 0;
-    int *sizes = calloc(max_label, sizeof(int));
+    size_t *sizes = calloc(max_label, sizeof(size_t));
     assert(sizes);
 
     // Pass I - Calculate Component Sizes.
     for (int i = 0; i < h; ++i) {
-        int *row = ldata + i * lstride;
+        int32_t *row = cvl_row_i32(labels, i);
         for (int j = 0; j < w; ++j) {
-            int label = row[j];
-            if (label > 0) {
-                sizes[label]++;
+            if (row[j] > 0) {
+                sizes[row[j]]++;
             }
         }
     }
 
     // Count Components.
-    for (int i = 0; i < max_label; ++i) {
-        if (sizes[i] >= thresh) {
+    int count = 0;
+    for (size_t i = 0; i < max_label; ++i) {
+        if (sizes[i] >= (size_t)thresh) {
             count++;
         }
     }
@@ -729,11 +717,11 @@ int cvl_color_components(cvl_Mat *img, cvl_Mat *labels, int thresh) {
     const int max = 256 - min;
 
     for (int i = 0; i < h; ++i) {
-        uint8_t *row = idata + i * istride;
-        int *lrow = (int *)((uint8_t *)ldata + i * lstride);
+        uint8_t *row = cvl_row_u8(img, i);
+        int32_t *lrow = cvl_row_i32(labels, i);
         for (int j = 0; j < w; ++j) {
             int label = lrow[j];
-            if (label > 0 && sizes[label] >= thresh) {
+            if (label > 0 && sizes[label] >= (size_t)thresh) {
                 row[j * ch + 0] = min + (label * 37) % max;  // r
                 row[j * ch + 1] = min + (label * 73) % max;  // g
                 row[j * ch + 2] = min + (label * 109) % max; // b
