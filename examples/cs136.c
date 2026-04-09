@@ -1,14 +1,14 @@
-// Example Program: Using CVL.
+// Example: Assignment checkpoints/deliverables for CS136.
 
-#include "cvl_imgproc.h"
-#include "cvl_io.h"
+#include <cvl/cvl.h>
+
 #include <assert.h>
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 
 // Add and Remove Salt and Pepper Noise (via shrink-expand pipeline).
-void part_i(void) {
+void p1_i(void) {
     cvl_Mat img = cvl_imread("./data/original/text.pgm");
     assert(img.channels == 1);
 
@@ -32,7 +32,7 @@ void part_i(void) {
 }
 
 // Connected Component Labeling.
-void part_ii(void) {
+void p1_ii(void) {
     cvl_Mat img = cvl_imread("./data/original/text.pgm");
     cvl_Mat labels = cvl_mat_create(img.height, img.width, 1, CVL_INT32);
 
@@ -48,7 +48,7 @@ void part_ii(void) {
 }
 
 // Count & Color Components (according to a threshold).
-void part_iii(void) {
+void p1_iii(void) {
     cvl_Mat img = cvl_imread("./data/original/text.pgm");
     cvl_Mat labels = cvl_mat_create(img.height, img.width, 1, CVL_INT32);
     cvl_Mat colored = {0};
@@ -59,7 +59,7 @@ void part_iii(void) {
     int num_components = cvl_connected_components(&img, &labels, 4);
     printf("\nNumber of Components: %d\n", num_components);
 
-    cvl_cvtcolor(&img, &colored, CVL_COLOR_GRAY2RGB);
+    cvl_cvt_color(&img, &colored, CVL_COLOR_GRAY2RGB);
     num_components = cvl_color_components(&colored, &labels, 20);
     printf("\nNumber of Components: %d\n", num_components);
 
@@ -72,45 +72,31 @@ void part_iii(void) {
 
 // Perform Mean & Median Blurring (via Convolution).
 void p2(void) {
+    // Load input image.
     cvl_Mat img = cvl_imread("./data/original/sample.ppm");
 
-    cvl_Mat grey = {0};
-    cvl_cvtcolor(&img, &grey, CVL_COLOR_RGB2GRAY);
-    cvl_imwrite("./data/modified/sample.pgm", &grey);
-    cvl_Mat grey_f64 = cvl_mat_create(grey.height, grey.width, 1, CVL_FLOAT64);
-    cvl_convert_to_f64(&grey, &grey_f64);
+    // Apply Mean Blur.
+    cvl_Mat mean_blur = cvl_blur_mean_new(&img, 3);
 
-    // Mean Windowing.
-    cvl_Mat mean = cvl_mat_create(grey.height, grey.width, 1, CVL_FLOAT64);
-    cvl_blur(&grey_f64, &mean, 3);
+    // Apply Median Blur.
+    cvl_Mat median_blur = cvl_blur_median_new(&img, 3);
 
-    cvl_Mat mean_u8 = cvl_mat_create(grey.height, grey.width, 1, CVL_UINT8);
-    cvl_convert_to_u8(&mean, &mean_u8);
-    cvl_imwrite("./data/modified/mean.pgm", &mean_u8);
-    
-    // Median Windowing.
-    cvl_Mat median = cvl_mat_create(grey.height, grey.width, 1, CVL_FLOAT64);
-    cvl_median_blur(&grey_f64, &median, 3);
-    
-    cvl_Mat median_u8 = cvl_mat_create(grey.height, grey.width, 1, CVL_UINT8);
-    cvl_convert_to_u8(&median, &median_u8);
-    cvl_imwrite("./data/modified/median.pgm", &median_u8);
+    // Save Results.
+    cvl_imwrite("./data/modified/1-original.ppm", &img);
+    cvl_imwrite("./data/modified/2-mean.ppm", &mean_blur);
+    cvl_imwrite("./data/modified/3-median.ppm", &median_blur);
 
-    
-    cvl_mat_free(&median_u8);
-    cvl_mat_free(&median);
-    cvl_mat_free(&mean_u8);
-    cvl_mat_free(&mean);
-    cvl_mat_free(&grey_f64);
-    cvl_mat_free(&grey);
+    // Cleanup.
+    cvl_mat_free(&median_blur);
+    cvl_mat_free(&mean_blur);
     cvl_mat_free(&img);
 }
 
 int main(void) {
 
-    // part_i();
-    // part_ii();
-    // part_iii();
+    // p1_i();
+    // p1_ii();
+    // p1_iii();
 
     p2();
 

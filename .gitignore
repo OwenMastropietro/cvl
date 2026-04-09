@@ -1,7 +1,10 @@
 .DS_Store
 
-*.pch
-*.out
+build/
+scripts/
 
 data/modified/*
 !data/modified/.gitinclude
+
+tests/data/*
+!tests/data/.gitinclude

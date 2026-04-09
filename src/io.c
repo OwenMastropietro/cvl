@@ -1,6 +1,7 @@
 #define _CRT_SECURE_NO_WARNINGS
 
-#include "cvl_io.h"
+#include <cvl/io.h>
+
 #include <assert.h>
 #include <ctype.h>
 #include <float.h>
@@ -9,12 +10,21 @@
 #include <stdlib.h>
 #include <string.h>
 
-static int detect_format(FILE *f) {
+static cvl_format_t detect_format(FILE *f) {
+    assert(f);
+
     unsigned char buf[8];
 
-    fread(buf, 1, 8, f);
+    if (fread(buf, 1, 8, f) < 2) return CVL_FMT_UNKNOWN;
+
     rewind(f);
 
+    // ascii PNM (not implemented)
+    // if (buf[0] == 'P' && buf[1] == '1') return CVL_FMT_PBM;
+    // if (buf[0] == 'P' && buf[1] == '2') return CVL_FMT_PGM;
+    // if (buf[0] == 'P' && buf[1] == '3') return CVL_FMT_PPM;  
+
+    // binary PNM
     if (buf[0] == 'P' && buf[1] == '4') return CVL_FMT_PBM;
     if (buf[0] == 'P' && buf[1] == '5') return CVL_FMT_PGM;
     if (buf[0] == 'P' && buf[1] == '6') return CVL_FMT_PPM;
@@ -27,11 +37,14 @@ static int detect_format(FILE *f) {
 static cvl_Mat read_pnm(FILE *f) {
     assert(f);
 
+    cvl_Mat img = {0};
+
     int format = detect_format(f);
-    int height, width, maxval = 255;
-    assert((format == CVL_FMT_PBM)
-        || (format == CVL_FMT_PGM)
-        || (format == CVL_FMT_PPM));
+    if (format == CVL_FMT_UNKNOWN) return img;
+
+    int height = 0;
+    int width = 0;
+    int maxval = 255;
 
     char magic[3]; // consume format specifier
     assert(fscanf(f, "%2s", magic) == 1);
@@ -48,7 +61,7 @@ static cvl_Mat read_pnm(FILE *f) {
     
     int channels = (format == CVL_FMT_PPM) ? 3 : 1;
 
-    cvl_Mat img = cvl_mat_create(height, width, channels, CVL_UINT8);
+    img = cvl_mat_create(height, width, channels, CVL_UINT8);
 
     size_t pixels = (size_t)width * height;
 
@@ -152,16 +165,15 @@ cvl_Mat cvl_imread(const char *filename) {
     FILE *f = fopen(filename, "rb");
     assert(f);
 
-    int format = detect_format(f);
+    cvl_Mat img = {0};
+    
+    int fmt = detect_format(f);
 
-    cvl_Mat img;
-
-    switch (format) {
+    switch (fmt) {
+        case CVL_FMT_UNKNOWN: break;
         case CVL_FMT_PBM:
         case CVL_FMT_PGM:
-        case CVL_FMT_PPM:
-            img = read_pnm(f);
-            break;
+        case CVL_FMT_PPM: img = read_pnm(f); break;
         // case CVL_FMT_PNG:
         //     img = cvl_read_png(f);
         //     break;

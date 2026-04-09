@@ -6,8 +6,16 @@
 
 #pragma once
 
-#include "cvl_core.h"
+#include <cvl/core.h>
+
+#ifdef __cplusplus
+extern "C" {
+#endif
 
 cvl_Mat cvl_imread(const char *filename);
 
 int cvl_imwrite(const char *filename, cvl_Mat *img);
+
+#ifdef __cplusplus
+}
+#endif

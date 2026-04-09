@@ -35,20 +35,20 @@ typedef struct {
 } cvl_Mat;
 
 // image formats
-typedef enum cvl_format {
+typedef enum cvl_format_t {
     CVL_FMT_UNKNOWN,
     CVL_FMT_PBM,
     CVL_FMT_PGM,
     CVL_FMT_PPM,
-} cvl_format;
+} cvl_format_t;
 
 // pixel depth
-typedef enum cvl_depth {
+typedef enum cvl_depth_t {
     CVL_INT32,
     CVL_UINT8,
     CVL_FLOAT32,
     CVL_FLOAT64,
-} cvl_depth;
+} cvl_depth_t;
 
 // color conversion codes
 typedef enum cvl_color_conversion {
@@ -68,14 +68,30 @@ typedef enum cvl_thresh_type {
     CVL_THRESH_TOZERO_INV,
 } cvl_thresh_type;
 
-cvl_Mat cvl_mat_create(int height, int width, int channels, int depth);
+#ifdef __cplusplus
+extern "C" {
+#endif
+
+size_t cvl_elem_size(cvl_depth_t depth);
+
+cvl_Mat cvl_mat_create(int height, int width, int channels, cvl_depth_t depth);
+
+cvl_Mat cvl_mat_create_fill(int height, int width, int channels, cvl_depth_t depth, const void *fill_value);
+
+cvl_Mat cvl_mat_create_from(int height, int width, int channels, cvl_depth_t depth, const void *data);
+
+cvl_Mat cvl_mat_copy(const cvl_Mat *src);
 
 void cvl_mat_free(cvl_Mat *mat);
 
-size_t cvl_elem_size(int depth);
-
 // Accessors
+
+uint8_t *cvl_mat_row(cvl_Mat *mat, int r);
+
+uint8_t *cvl_row_u8(cvl_Mat *mat, int r);
 
 double *cvl_row_f64(cvl_Mat *mat, int r);
 
-uint8_t *cvl_row_u8(cvl_Mat *mat, int r);
+#ifdef __cplusplus
+}
+#endif

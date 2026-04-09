@@ -1,14 +1,15 @@
-#include "cvl_imgproc.h"
+#include <cvl/imgproc.h>
+
 #include <assert.h>
 #include <math.h>
-#include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
 // ==========================
-// Internal Helpers
+// Helpers
 // ==========================
+
 typedef struct {
     int parent;
 } UFNode;
@@ -112,11 +113,13 @@ static inline int _clamp(int x, int lo, int hi) {
     return x;
 }
 
-static inline uint8_t saturate_u8(int v) {
+// Clamps and rounds int into uint8_t.
+static inline uint8_t cvl_sat_u8_i(int v) {
     return (v < 0) ? 0 : (v > 255) ? 255 : (uint8_t)v;
 }
 
-static inline uint8_t cvl_sat_u8(double v) {
+// Clamps and rounds double into uint8_t.
+static inline uint8_t cvl_sat_u8_f64(double v) {
     return (v < 0.0) ? 0 : (v > 255.0) ? 255 : (uint8_t)(v + 0.5);
 }
 
@@ -124,117 +127,189 @@ static inline uint8_t cvl_sat_u8(double v) {
 // Color & Depth Conversion
 // ==========================
 
-void cvl_cvtcolor(cvl_Mat *src, cvl_Mat *dst, int code) {
+void cvl_cvt_color(const cvl_Mat *src, cvl_Mat *dst, int code) {
     assert(src && src->data && dst);
+    assert(src->height == dst->height && src->width == dst->width);
 
     const int height = src->height;
     const int width = src->width;
-    const int schannels = src->channels;
+
     const uint8_t *sdata = src->data;
-
-    // Determine Destination Channels.
-    int dchannels = 0;
-    switch (code) {
-        case CVL_COLOR_RGB2GRAY:
-        case CVL_COLOR_BGR2GRAY:
-            assert(schannels == 3);
-            dchannels = 1;
-            break;
-        case CVL_COLOR_GRAY2RGB:
-        case CVL_COLOR_GRAY2BGR:
-            assert(schannels == 1);
-            dchannels = 3;
-            break;
-        default: assert(false);
-    }
-
-    *dst = cvl_mat_create(height, width, dchannels, CVL_UINT8);
     uint8_t *ddata = dst->data;
 
-    // ITU-R BT.601-7
+    // ITU-R BT.601-7 luminance
     const double lum_r = 0.299;
     const double lum_g = 0.587;
-    const double lum_b = 0.114;;
+    const double lum_b = 0.114;
 
     for (int i = 0; i < height; ++i) {
         const uint8_t *srow = sdata + i * src->stride;
-        uint8_t *drow = ddata  + i * dst->stride;
+        uint8_t *drow = ddata + i * dst->stride;
 
         switch (code) {
-            // case CVL_BGR2RGB:
-            // case CVL_RGB2BGR: {
-            //     for (int x = 0; x < width; x++) {
-            //         const uint8_t *p = srow + x * 3;
-            //         uint8_t *q = drow + x * 3;
-            //         q[0] = p[2];  // swap r & b
-            //         q[1] = p[1];  // g
-            //         q[2] = p[0];  // swap r & b
-            //     }
-            //     break;
-            // }
-            case CVL_COLOR_RGB2GRAY: {
-                for (int j = 0; j < width; ++j) {
-                    const uint8_t *p = srow + j * 3;
-                    int gray = (int)lum_r*p[0] + lum_g*p[1] + lum_b*p[2];
-                    drow[j] = saturate_u8(gray);
-                }
-                break;
+        // case CVL_BGR2RGB:
+        // case CVL_RGB2BGR: {
+        //     for (int x = 0; x < width; x++) {
+        //         const uint8_t *p = srow + x * 3;
+        //         uint8_t *q = drow + x * 3;
+        //         q[0] = p[2];  // swap r & b
+        //         q[1] = p[1];  // g
+        //         q[2] = p[0];  // swap r & b
+        //     }
+        //     break;
+        // }
+        case CVL_COLOR_RGB2GRAY: {
+            for (int j = 0; j < width; ++j) {
+                const uint8_t *p = srow + j * 3;
+                int gray = (int)lum_r * p[0] + lum_g * p[1] + lum_b * p[2];
+                drow[j] = cvl_sat_u8_i(gray);
             }
-            case CVL_COLOR_BGR2GRAY: {
-                for (int j = 0; j < width; ++j) {
-                    const uint8_t *p = srow + j * 3;
-                    int gray = (int)lum_b*p[0] + lum_g*p[1] + lum_r*p[2];
-                    drow[j] = saturate_u8(gray);
-                }
-                break;
+            break;
+        }
+        case CVL_COLOR_BGR2GRAY: {
+            for (int j = 0; j < width; ++j) {
+                const uint8_t *p = srow + j * 3;
+                int gray = (int)lum_b * p[0] + lum_g * p[1] + lum_r * p[2];
+                drow[j] = cvl_sat_u8_i(gray);
             }
-            case CVL_COLOR_GRAY2BGR:
-            case CVL_COLOR_GRAY2RGB: {
-                for (int j = 0; j < width; ++j) {
-                    uint8_t g = srow[j];
-                    uint8_t *p = drow + j * 3;
-                    p[0] = g;
-                    p[1] = g;
-                    p[2] = g;
-                }
-                break;
+            break;
+        }
+        case CVL_COLOR_GRAY2BGR:
+        case CVL_COLOR_GRAY2RGB: {
+            for (int j = 0; j < width; ++j) {
+                uint8_t g = srow[j];
+                uint8_t *p = drow + j * 3;
+                p[0] = g;
+                p[1] = g;
+                p[2] = g;
             }
-            default: assert(false);
+            break;
+        }
+        default:
+            assert(false);
         }
     }
 }
 
-void cvl_convert_to(cvl_Mat *src, cvl_Mat *dst, double alpha, double beta) {
-    // void cvl_cvtdepth(cvl_Mat *src, cvl_Mat *dst, int ddepth)
+cvl_Mat cvl_cvt_color_new(const cvl_Mat *src, int code) {
+    int dch = 0;
+    switch (code) {
+    case CVL_COLOR_RGB2GRAY:
+    case CVL_COLOR_BGR2GRAY:
+        assert(src->channels == 3);
+        dch = 1;
+        break;
+
+    case CVL_COLOR_GRAY2RGB:
+    case CVL_COLOR_GRAY2BGR:
+        assert(src->channels == 3);
+        dch = 3;
+        break;
+    }
+
+    cvl_Mat dst = cvl_mat_create(src->height, src->width, dch, CVL_UINT8);
+    assert(dst.data);
+
+    cvl_cvt_color(src, &dst, code);
+
+    return dst;
+}
+
+/**
+ * Converts a matrix to another type with scaling.
+ *
+ * Effectively: `dst(x, y) = saturate_cast<ddepth>(α * src(x, y) + β)`
+ *
+ * @param src Input matrix.
+ * @param dst Output matrix.
+ * @param ddepth Type to convert to.
+ * @param alpha Scale factor (1.0 for no change).
+ * @param beta Value added to scaled values (0 for no change).
+ */
+void cvl_cvt_depth(const cvl_Mat *src, cvl_Mat *dst, cvl_depth_t ddepth, double alpha, double beta) {
     assert(src->height == dst->height);
     assert(src->width == dst->width);
     assert(src->channels == dst->channels);
-    
-    for (int i = 0; i < src->height; ++i) {
-        uint8_t *srow_u8 =  cvl_row_u8(src, i);
-        double *srow_f64 = cvl_row_f64(src, i);
-        
-        uint8_t *drow_u8 = cvl_row_u8(dst, i);
-        double *drow_f64 = cvl_row_f64(dst, i);
-        
-        for (int j = 0; j < src->width; ++j) {
-            double v;
-            
-            switch (src->depth) {
-                case CVL_UINT8:   v = (double)srow_u8[j]; break;
-                case CVL_FLOAT64: v = srow_f64[j]; break;
-                default: assert(false);
+    assert(dst->depth == ddepth);
+
+    const int h = src->height;
+    const int w = src->width;
+    const int ch = src->channels;
+    const cvl_depth_t sdepth = src->depth;
+
+    for (int i = 0; i < h; ++i) {
+
+        switch (sdepth) {
+        case CVL_UINT8: {
+            uint8_t *srow = cvl_row_u8(src, i);
+
+            switch (ddepth) {
+            case CVL_UINT8: {
+                uint8_t *drow = cvl_row_u8(dst, i);
+                for (int j = 0; j < w * ch; ++j) {
+                    double v = (double)srow[j];
+                    v = alpha * v + beta;
+                    drow[j] = cvl_sat_u8_f64(v);
+                }
+                break;
             }
-            
-            v = alpha * v + beta;
-            
-            switch (dst->depth) {
-                case CVL_UINT8:   drow_u8[j] = cvl_sat_u8(v); break;
-                case CVL_FLOAT64: drow_f64[j] = v; break;
-                default: assert(false);
+
+            case CVL_FLOAT64: {
+                double *drow = cvl_row_f64(dst, i);
+                for (int j = 0; j < w * ch; ++j) {
+                    double v = (double)srow[j];
+                    v = alpha * v + beta;
+                    drow[j] = v;
+                }
+                break;
             }
+
+            default:
+                assert(false);
+            }
+            break;
+        }
+
+        case CVL_FLOAT64: {
+            double *srow = cvl_row_f64(src, i);
+
+            switch (ddepth) {
+            case CVL_UINT8: {
+                uint8_t *drow = cvl_row_u8(dst, i);
+                for (int j = 0; j < w * ch; ++j) {
+                    double v = srow[j];
+                    v = alpha * v + beta;
+                    drow[j] = cvl_sat_u8_f64(v);
+                }
+                break;
+            }
+
+            case CVL_FLOAT64: {
+                double *drow = cvl_row_f64(dst, i);
+                for (int j = 0; j < w * ch; ++j) {
+                    double v = srow[j];
+                    v = alpha * v + beta;
+                    drow[j] = v;
+                }
+                break;
+            }
+
+            default:
+                assert(false);
+            }
+            break;
+        }
+
+        default:
+            assert(false);
         }
     }
+}
+
+cvl_Mat cvl_cvt_depth_new(const cvl_Mat *src, cvl_depth_t ddepth, double alpha, double beta) {
+    cvl_Mat dst = cvl_mat_create(src->height, src->width, src->channels, ddepth);
+    cvl_cvt_depth(src, &dst, ddepth, alpha, beta);
+    return dst;
 }
 
 void cvl_convert_to_u8(cvl_Mat *src, cvl_Mat *dst) {
@@ -243,22 +318,16 @@ void cvl_convert_to_u8(cvl_Mat *src, cvl_Mat *dst) {
     assert(src->channels == dst->channels);
     assert(src->depth == CVL_FLOAT64);
     assert(dst->depth == CVL_UINT8);
-    
+
     const int h = src->height;
     const int w = src->width;
     const int chs = src->channels;
-    
+
     for (int i = 0; i < h; ++i) {
         for (int j = 0; j < w; ++j) {
             for (int c = 0; c < chs; ++c) {
                 double val = CVL_AT_F64(src, i, j, c);
-
-                // clamp
-                if (val < 0.0) val = 0.0;
-                if (val > 255.0) val = 255.0;
-
-                // round + cast
-                CVL_AT_U8(dst, i, j, c) = (uint8_t)(val + 0.5);
+                CVL_AT_U8(dst, i, j, c) = cvl_sat_u8_f64(val);
             }
         }
     }
@@ -266,7 +335,7 @@ void cvl_convert_to_u8(cvl_Mat *src, cvl_Mat *dst) {
 
 void cvl_convert_to_f64(cvl_Mat *src, cvl_Mat *dst) {
     assert(src->height == dst->height);
-    assert(src->width  == dst->width);
+    assert(src->width == dst->width);
     assert(src->channels == dst->channels);
     assert(src->depth == CVL_UINT8);
     assert(dst->depth == CVL_FLOAT64);
@@ -276,8 +345,8 @@ void cvl_convert_to_f64(cvl_Mat *src, cvl_Mat *dst) {
     int chs = src->channels;
 
     for (int r = 0; r < h; ++r) {
-        const uint8_t *srow = (uint8_t*)src->data + r * src->stride;
-        double *drow = (double*)((uint8_t*)dst->data + r * dst->stride);
+        const uint8_t *srow = (uint8_t *)src->data + r * src->stride;
+        double *drow = (double *)((uint8_t *)dst->data + r * dst->stride);
 
         for (int c = 0; c < w; ++c) {
             for (int ch = 0; ch < chs; ++ch) {
@@ -288,7 +357,7 @@ void cvl_convert_to_f64(cvl_Mat *src, cvl_Mat *dst) {
 }
 
 void cvl_normalize(cvl_Mat *src, cvl_Mat *dst) {
-    cvl_convert_to(src, dst, 1.0 / 255.0, 0);
+    cvl_cvt_depth(src, dst, dst->depth, 1.0 / 255.0, 0);
 }
 
 // ==========================
@@ -301,72 +370,111 @@ void cvl_threshold(cvl_Mat *img, int thresh, int maxval, int type) {
     assert(0 < img->channels && img->channels < 4);
 
     const size_t height = img->height;
-    const size_t width  = img->width;
+    const size_t width = img->width;
     const size_t channels = img->channels;
     const size_t stride = img->stride;
 
     switch (img->depth) {
-        case CVL_UINT8: {
-            uint8_t *data = (uint8_t*)img->data;
-            uint8_t t     = (uint8_t)thresh;
-            uint8_t mv    = (uint8_t)maxval;
-            for (size_t i = 0; i < height; ++i) {
-                uint8_t *row = data + i * stride;
-                for (size_t j = 0; j < width * channels; ++j) {
-                    uint8_t v = row[j];
-                    switch (type) {
-                        case CVL_THRESH_BINARY:     row[j] = (v > t) ? mv : 0; break;
-                        case CVL_THRESH_BINARY_INV: row[j] = (v > t) ? 0 : mv; break;
-                        case CVL_THRESH_TRUNC:      row[j] = (v > t) ? t : v;  break;
-                        case CVL_THRESH_TOZERO:     row[j] = (v > t) ? v : 0;  break;
-                        case CVL_THRESH_TOZERO_INV: row[j] = (v > t) ? 0 : v;  break;
-                        default: assert(false);  // CVL_THRESH_UNKNOWN
-                    }
+    case CVL_UINT8: {
+        uint8_t *data = (uint8_t *)img->data;
+        uint8_t t = (uint8_t)thresh;
+        uint8_t mv = (uint8_t)maxval;
+        for (size_t i = 0; i < height; ++i) {
+            uint8_t *row = data + i * stride;
+            for (size_t j = 0; j < width * channels; ++j) {
+                uint8_t v = row[j];
+                switch (type) {
+                case CVL_THRESH_BINARY:
+                    row[j] = (v > t) ? mv : 0;
+                    break;
+                case CVL_THRESH_BINARY_INV:
+                    row[j] = (v > t) ? 0 : mv;
+                    break;
+                case CVL_THRESH_TRUNC:
+                    row[j] = (v > t) ? t : v;
+                    break;
+                case CVL_THRESH_TOZERO:
+                    row[j] = (v > t) ? v : 0;
+                    break;
+                case CVL_THRESH_TOZERO_INV:
+                    row[j] = (v > t) ? 0 : v;
+                    break;
+                default:
+                    assert(false); // CVL_THRESH_UNKNOWN
                 }
             }
-            break;
         }
-        case CVL_FLOAT32: {
-            float *data = (float*)img->data;
-            float t     = (float)thresh;
-            float mv    = (float)maxval;
-            for (size_t i = 0; i < height; ++i) {
-                float *row = (float *)((uint8_t *)data + i * stride);
-                for (size_t j = 0; j < width * channels; ++j) {
-                    float v = row[j];
-                    switch (type) {
-                        case CVL_THRESH_BINARY:     row[j] = (v > t) ? mv : 0.0f; break;
-                        case CVL_THRESH_BINARY_INV: row[j] = (v > t) ? 0.0f : mv; break;
-                        case CVL_THRESH_TRUNC:      row[j] = (v > t) ? t : v;     break;
-                        case CVL_THRESH_TOZERO:     row[j] = (v > t) ? v : 0.0f;  break;
-                        case CVL_THRESH_TOZERO_INV: row[j] = (v > t) ? 0.0f : v;  break;
-                        default: assert(false);  // CVL_THRESH_UNKNOWN
-                    }
-                }
-            }
-            break;
-        }
-        case CVL_FLOAT64: {
-            double *data = (double*)img->data;
-            double t     = (double)thresh;
-            double mv    = (double)maxval;
-            for (size_t i = 0; i < height; ++i) {
-                double *row = (double *)((uint8_t *)data + i * stride);
-                for (size_t j = 0; j < width * channels; ++j) {
-                    double v = row[j];
-                    switch (type) {
-                        case CVL_THRESH_BINARY:     row[j] = (v > t) ? mv : 0.0; break;
-                        case CVL_THRESH_BINARY_INV: row[j] = (v > t) ? 0.0 : mv; break;
-                        case CVL_THRESH_TRUNC:      row[j] = (v > t) ? t : v;    break;
-                        case CVL_THRESH_TOZERO:     row[j] = (v > t) ? v : 0.0;  break;
-                        case CVL_THRESH_TOZERO_INV: row[j] = (v > t) ? 0.0 : v;  break;
-                        default: assert(false);  // CVL_THRESH_UNKNOWN
-                    }
-                }
-            }
-            break;
-        }
+        break;
     }
+    case CVL_FLOAT32: {
+        float *data = (float *)img->data;
+        float t = (float)thresh;
+        float mv = (float)maxval;
+        for (size_t i = 0; i < height; ++i) {
+            float *row = (float *)((uint8_t *)data + i * stride);
+            for (size_t j = 0; j < width * channels; ++j) {
+                float v = row[j];
+                switch (type) {
+                case CVL_THRESH_BINARY:
+                    row[j] = (v > t) ? mv : 0.0f;
+                    break;
+                case CVL_THRESH_BINARY_INV:
+                    row[j] = (v > t) ? 0.0f : mv;
+                    break;
+                case CVL_THRESH_TRUNC:
+                    row[j] = (v > t) ? t : v;
+                    break;
+                case CVL_THRESH_TOZERO:
+                    row[j] = (v > t) ? v : 0.0f;
+                    break;
+                case CVL_THRESH_TOZERO_INV:
+                    row[j] = (v > t) ? 0.0f : v;
+                    break;
+                default:
+                    assert(false); // CVL_THRESH_UNKNOWN
+                }
+            }
+        }
+        break;
+    }
+    case CVL_FLOAT64: {
+        double *data = (double *)img->data;
+        double t = (double)thresh;
+        double mv = (double)maxval;
+        for (size_t i = 0; i < height; ++i) {
+            double *row = (double *)((uint8_t *)data + i * stride);
+            for (size_t j = 0; j < width * channels; ++j) {
+                double v = row[j];
+                switch (type) {
+                case CVL_THRESH_BINARY:
+                    row[j] = (v > t) ? mv : 0.0;
+                    break;
+                case CVL_THRESH_BINARY_INV:
+                    row[j] = (v > t) ? 0.0 : mv;
+                    break;
+                case CVL_THRESH_TRUNC:
+                    row[j] = (v > t) ? t : v;
+                    break;
+                case CVL_THRESH_TOZERO:
+                    row[j] = (v > t) ? v : 0.0;
+                    break;
+                case CVL_THRESH_TOZERO_INV:
+                    row[j] = (v > t) ? 0.0 : v;
+                    break;
+                default:
+                    assert(false); // CVL_THRESH_UNKNOWN
+                }
+            }
+        }
+        break;
+    }
+    }
+}
+
+cvl_Mat cvl_threshold_new(const cvl_Mat *src, int thresh, int maxval, int type) {
+    cvl_Mat dst = cvl_mat_copy(src);
+    cvl_threshold(&dst, thresh, maxval, type);
+    return dst;
 }
 
 // Randomly flips binary pixels with probability p.
@@ -450,7 +558,7 @@ void cvl_invert(cvl_Mat *img, int maxval) {
                 if (img->depth == CVL_UINT8) {
                     uint8_t v = CVL_AT_U8(img, i, j, ch);
                     double out = maxval - v;
-                    CVL_AT_U8(img, i, j, ch) = cvl_sat_u8(out);
+                    CVL_AT_U8(img, i, j, ch) = cvl_sat_u8_f64(out);
                 } else if (img->depth == CVL_FLOAT64) {
                     double v = CVL_AT_F64(img, i, j, ch);
                     CVL_AT_F64(img, i, j, ch) = maxval - v;
@@ -503,25 +611,27 @@ int cvl_connected_components(cvl_Mat *img, cvl_Mat *labels, int connectivity) {
     for (int i = 0; i < h; ++i) {
         uint8_t *irow = idata + i * istride;
         int *lrow = (int *)((uint8_t *)ldata + i * lstride);
-        
+
         for (int j = 0; j < w; ++j) {
-            if (irow[j] == WHITE) continue;
-            
+            if (irow[j] == WHITE)
+                continue;
+
             int count = 0;
             int neighbor_labels[4];
             for (int k = 0; k < n_neighbors; ++k) {
                 int ni = i + dh[k];
                 int nj = j + dw[k];
-                
+
                 bool in_bounds = (0 <= ni && ni < h) && (0 <= nj && nj < w);
-                if (!in_bounds) continue;
-                
+                if (!in_bounds)
+                    continue;
+
                 int *nrow = (int *)((uint8_t *)ldata + ni * lstride);
                 if (nrow[nj] > 0) {
                     neighbor_labels[count++] = nrow[nj];
                 }
             }
-            
+
             if (count == 0) { // assign new label
                 lrow[j] = next_label;
                 uf[next_label].parent = next_label;
@@ -534,18 +644,18 @@ int cvl_connected_components(cvl_Mat *img, cvl_Mat *labels, int connectivity) {
                     }
                 }
                 lrow[j] = min_label;
-                
+
                 for (int k = 0; k < count; ++k) { // assign equivalence
                     uf_union(uf, min_label, neighbor_labels[k]);
                 }
             }
         }
     }
-    
+
     // Pass II - Reconcile Equivalences.
     for (int i = 0; i < h; ++i) {
         int *lrow = (int *)((uint8_t *)ldata + i * lstride);
-        
+
         for (int j = 0; j < w; ++j) {
             int label = lrow[j];
             if (label > 0) {
@@ -553,14 +663,14 @@ int cvl_connected_components(cvl_Mat *img, cvl_Mat *labels, int connectivity) {
             }
         }
     }
-    
+
     // Pass III - Count Unique Labels.
     bool *seen = calloc(next_label, sizeof(bool));
     assert(seen);
     int num_components = 0;
     for (int i = 0; i < h; ++i) {
         int *lrow = (int *)((uint8_t *)ldata + i * lstride);
-        
+
         for (int j = 0; j < w; ++j) {
             int label = lrow[j];
             if (label > 0 && !seen[label]) {
@@ -569,7 +679,7 @@ int cvl_connected_components(cvl_Mat *img, cvl_Mat *labels, int connectivity) {
             }
         }
     }
-    
+
     free(seen);
     free(uf);
 
@@ -642,18 +752,18 @@ int cvl_color_components(cvl_Mat *img, cvl_Mat *labels, int thresh) {
 }
 
 // ==========================
-// Filtering & Convolution
+// Correlation & Convolution
 // ==========================
 
-// Correlate src with kernel using zero padding.
-void cvl_correlate(cvl_Mat *src, cvl_Mat *dst, cvl_Mat *kernel) {
+// Floating point correlation of src with kernel (using zero padding).
+static void _correlate_f(const cvl_Mat *src, cvl_Mat *dst, cvl_Mat *kernel) {
     // G(r, c) = \sum_{i=-m}^{m} \sum_{j=-n}^{n} K(i, j) * I(r + i), c + j)
     assert(src->height == dst->height);
     assert(src->width == dst->width);
     assert(src->channels == dst->channels);
     assert(src->depth == CVL_FLOAT64);
-    assert(src->depth == dst->depth);
-    assert(src->depth == kernel->depth);
+    assert(dst->depth == CVL_FLOAT64);
+    assert(kernel->depth == CVL_FLOAT64);
 
     const int h = src->height;
     const int w = src->width;
@@ -684,41 +794,101 @@ void cvl_correlate(cvl_Mat *src, cvl_Mat *dst, cvl_Mat *kernel) {
                         }
                     }
                 }
+
                 CVL_AT_F64(dst, r, c, ch) = ws;
             }
         }
     }
 }
 
-// Convolve src with kernel using zero padding.
-void cvl_convolve(cvl_Mat *src, cvl_Mat *dst, cvl_Mat *kernel) {
-    cvl_rotate(kernel);
-    cvl_correlate(src, dst, kernel);
-    cvl_rotate(kernel); // undo rotation
+// Correlate src with kernel using zero padding.
+void cvl_correlate(const cvl_Mat *src, cvl_Mat *dst, cvl_Mat *kernel) {
+    cvl_Mat src_f64 = cvl_mat_create(src->height, src->width, src->channels, CVL_FLOAT64);
+    cvl_Mat dst_f64 = cvl_mat_create(src->height, src->width, src->channels, CVL_FLOAT64);
+
+    cvl_cvt_depth(src, &src_f64, CVL_FLOAT64, 1.0, 0.0); // src --> f64
+
+    _correlate_f(&src_f64, &dst_f64, kernel);
+
+    cvl_cvt_depth(&dst_f64, dst, dst->depth, 1.0, 0.0); // f64 --> dst
+
+    cvl_mat_free(&src_f64);
+    cvl_mat_free(&dst_f64);
 }
 
-// Apply mean blur using normalized ksize * ksize uniformly kernel.
-void cvl_blur(cvl_Mat *src, cvl_Mat *dst, int ksize) {
+cvl_Mat cvl_correlate_new(const cvl_Mat *src, cvl_Mat *kernel) {
+    cvl_Mat dst = cvl_mat_create(src->height, src->width, src->channels, src->depth);
+    cvl_correlate(src, &dst, kernel);
+    return dst;
+}
+
+// Convolve src with kernel using zero padding.
+void cvl_convolve(const cvl_Mat *src, cvl_Mat *dst, cvl_Mat *kernel) {
+    const int h = kernel->height;
+    const int w = kernel->width;
+    const int chs = kernel->channels;
+    const int depth = kernel->depth;
+
+    // Create Flipped Kernel (rotated 180 degrees).
+    cvl_Mat flipped = cvl_mat_create(h, w, chs, depth);
+    for (int i = 0; i < h; ++i) {
+        for (int j = 0; j < w; ++j) {
+            for (int ch = 0; ch < chs; ++ch) {
+                double v = CVL_AT_F64(kernel, h - 1 - i, w - 1 - j, ch);
+                CVL_AT_F64(&flipped, i, j, ch) = v;
+            }
+        }
+    }
+
+    cvl_correlate(src, dst, &flipped);
+
+    cvl_mat_free(&flipped);
+}
+
+cvl_Mat cvl_convolve_new(const cvl_Mat *src, cvl_Mat *kernel) {
+    cvl_Mat dst = cvl_mat_create(src->height, src->width, src->channels, src->depth);
+    cvl_convolve(src, &dst, kernel);
+    return dst;
+}
+
+// ==========================
+// Blurring / Smoothing
+// ==========================
+
+// Apply mean blur using a uniform kernel with optional normalization.
+void cvl_blur_box(const cvl_Mat *src, cvl_Mat *dst, int ksize, bool normalize) {
     assert(src && src->data);
     assert(dst && dst->data);
     assert(src->height == dst->height && src->width == dst->width);
-    assert(dst->depth == CVL_FLOAT64);
 
-    cvl_Mat kernel = cvl_mat_create(ksize, ksize, 1, CVL_FLOAT64);
-    double *data = kernel.data;
+    const double norm = normalize ? 1.0 / (ksize * ksize) : 1.0;
 
-    double v = 1.0 / (ksize * ksize);
-    for (int i = 0; i < kernel.height * kernel.width; ++i) {
-        data[i] = v;
-    }
+    cvl_Mat kernel = cvl_mat_create_fill(ksize, ksize, 1, CVL_FLOAT64, &norm);
 
     cvl_convolve(src, dst, &kernel);
 
     cvl_mat_free(&kernel);
 }
 
+cvl_Mat cvl_blur_box_new(const cvl_Mat *src, int ksize, bool normalize) {
+    cvl_Mat dst = cvl_mat_create(src->height, src->width, src->channels, src->depth);
+    cvl_blur_box(src, &dst, ksize, normalize);
+    return dst;
+}
+
+// Apply mean blur using a normalized uniform kernel.
+void cvl_blur_mean(const cvl_Mat *src, cvl_Mat *dst, int ksize) {
+    cvl_blur_box(src, dst, ksize, true);
+}
+
+cvl_Mat cvl_blur_mean_new(const cvl_Mat *src, int ksize) {
+    cvl_Mat dst = cvl_mat_create(src->height, src->width, src->channels, src->depth);
+    cvl_blur_mean(src, &dst, ksize);
+    return dst;
+}
+
 // Apply median blur using replicated outlier pixel values.
-void cvl_median_blur(cvl_Mat *src, cvl_Mat *dst, int ksize) {
+void cvl_blur_median(const cvl_Mat *src, cvl_Mat *dst, int ksize) {
     assert(src->height == dst->height && src->width == dst->width);
     assert(ksize % 2 == 1);
 
@@ -744,7 +914,8 @@ void cvl_median_blur(cvl_Mat *src, cvl_Mat *dst, int ksize) {
                         int rr = _clamp(r + i - ar, 0, h - 1);
                         int cc = _clamp(c + j - ac, 0, w - 1);
 
-                        kernel[idx++] = CVL_AT_F64(src, rr, cc, ch); // BORDER_REPLICATE
+                        // BORDER_REPLICATE
+                        kernel[idx++] = CVL_AT_F64(src, rr, cc, ch);
                     }
                 }
 
@@ -754,4 +925,10 @@ void cvl_median_blur(cvl_Mat *src, cvl_Mat *dst, int ksize) {
     }
 
     free(kernel);
+}
+
+cvl_Mat cvl_blur_median_new(const cvl_Mat *src, int ksize) {
+    cvl_Mat dst = cvl_mat_create(src->height, src->width, src->channels, src->depth);
+    cvl_blur_median(src, &dst, ksize);
+    return dst;
 }
