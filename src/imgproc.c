@@ -113,11 +113,6 @@ static inline int _clamp(int x, int lo, int hi) {
     return x;
 }
 
-// Clamps and rounds int into uint8_t.
-static inline uint8_t cvl_sat_u8_i(int v) {
-    return (v < 0) ? 0 : (v > 255) ? 255 : (uint8_t)v;
-}
-
 // Clamps and rounds double into uint8_t.
 static inline uint8_t cvl_sat_u8_f64(double v) {
     return (v < 0.0) ? 0 : (v > 255.0) ? 255 : (uint8_t)(v + 0.5);
@@ -161,16 +156,16 @@ void cvl_cvt_color(const cvl_Mat *src, cvl_Mat *dst, int code) {
         case CVL_COLOR_RGB2GRAY: {
             for (int j = 0; j < width; ++j) {
                 const uint8_t *p = srow + j * 3;
-                int gray = (int)lum_r * p[0] + lum_g * p[1] + lum_b * p[2];
-                drow[j] = cvl_sat_u8_i(gray);
+                double gray = lum_r * p[0] + lum_g * p[1] + lum_b * p[2];
+                drow[j] = cvl_sat_u8_f64(gray);
             }
             break;
         }
         case CVL_COLOR_BGR2GRAY: {
             for (int j = 0; j < width; ++j) {
                 const uint8_t *p = srow + j * 3;
-                int gray = (int)lum_b * p[0] + lum_g * p[1] + lum_r * p[2];
-                drow[j] = cvl_sat_u8_i(gray);
+                double gray = lum_b * p[0] + lum_g * p[1] + lum_r * p[2];
+                drow[j] = cvl_sat_u8_f64(gray);
             }
             break;
         }
@@ -202,7 +197,7 @@ cvl_Mat cvl_cvt_color_new(const cvl_Mat *src, int code) {
 
     case CVL_COLOR_GRAY2RGB:
     case CVL_COLOR_GRAY2BGR:
-        assert(src->channels == 3);
+        assert(src->channels == 1);
         dch = 3;
         break;
     }

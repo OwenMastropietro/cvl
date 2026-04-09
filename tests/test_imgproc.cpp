@@ -253,3 +253,123 @@ TEST(ImgProcTest, BlurMedian) {
         cvl_mat_free(&dst);
     }
 }
+
+TEST(ImgProcTest, CvtColor) {
+    // Test 1: RGB to GRAY
+    {
+        uint8_t vals[2][2][3] = {
+            {{255, 0, 0}, {0, 255, 0}},
+            {{0, 0, 255}, {255, 255, 255}},
+        };
+
+        uint8_t exp[2][2] = {
+            {76, 150}, // 76.245, 149.685
+            {29, 255}, // 29.07, 255.0
+        };
+
+        cvl_Mat src = cvl_mat_create_from(2, 2, 3, CVL_UINT8, vals);
+        cvl_Mat dst = cvl_cvt_color_new(&src, CVL_COLOR_RGB2GRAY);
+
+        for (int i = 0; i < dst.height; ++i) {
+            uint8_t *row = cvl_row_u8(&dst, i);
+
+            for (int j = 0; j < dst.width; ++j) {
+                uint8_t expected = exp[i][j];
+                EXPECT_EQ(row[j], expected);
+            }
+        }
+
+        cvl_mat_free(&src);
+        cvl_mat_free(&dst);
+    }
+
+    // Test 2: BGR to GRAY
+    {
+        uint8_t vals[2][2][3] = {
+            {{0, 0, 255}, {0, 255, 0}},
+            {{255, 0, 0}, {255, 255, 255}},
+        };
+
+        uint8_t exp[2][2] = {
+            {76, 150}, // 76.245, 149.685
+            {29, 255}, // 29.07, 255.0
+        };
+
+        cvl_Mat src = cvl_mat_create_from(2, 2, 3, CVL_UINT8, vals);
+        cvl_Mat dst = cvl_cvt_color_new(&src, CVL_COLOR_BGR2GRAY);
+
+        for (int i = 0; i < dst.height; ++i) {
+            uint8_t *row = cvl_row_u8(&dst, i);
+
+            for (int j = 0; j < dst.width; ++j) {
+                uint8_t expected = exp[i][j];
+                EXPECT_EQ(row[j], expected);
+            }
+        }
+
+        cvl_mat_free(&src);
+        cvl_mat_free(&dst);
+    }
+
+    // Test 3: GRAY to RGB
+    {
+        uint8_t vals[2][2] = {
+            {76, 150},
+            {29, 255},
+        };
+
+        uint8_t exp[2][2][3] = {
+            {{76, 76, 76}, {150, 150, 150}},
+            {{29, 29, 29}, {255, 255, 255}},
+        };
+
+        cvl_Mat src = cvl_mat_create_from(2, 2, 1, CVL_UINT8, vals);
+        cvl_Mat dst = cvl_cvt_color_new(&src, CVL_COLOR_GRAY2RGB);
+
+        for (int i = 0; i < dst.height; ++i) {
+            uint8_t *row = cvl_row_u8(&dst, i);
+
+            for (int j = 0; j < dst.width; ++j) {
+                uint8_t *expected = exp[i][j];
+                uint8_t *p = row + j * 3;
+                EXPECT_EQ(p[0], expected[0]);
+                EXPECT_EQ(p[1], expected[1]);
+                EXPECT_EQ(p[2], expected[2]);
+            }
+        }
+
+        cvl_mat_free(&src);
+        cvl_mat_free(&dst);
+    }
+
+    // Test 4: GRAY to BGR
+    {
+        uint8_t vals[2][2] = {
+            {76, 150},
+            {29, 255},
+        };
+
+        uint8_t exp[2][2][3] = {
+            {{76, 76, 76}, {150, 150, 150}},
+            {{29, 29, 29}, {255, 255, 255}},
+        };
+
+        cvl_Mat src = cvl_mat_create_from(2, 2, 1, CVL_UINT8, vals);
+        cvl_Mat dst = cvl_cvt_color_new(&src, CVL_COLOR_GRAY2BGR);
+
+        for (int i = 0; i < dst.height; ++i) {
+            uint8_t *row = cvl_row_u8(&dst, i);
+
+            for (int j = 0; j < dst.width; ++j) {
+                uint8_t *expected = exp[i][j];
+                uint8_t *p = row + j * 3;
+                EXPECT_EQ(p[0], expected[0]);
+                EXPECT_EQ(p[1], expected[1]);
+                EXPECT_EQ(p[2], expected[2]);
+            }
+        }
+
+        cvl_mat_free(&src);
+        cvl_mat_free(&dst);
+    }
+}
