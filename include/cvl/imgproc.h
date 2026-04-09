@@ -43,12 +43,6 @@ void cvl_blur_gauss(const cvl_Mat *src, cvl_Mat *dst, int ksize, double sigma);
 
 void cvl_blur_median(const cvl_Mat *src, cvl_Mat *dst, int ksize);
 
-// todo: remove these guys (opt for convert_to)
-
-void cvl_convert_to_u8(cvl_Mat *src, cvl_Mat *dst);
-
-void cvl_convert_to_f64(cvl_Mat *src, cvl_Mat *dst);
-
 // ================
 // Convenience "_new" wrappers
 // ================

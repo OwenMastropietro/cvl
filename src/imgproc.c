@@ -307,50 +307,6 @@ cvl_Mat cvl_cvt_depth_new(const cvl_Mat *src, cvl_depth_t ddepth, double alpha, 
     return dst;
 }
 
-void cvl_convert_to_u8(cvl_Mat *src, cvl_Mat *dst) {
-    assert(src->height == dst->height);
-    assert(src->width == dst->width);
-    assert(src->channels == dst->channels);
-    assert(src->depth == CVL_FLOAT64);
-    assert(dst->depth == CVL_UINT8);
-
-    const int h = src->height;
-    const int w = src->width;
-    const int chs = src->channels;
-
-    for (int i = 0; i < h; ++i) {
-        for (int j = 0; j < w; ++j) {
-            for (int c = 0; c < chs; ++c) {
-                double val = CVL_AT_F64(src, i, j, c);
-                CVL_AT_U8(dst, i, j, c) = cvl_sat_u8_f64(val);
-            }
-        }
-    }
-}
-
-void cvl_convert_to_f64(cvl_Mat *src, cvl_Mat *dst) {
-    assert(src->height == dst->height);
-    assert(src->width == dst->width);
-    assert(src->channels == dst->channels);
-    assert(src->depth == CVL_UINT8);
-    assert(dst->depth == CVL_FLOAT64);
-
-    int h = src->height;
-    int w = src->width;
-    int chs = src->channels;
-
-    for (int r = 0; r < h; ++r) {
-        const uint8_t *srow = (uint8_t *)src->data + r * src->stride;
-        double *drow = (double *)((uint8_t *)dst->data + r * dst->stride);
-
-        for (int c = 0; c < w; ++c) {
-            for (int ch = 0; ch < chs; ++ch) {
-                drow[c * chs + ch] = (double)srow[c * chs + ch];
-            }
-        }
-    }
-}
-
 void cvl_normalize(cvl_Mat *src, cvl_Mat *dst) {
     cvl_cvt_depth(src, dst, dst->depth, 1.0 / 255.0, 0);
 }
