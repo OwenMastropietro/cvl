@@ -5,45 +5,40 @@
 #include <math.h>
 
 int main(void) {
-    Image img = cvl_imread("./data/original/lena.ppm");
-    Image binary = cvl_binarize_new(&img, 128);
+    // Load Input Image.
+    Image img = cvl_imread("./data/original/halo.ppm");
+    Matrix mat = cvl_img2mat(img);
+    Matrix blur = cvl_blur_gauss_new(&mat, 1);
 
-    Matrix lena = cvl_img2mat(binary);
-    Matrix lena_smooth = cvl_blur_gauss_new(&lena, 1);
+    // Apply Sobel Filter (for directional gradients).
+    Matrix gx = cvl_mat_create(mat.height, mat.width);
+    Matrix gy = cvl_mat_create(mat.height, mat.width);
+    cvl_sobel(&blur, &gx, &gy);
 
-    Matrix gx = cvl_mat_create(lena.height, lena.width);
-    Matrix gy = cvl_mat_create(lena.height, lena.width);
-    cvl_sobel(&lena_smooth, &gx, &gy);
+    // Apply Sobel Filter (for gradient magnitudes and angles).
+    Matrix mags = cvl_sobel_mag(&blur);
+    // Matrix angs = cvl_sobel_angle(&blur);
 
-    // Compute G and θ from Sobel Gradients (Gx, Gy).
-    Matrix mags = cvl_sobel_mag(&lena_smooth);
-    Matrix angs = cvl_sobel_angle(&lena_smooth);
-
-    // Convert back to Images.
+    // Save Results.
     Image gx_img = cvl_mat2img(gx, 0, 1);
     Image gy_img = cvl_mat2img(gy, 0, 1);
     Image mags_img = cvl_mat2img(mags, 0, 1);
-    Image angs_img = cvl_mat2img(angs, 0, 1);
-    cvl_binarize(&angs_img, M_PI / 2);
+    // cvl_binarize(&mags_img, 128);
 
     cvl_imwrite("./data/modified/1-original.ppm", &img);
-    cvl_imwrite("./data/modified/2-binary.pbm", &binary);
-    cvl_imwrite("./data/modified/3-mags.pgm", &mags_img);
-    cvl_imwrite("./data/modified/4-angles.pgm", &angs_img);
-    cvl_imwrite("./data/modified/5-grads-horizontal.pgm", &gx_img);
-    cvl_imwrite("./data/modified/6-grads-vertical.pgm", &gy_img);
+    cvl_imwrite("./data/modified/2-mags.pgm", &mags_img);
+    cvl_imwrite("./data/modified/3-grads-horizontal.pgm", &gx_img);
+    cvl_imwrite("./data/modified/4-grads-vertical.pgm", &gy_img);
 
-    cvl_img_free(angs_img);
+    // Cleanup.
     cvl_img_free(mags_img);
     cvl_img_free(gy_img);
     cvl_img_free(gx_img);
-    cvl_mat_free(angs);
     cvl_mat_free(mags);
     cvl_mat_free(gx);
     cvl_mat_free(gy);
-    cvl_mat_free(lena_smooth);
-    cvl_mat_free(lena);
-    cvl_img_free(binary);
+    cvl_mat_free(blur);
+    cvl_mat_free(mat);
     cvl_img_free(img);
 
     return 0;
