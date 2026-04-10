@@ -8,10 +8,8 @@
 
 int main(void) {
     Image img = cvl_imread("./data/original/sample.ppm");
-    cvl_binarize(&img, 128);
     Matrix mat = cvl_img2mat(img);
-
-    cvl_imwrite("./data/modified/1-original.pbm", &img);
+    cvl_imwrite("./data/modified/1-original.pgm", &img);
 
     Matrix smoothed;
     Image smoothed_img;
