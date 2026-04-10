@@ -39,7 +39,9 @@ void cvl_blur_gauss(Matrix *src, Matrix *dst, double sigma);
 
 void cvl_blur_median(Matrix *src, Matrix *dst, int ksize);
 
-void cvl_sobel(Matrix *src, Matrix *gx, Matrix *gy);
+void cvl_sobel(const Matrix *src, Matrix *gx, Matrix *gy);
+
+void cvl_scharr(const Matrix *src, Matrix *gx, Matrix *gy);
 
 void cvl_laplacian(const Matrix *src, Matrix *dst);
 
@@ -64,6 +66,8 @@ Matrix cvl_blur_gauss_new(Matrix *src, double sigma);
 Matrix cvl_blur_median_new(Matrix *src, int ksize);
 
 Matrix cvl_sobel_mag(Matrix *src);
+
+Matrix cvl_scharr_mag(Matrix *src);
 
 Matrix cvl_sobel_angle(Matrix *src);
 

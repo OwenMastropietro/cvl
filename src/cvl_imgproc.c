@@ -533,11 +533,11 @@ void cvl_blur_median(Matrix *src, Matrix *dst, int ksize) {
     free(kernel);
 }
 
-void cvl_sobel(Matrix *src, Matrix *gx, Matrix *gy) {
+void cvl_sobel(const Matrix *src, Matrix *gx, Matrix *gy) {
     double xvals[] = {
-        -1, 0, 1,
-        -2, 0, 2,
-        -1, 0, 1,
+        -1,  0,  1,
+        -2,  0,  2,
+        -1,  0,  1,
     };
     double yvals[] = {
         -1, -2, -1,
@@ -545,11 +545,36 @@ void cvl_sobel(Matrix *src, Matrix *gx, Matrix *gy) {
          1,  2,  1,
     };
 
-    Matrix xkernel = cvl_mat_create_from(xvals, 3, 3);
-    Matrix ykernel = cvl_mat_create_from(yvals, 3, 3);
+    Matrix kx = cvl_mat_create_from(xvals, 3, 3);
+    Matrix ky = cvl_mat_create_from(yvals, 3, 3);
 
-    cvl_convolve(src, gx, &xkernel);
-    cvl_convolve(src, gy, &ykernel);
+    cvl_convolve(src, gx, &kx);
+    cvl_convolve(src, gy, &ky);
+
+    cvl_mat_free(kx);
+    cvl_mat_free(ky);
+}
+
+void cvl_scharr(const Matrix *src, Matrix *gx, Matrix *gy) {
+    double xvals[] = {
+        -3,   0,  3,
+        -10,  0,  10,
+        -3,   0,  3,
+    };
+    double yvals[] = {
+        -3, -10, -3,
+         0,   0,  0,
+         3,  10,  3,
+    };
+
+    Matrix kx = cvl_mat_create_from(xvals, 3, 3);
+    Matrix ky = cvl_mat_create_from(yvals, 3, 3);
+
+    cvl_convolve(src, gx, &kx);
+    cvl_convolve(src, gy, &ky);
+
+    cvl_mat_free(kx);
+    cvl_mat_free(ky);
 }
 
 void cvl_laplacian(const Matrix *src, Matrix *dst) {
@@ -819,6 +844,16 @@ Matrix cvl_sobel_mag(Matrix *src) {
     Matrix gx = cvl_mat_create(src->height, src->width);
     Matrix gy = cvl_mat_create(src->height, src->width);
     cvl_sobel(src, &gx, &gy);
+    cvl_mag(&g, &gx, &gy);
+
+    return g;
+}
+
+Matrix cvl_scharr_mag(Matrix *src) {
+    Matrix g = cvl_mat_create(src->height, src->width);
+    Matrix gx = cvl_mat_create(src->height, src->width);
+    Matrix gy = cvl_mat_create(src->height, src->width);
+    cvl_scharr(src, &gx, &gy);
     cvl_mag(&g, &gx, &gy);
 
     return g;

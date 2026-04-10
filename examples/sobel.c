@@ -17,6 +17,7 @@ int main(void) {
 
     // Apply Sobel Filter (for gradient magnitudes and angles).
     Matrix mags = cvl_sobel_mag(&blur);
+    // Matrix mags = cvl_scharr_mag(&blur);
     // Matrix angs = cvl_sobel_angle(&blur);
 
     // Save Results.
