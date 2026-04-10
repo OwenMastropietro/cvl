@@ -477,6 +477,8 @@ static Matrix cvl_gaussian_kernel(int ksize, double sigma) {
  * @todo sigma_x & sigma_y?
  */
 void cvl_blur_gauss(Matrix *src, Matrix *dst, double sigma) {
+    if (sigma <= 0.0) return;
+
     const double radius = ceil(3.0 * sigma);
     const int ksize = 2 * radius + 1;
 
@@ -801,7 +803,7 @@ Matrix cvl_blur_mean_new(Matrix *src, int ksize) {
 }
 
 Matrix cvl_blur_gauss_new(Matrix *src, double sigma) {
-    Matrix dst = cvl_mat_create(src->height, src->width);
+    Matrix dst = cvl_mat_copy(src); // for sigma == 0 case
     cvl_blur_gauss(src, &dst, sigma);
     return dst;
 }
