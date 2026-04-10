@@ -63,6 +63,8 @@ Matrix cvl_mat_create(int height, int width);
 
 Matrix cvl_mat_create_from(double *entry, int height, int width);
 
+Matrix cvl_mat_copy(Matrix *src);
+
 void cvl_mat_free(Matrix mx);
 
 Matrix cvl_img2mat(Image img);

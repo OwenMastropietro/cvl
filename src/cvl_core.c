@@ -98,6 +98,19 @@ Matrix cvl_mat_create_from(double *entry, int height, int width) {
     return mx;
 }
 
+// Copy an input matrix.
+Matrix cvl_mat_copy(Matrix *src) {
+    Matrix dst = cvl_mat_create(src->height, src->width);
+
+    for (int i = 0; i < src->height; ++i) {
+        for (int j = 0; j < src->width; ++j) {
+            dst.map[i][j] = src->map[i][j];
+        }
+    }
+
+    return dst;
+}
+
 // Delete a previously created matrix and free its allocated memory on the heap.
 void cvl_mat_free(Matrix mat) {
     for (int i = 0; i < mat.height; ++i) {
