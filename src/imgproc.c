@@ -1037,3 +1037,88 @@ cvl_Mat cvl_blur_median_new(const cvl_Mat *src, int ksize) {
     cvl_blur_median(src, &dst, ksize);
     return dst;
 }
+
+static void _mag(cvl_Mat *g, const cvl_Mat *gx, const cvl_Mat *gy) {
+    assert(g->depth == gx->depth && gx->depth == gy->depth && gy->depth == CVL_FLOAT64);
+
+    for (int i = 0; i < g->height; ++i) {
+        double *grow = cvl_row_f64(g, i);
+        double *xrow = cvl_row_f64(gx, i);
+        double *yrow = cvl_row_f64(gy, i);
+
+        for (int j = 0; j < g->width; ++j) {
+            grow[j] = hypot(xrow[j], yrow[j]); // sqrt(x*x + y*y)
+        }
+    }
+}
+
+static void _ang(cvl_Mat *a, const cvl_Mat *gx, const cvl_Mat *gy) {
+    assert(a->depth == gx->depth && gx->depth == gy->depth && gy->depth == CVL_FLOAT64);
+
+    for (int i = 0; i < a->height; ++i) {
+        double *arow = cvl_row_f64(a, i);
+        double *xrow = cvl_row_f64(gx, i);
+        double *yrow = cvl_row_f64(gy, i);
+
+        for (int j = 0; j < a->width; ++j) {
+            arow[j] = atan2(yrow[j], xrow[j]);
+        }
+    }
+}
+
+void cvl_sobel(const cvl_Mat *src, cvl_Mat *gx, cvl_Mat *gy) {
+    assert(src->channels == 1);
+    assert(gx->channels == 1 && gx->depth == CVL_FLOAT64);
+    assert(gy->channels == 1 && gy->depth == CVL_FLOAT64);
+
+    // Convert Depth.
+    cvl_Mat src_f = cvl_cvt_depth_new(src, CVL_FLOAT64, 1.0, 0.0);
+
+    // Sobel Kernels (todo: these are separable).
+    double xvals[] = {
+        -1,  0,  1,
+        -2,  0,  2,
+        -1,  0,  1,
+    };
+    double yvals[] = {
+        -1, -2, -1,
+         0,  0,  0,
+         1,  2,  1,
+    };
+
+    cvl_Mat kx = cvl_mat_create_from(3, 3, 1, CVL_FLOAT64, xvals);
+    cvl_Mat ky = cvl_mat_create_from(3, 3, 1, CVL_FLOAT64, yvals);
+
+    cvl_convolve(&src_f, gx, &kx);
+    cvl_convolve(&src_f, gy, &ky);
+
+    cvl_mat_free(&kx);
+    cvl_mat_free(&ky);
+    cvl_mat_free(&src_f);
+}
+
+void cvl_sobel_mag(const cvl_Mat *src, cvl_Mat *dst) {
+    const int h = src->height;
+    const int w = src->width;
+
+    cvl_Mat gx = cvl_mat_create(h, w, 1, CVL_FLOAT64);
+    cvl_Mat gy = cvl_mat_create(h, w, 1, CVL_FLOAT64);
+
+    cvl_sobel(src, &gx, &gy);
+
+    cvl_Mat dst_f = cvl_mat_create(h, w, 1, CVL_FLOAT64);
+
+    _mag(&dst_f, &gx, &gy);
+
+    cvl_cvt_depth(&dst_f, dst, dst->depth, 1.0, 0.0);
+
+    cvl_mat_free(&dst_f);
+    cvl_mat_free(&gx);
+    cvl_mat_free(&gy);
+}
+
+cvl_Mat cvl_sobel_mag_new(const cvl_Mat *src) {
+    cvl_Mat dst = cvl_mat_create(src->height, src->width, 1, src->depth);
+    cvl_sobel_mag(src, &dst);
+    return dst;
+}

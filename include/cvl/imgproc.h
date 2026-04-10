@@ -43,6 +43,10 @@ void cvl_blur_gauss(const cvl_Mat *src, cvl_Mat *dst, int ksize, double sigma);
 
 void cvl_blur_median(const cvl_Mat *src, cvl_Mat *dst, int ksize);
 
+void cvl_sobel(const cvl_Mat *src, cvl_Mat *gx, cvl_Mat *gy);
+
+void cvl_sobel_mag(const cvl_Mat *src, cvl_Mat *dst);
+
 // ================
 // Convenience "_new" wrappers
 // ================
@@ -64,6 +68,8 @@ cvl_Mat cvl_blur_mean_new(const cvl_Mat *src, int ksize);
 cvl_Mat cvl_blur_gauss_new(const cvl_Mat *src, int ksize, double sigma);
 
 cvl_Mat cvl_blur_median_new(const cvl_Mat *src, int ksize);
+
+cvl_Mat cvl_sobel_mag_new(const cvl_Mat *src);
 
 #ifdef __cplusplus
 }
