@@ -1,9 +1,14 @@
 # GoogleTest
+cmake_policy(SET CMP0135 NEW)
+
 include(FetchContent)
+
 FetchContent_Declare(
   googletest
   URL https://github.com/google/googletest/archive/7917641ff965959afae189afb5f052524395525c.zip
+  DOWNLOAD_EXTRACT_TIMESTAMP TRUE
 )
+
 FetchContent_MakeAvailable(googletest)
 
 add_executable(test_cvl
