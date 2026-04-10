@@ -221,8 +221,8 @@ int cvl_hough_circles(
     Matrix edges = cvl_canny_new(src, 1, (int)(thresh_canny * 0.5), (int)thresh_canny);
 
     // DEBUG
-    // Image edges_img = cvl_mat2img(edges, 0, 1.0);
-    // cvl_imwrite("./data/modified/circle-edges.ppm", &edges_img);
+    // Image edges_img = cvl_mat2img(edges, 0, 0.5);
+    // cvl_imwrite("./data/modified/edges.ppm", &edges_img);
     // DEBUG
 
     // Sobel Gradient.
@@ -403,6 +403,9 @@ int cvl_hough_circles(
     //     }
     // }
     // printf("max vote: %f\n", max_vote);
+
+    // Image acc = cvl_mat2img(accum, 0, 0.2);
+    // cvl_imwrite("./data/modified/accum.ppm", &acc);
     // DEBUG
 
     dst->size = ncircles;
@@ -462,6 +465,6 @@ void cvl_draw_hough_circles(Image *img, const cvl_hough_circles_t *circles) {
             (int)round(circle.radius),
         };
 
-        cvl_draw_ellipse(*img, center, radius, 0, 0, 0, 255, 0, 0, 255);
+        cvl_draw_ellipse(*img, center, radius, 2, 5, 5, 255, 0, 0, 255);
     }
 }

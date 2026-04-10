@@ -23,7 +23,7 @@ gcc examples/<example>.c src/* -Iinclude -o <example>
 cmake -B build -S .
 cmake --build build
 
-./build/<example>
+./build/examples/<example>
 ```
 
 > Build and run tests.
@@ -39,15 +39,15 @@ ctest --test-dir build
 
 > See the [docs](https://owenmastropietro.github.io/projects/cvl/) for more examples and documentation.
 
-| Executable          | Source File                                              | Description                  |
-| ------------------- | -------------------------------------------------------- | ---------------------------- |
-| `cvl_hough_lines`   | [`examples/hough_lines.c`](./examples/hough_lines.c)     | Hough Line Detection         |
-| `cvl_hough_circles` | [`examples/hough_circles.c`](./examples/hough_circles.c) | Hough Circle Detection       |
-| `cvl_sobel`         | [`examples/sobel.c`](./examples/sobel.c)                 | Sobel Filtering              |
-| `cvl_canny`         | [`examples/canny.c`](./examples/canny.c)                 | Canny Edge Detection         |
-| `cvl_laplacian`     | [`examples/laplacian.c`](./examples/laplacian.c)         | laplacian Edge Detection     |
-| `cvl_ccl`           | [`examples/ccl.c`](./examples/ccl.c)                     | Connected Component Labeling |
-| `cvl_cs136`         | [`examples/cs136.c`](./examples/cs136.c)                 | Assignments from CS136       |
+| Executable | Source File | Description |
+| ---------- | ----------- | ----------- |
+| `hough_lines` | [`examples/hough_lines.c`](./examples/hough_lines.c) | Hough Line Detection |
+| `hough_circles` | [`examples/hough_circles.c`](./examples/hough_circles.c) | Hough Circle Detection |
+| `sobel` | [`examples/sobel.c`](./examples/sobel.c) | Sobel Filtering |
+| `canny` | [`examples/canny.c`](./examples/canny.c) | Canny Edge Detection |
+| `laplacian` | [`examples/laplacian.c`](./examples/laplacian.c) | laplacian Edge Detection |
+| `ccl` | [`examples/ccl.c`](./examples/ccl.c) | Connected Component Labeling |
+| `cs136` | [`examples/cs136.c`](./examples/cs136.c) | Assignments from CS136 |
 
 ## Demonstrations
 
@@ -171,8 +171,9 @@ int main(void) {
 
 ```
 
-|            Original             |                 Canny Edges                  |                Hough Circles                 |
-| :-----------------------------: | :------------------------------------------: | :------------------------------------------: |
-| ![circle](./assets/circles.png) | ![circles-edges](./assets/circles-edges.png) | ![circles-hough](./assets/circles-hough.png) |
+| Original | Canny Edges | Accumulator | Hough Circles |
+| :------: | :---------: | :---------: | :-----------: |
+| ![circle](./assets/four-circles-filled.png) | ![circles-edges](./assets/hough/1a-circle-edges.png) | ![circles-acc](./assets/hough/1b-circles-acc.png) | ![circles-hc](./assets/hough/1c-circles-hc.png)
+| ![8ball](./assets/8-ball.png) | ![8ball-edges](./assets/hough/3a-8ball-edges-small.png) | ![8ball-acc](./assets/hough/3b-8ball-acc-small.png) | ![8ball-hc](./assets/hough/3c-8ball-hc-small.png) |
 
 ---

@@ -39,7 +39,7 @@ foreach(example ${EXAMPLE_SOURCES})
     target_link_libraries(${name} cvl)
 
     set_target_properties(${name} PROPERTIES
-        RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/example
+        RUNTIME_OUTPUT_DIRECTORY ${CMAKE_BINARY_DIR}/examples
     )
 endforeach()
 

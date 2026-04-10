@@ -152,6 +152,50 @@ void p3_ii(void) {
     cvl_img_free(img);
 }
 
+// Hough Circle Detection.
+void p4(void) {
+    // Load Input Image.
+    Image img = cvl_imread("./data/original/8ball.pgm");
+    if (!img.map) fprintf(stderr, "bad read\n");
+
+    Matrix input = cvl_img2mat(img); // convert depth (u8 to f64)
+
+    // Hough Circle Detection.
+    bool inner = true; // detect inner vs. outer circle on 8-ball
+    const double dp       = inner ?  1.0 : 1.0;
+    const double min_dist = inner ?  40  : 20;
+    const double thresh   = inner ?  15  : 10;
+    const double canny_hi = inner ?  100 : 120;
+    const int min_radius  = inner ?  15  : 40;
+    const int max_radius  = inner ?  40  : 200;
+    cvl_hough_circles_t circles = cvl_hough_circles_new(
+        &input,
+        dp,
+        min_dist,
+        canny_hi,
+        thresh,
+        min_radius,
+        max_radius
+    );
+
+    // Save Results.
+    printf("Found %zu circles.\n", circles.size);
+
+    // Image circles_img = cvl_img_create_fill(img.height, img.width, BLACK);
+    Image circles_img = cvl_img_copy(&img);
+    cvl_draw_hough_circles(&circles_img, &circles);
+
+    cvl_imwrite("./data/modified/1-original.ppm", &img);
+    // todo: I think I'd rather pass in canny edges...
+    cvl_imwrite("./data/modified/2-hough-circles.ppm", &circles_img);
+
+    // Cleanup.
+    cvl_hough_circles_free(&circles);
+    cvl_img_free(circles_img);
+    cvl_mat_free(input);
+    cvl_img_free(img);
+}
+
 int main(void) {
 
     p1_i();
@@ -162,6 +206,8 @@ int main(void) {
 
     p3_i();
     p3_ii();
+
+    p4();
 
     return 0;
 }
