@@ -31,8 +31,11 @@ target_link_libraries(cvl_cs136 cvl)
 add_executable(cvl_canny examples/canny.c)
 target_link_libraries(cvl_canny cvl)
 
-add_executable(cvl_hough examples/hough.c)
-target_link_libraries(cvl_hough cvl)
+add_executable(cvl_hough_lines examples/hough_lines.c)
+target_link_libraries(cvl_hough_lines cvl)
+
+add_executable(cvl_hough_circles examples/hough_circles.c)
+target_link_libraries(cvl_hough_circles cvl)
 
 add_executable(cvl_sobel examples/sobel.c)
 target_link_libraries(cvl_sobel cvl)
