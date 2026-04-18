@@ -13,6 +13,7 @@ FetchContent_MakeAvailable(googletest)
 
 add_executable(test_cvl
   test_image.cpp
+  test_mat.cpp
   test_imgproc.cpp
   test_io.cpp
 )

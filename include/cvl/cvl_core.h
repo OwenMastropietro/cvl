@@ -51,6 +51,8 @@ typedef enum cvl_thresh_type {
 extern "C" {
 #endif
 
+// Image Methods
+
 Image cvl_img_create(int height, int width);
 
 Image cvl_img_create_fill(int height, int width, int value);
@@ -59,19 +61,44 @@ Image cvl_img_copy(Image *src);
 
 void cvl_img_free(Image img);
 
-Matrix cvl_mat_create(int height, int width);
-
-Matrix cvl_mat_create_from(double *entry, int height, int width);
-
-Matrix cvl_mat_copy(Matrix *src);
-
-void cvl_mat_free(Matrix mx);
-
-Matrix cvl_img2mat(Image img);
+void cvl_set_pixel(Image img, int row, int col, int r, int g, int b, int i);
 
 Image cvl_mat2img(Matrix mx, int scale, double gamma);
 
-void cvl_set_pixel(Image img, int row, int col, int r, int g, int b, int i);
+Matrix cvl_img2mat(Image img);
+
+// Matrix Methods
+
+Matrix cvl_mat_create(int height, int width);
+
+Matrix cvl_mat_create_fill(int height, int width, double fill_value);
+
+Matrix cvl_mat_create_from(double *entry, int height, int width);
+
+Matrix cvl_mat_copy(const Matrix *src);
+
+void cvl_mat_free(Matrix mx);
+
+void cvl_mat_add(const Matrix *a, const Matrix *b, Matrix *dst);
+
+void cvl_mat_sub(const Matrix *a, const Matrix *b, Matrix *dst);
+
+void cvl_mat_mul(const Matrix *a, const Matrix *b, Matrix *dst);
+
+void cvl_mat_scale(Matrix *m, double scalar);
+
+void cvl_mat_hadamard(const Matrix *a, const Matrix *b, Matrix *dst);
+
+void cvl_mat_transpose(const Matrix *src, Matrix *dst);
+
+// Convenience "_new" helpers.
+
+Matrix cvl_mat_add_new(const Matrix *a, const Matrix *b);
+Matrix cvl_mat_sub_new(const Matrix *a, const Matrix *b);
+Matrix cvl_mat_mul_new(const Matrix *a, const Matrix *b);
+Matrix cvl_mat_scale_new(const Matrix *m, double scalar);
+Matrix cvl_mat_hadamard_new(const Matrix *a, const Matrix *b);
+Matrix cvl_mat_transpose_new(const Matrix *src);
 
 #ifdef __cplusplus
 }

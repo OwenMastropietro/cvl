@@ -11,6 +11,10 @@
 #include <stdlib.h>
 #include <string.h>
 
+// ================
+// IMAGE
+// ================
+
 // Create a new image of the given size and fill it with white pixels.
 Image cvl_img_create(int height, int width) {
     // todo: zero-fill
@@ -60,65 +64,6 @@ void cvl_img_free(Image img) {
     free(img.map);
 }
 
-// Create a new matrix of the given size and fill it with zeroes.
-Matrix cvl_mat_create(int height, int width) {
-    int i, j;
-    Matrix mx;
-
-    mx.height = height;
-    mx.width = width;
-
-    mx.map = (double **)malloc(sizeof(double *) * height);
-    for (i = 0; i < height; i++) {
-        mx.map[i] = (double *)malloc(sizeof(double) * width);
-        for (j = 0; j < width; j++) {
-            mx.map[i][j] = 0.0;
-        }
-    }
-
-    return mx;
-}
-
-// Create a new matrix of the given size and fill it with content of 2D double array.
-Matrix cvl_mat_create_from(double *entry, int height, int width) {
-    int i, j;
-    Matrix mx;
-
-    mx.height = height;
-    mx.width = width;
-
-    mx.map = (double **)malloc(sizeof(double *) * height);
-    for (i = 0; i < height; i++) {
-        mx.map[i] = (double *)malloc(sizeof(double) * width);
-        for (j = 0; j < width; j++) {
-            mx.map[i][j] = *(entry++);
-        }
-    }
-
-    return mx;
-}
-
-// Copy an input matrix.
-Matrix cvl_mat_copy(Matrix *src) {
-    Matrix dst = cvl_mat_create(src->height, src->width);
-
-    for (int i = 0; i < src->height; ++i) {
-        for (int j = 0; j < src->width; ++j) {
-            dst.map[i][j] = src->map[i][j];
-        }
-    }
-
-    return dst;
-}
-
-// Delete a previously created matrix and free its allocated memory on the heap.
-void cvl_mat_free(Matrix mat) {
-    for (int i = 0; i < mat.height; ++i) {
-        free(mat.map[i]);
-    }
-    free(mat.map);
-}
-
 // Convert the intensity components of an image into a matrix of identical size.
 Matrix cvl_img2mat(Image img) {
     int m, n;
@@ -131,6 +76,210 @@ Matrix cvl_img2mat(Image img) {
     }
 
     return result;
+}
+
+// ================
+// MATRIX
+// ================
+
+// Create a new matrix of the given size and fill it with zeroes.
+Matrix cvl_mat_create(int height, int width) {
+    return cvl_mat_create_fill(height, width, 0.0);
+}
+
+// Create a new matrix of the given size and fill it with `fill_value`.
+Matrix cvl_mat_create_fill(int height, int width, double fill_value) {
+    Matrix m = {
+        .height = 0,
+        .width  = 0,
+        .map    = NULL,
+    };
+
+    if (height <= 0 || width <= 0) return m;
+
+    m.height = height;
+    m.width  = width;
+    m.map    = (double **)malloc(sizeof(double *) * height);
+
+    for (int i = 0; i < height; i++) {
+        m.map[i] = (double *)malloc(sizeof(double) * width);
+        for (int j = 0; j < width; j++) {
+            m.map[i][j] = fill_value;
+        }
+    }
+
+    return m;
+}
+
+// Create a new matrix of the given size and fill it with content of 2D double array.
+Matrix cvl_mat_create_from(double *entry, int height, int width) {
+    // todo: cvl_mat_create_from(h, w, const values)
+    Matrix m = cvl_mat_create(height, width);
+
+    if (!entry || m.map == NULL) return m;
+
+    for (int i = 0; i < height; i++) {
+        for (int j = 0; j < width; j++) {
+            m.map[i][j] = entry[i * width + j];
+        }
+    }
+
+    return m;
+}
+
+// Copy an input matrix.
+Matrix cvl_mat_copy(const Matrix *src) {
+    const int h = src->height;
+    const int w = src->width;
+
+    Matrix dst = cvl_mat_create(h, w);
+    for (int i = 0; i < h; ++i) {
+        for (int j = 0; j < w; ++j) {
+            dst.map[i][j] = src->map[i][j];
+        }
+    }
+
+    return dst;
+}
+
+// Delete a previously created matrix and free its allocated memory on the heap.
+void cvl_mat_free(Matrix mat) {
+    // todo: cvl_mat_free(Matrix *mat)
+    // if (!mat || !mat.map) return;
+
+    for (int i = 0; i < mat.height; ++i) {
+        free(mat.map[i]);
+    }
+    free(mat.map);
+
+    // mat->map = NULL
+    // mat->height = 0
+    // mat->width = 0
+}
+
+// Element-wise sum (a + b).
+void cvl_mat_add(const Matrix *a, const Matrix *b, Matrix *dst) {
+    const int h = a->height;
+    const int w = a->width;
+
+    assert(b->height == h && b->width == w && dst->height == h && dst->width == w);
+
+    for (int i = 0; i < h; i++) {
+        for (int j = 0; j < w; j++) {
+            dst->map[i][j] = a->map[i][j] + b->map[i][j];
+        }
+    }
+}
+
+// Element-wise sum (a + b).
+Matrix cvl_mat_add_new(const Matrix *a, const Matrix *b) {
+    Matrix dst = cvl_mat_create(a->height, a->width);
+    cvl_mat_add(a, b, &dst);
+    return dst;
+}
+
+// Element-wise difference (a - b).
+void cvl_mat_sub(const Matrix *a, const Matrix *b, Matrix *dst) {
+    const int h = a->height;
+    const int w = a->width;
+
+    assert(b->height == h && b->width == w && dst->height == h && dst->width == w);
+
+    for (int i = 0; i < h; i++) {
+        for (int j = 0; j < w; j++) {
+            dst->map[i][j] = a->map[i][j] - b->map[i][j];
+        }
+    }
+}
+
+// Element-wise difference (a - b).
+Matrix cvl_mat_sub_new(const Matrix *a, const Matrix *b) {
+    Matrix dst = cvl_mat_create(a->height, a->width);
+    cvl_mat_sub(a, b, &dst);
+    return dst;
+}
+
+// Standard matrix multiplication - (mxn) * (nxp) = (mxp).
+void cvl_mat_mul(const Matrix *a, const Matrix *b, Matrix *dst) {
+    const int m = a->height;
+    const int n = a->width;
+    const int p = b->width;
+
+    for (int i = 0; i < m; i++) {
+        for (int j = 0; j < p; j++) {
+            dst->map[i][j] = 0.0;
+            for (int k = 0; k < n; k++) {
+                dst->map[i][j] += a->map[i][k] * b->map[k][j];
+            }
+        }
+    }
+}
+
+// Standard matrix multiplication - (mxn) * (nxp) = (mxp).
+Matrix cvl_mat_mul_new(const Matrix *a, const Matrix *b) {
+    Matrix dst = cvl_mat_create(a->height, b->width);
+    cvl_mat_mul(a, b, &dst);
+    return dst;
+}
+
+// Element-wise scaling (m * scalar).
+void cvl_mat_scale(Matrix *m, double scalar) {
+    const int h = m->height;
+    const int w = m->width;
+
+    for (int i = 0; i < h; i++) {
+        for (int j = 0; j < w; j++) {
+            m->map[i][j] = m->map[i][j] * scalar;
+        }
+    }
+}
+
+// Element-wise scaling (m * scalar).
+Matrix cvl_mat_scale_new(const Matrix *m, double scalar) {
+    Matrix dst = cvl_mat_copy(m);
+    cvl_mat_scale(&dst, scalar);
+    return dst;
+}
+
+// Element-wise product (a * b).
+void cvl_mat_hadamard(const Matrix *a, const Matrix *b, Matrix *dst) {
+    const int h = a->height;
+    const int w = a->width;
+
+    assert(b->height == h && b->width == w && dst->height == h && dst->width == w);
+
+    for (int i = 0; i < h; i++) {
+        for (int j = 0; j < w; j++) {
+            dst->map[i][j] = a->map[i][j] * b->map[i][j];
+        }
+    }
+}
+
+// Element-wise product (a * b).
+Matrix cvl_mat_hadamard_new(const Matrix *a, const Matrix *b) {
+    Matrix dst = cvl_mat_create(a->height, a->width);
+    cvl_mat_hadamard(a, b, &dst);
+    return dst;
+}
+
+// Transposes a matrix (mxn) --> (nxm).
+void cvl_mat_transpose(const Matrix *src, Matrix *dst) {
+    assert(src->height == dst->width && src->width == dst->height);
+    const int h = dst->height;
+    const int w = dst->width;
+
+    for (int i = 0; i < h; i++) {
+        for (int j = 0; j < w; j++) {
+            dst->map[i][j] = src->map[j][i];
+        }
+    }
+}
+
+// Transposes a matrix (mxn) --> (nxm).
+Matrix cvl_mat_transpose_new(const Matrix *src) {
+    Matrix dst = cvl_mat_create(src->width, src->height);
+    cvl_mat_transpose(src, &dst);
+    return dst;
 }
 
 // Converts a matrix to an image with scaling and gamma correction.
