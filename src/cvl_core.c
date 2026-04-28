@@ -282,6 +282,83 @@ Matrix cvl_mat_transpose_new(const Matrix *src) {
     return dst;
 }
 
+void cvl_mat_square(const Matrix *src, Matrix *dst) {
+    const int h = src->height;
+    const int w = src->width;
+
+    for (int i = 0; i < h; ++i) {
+        for (int j = 0; j < w; ++j) {
+            dst->map[i][j] = src->map[i][j] * src->map[i][j];
+        }
+    }
+}
+
+Matrix cvl_mat_square_new(const Matrix *src) {
+    Matrix dst = cvl_mat_create(src->height, src->width);
+    cvl_mat_square(src, &dst);
+    return dst;
+}
+
+void cvl_outer(const Matrix *a, const Matrix *b, Matrix *dst) {
+    const int m = a->height * a->width;
+    const int n = b->height * b->width;
+
+    for (int i = 0; i < m; ++i) {
+        int ai = i / a->width;
+        int aj = i % a->width;
+        double va = a->map[ai][aj];
+
+        for (int j = 0; j < n; ++j) {
+            int bi = j / b->width;
+            int bj = j % b->width;
+            double vb = b->map[bi][bj];
+
+            dst->map[i][j] = va * vb;
+        }
+    }
+}
+
+Matrix cvl_outer_new(const Matrix *a, const Matrix *b) {
+    const int m = a->height * a->width;
+    const int n = b->height * b->width;
+    Matrix dst = cvl_mat_create(m, n);
+    cvl_outer(a, b, &dst);
+    return dst;
+}
+
+void cvl_outer_arr(const double *a, int m, const double *b, int n, Matrix *dst) {
+    for (int i = 0; i < m; ++i) {
+        for (int j = 0; j < n; ++j) {
+            dst->map[i][j] = a[i] * b[j];
+        }
+    }
+}
+
+Matrix cvl_outer_arr_new(const double *a, int m, const double *b, int n) {
+    Matrix dst = cvl_mat_create(m, n);
+    cvl_outer_arr(a, m, b, n, &dst);
+    return dst;
+}
+
+// Returns element-wise |src|.
+void cvl_mat_abs(Matrix *src) {
+    const int h = src->height;
+    const int w = src->width;
+
+    for (int i = 0; i < h; i++) {
+        for (int j = 0; j < w; j++) {
+            src->map[i][j] = fabs(src->map[i][j]);
+        }
+    }
+}
+
+// Returns element-wise |src|.
+Matrix cvl_mat_abs_new(const Matrix *src) {
+    Matrix dst = cvl_mat_copy(src);
+    cvl_mat_abs(&dst);
+    return dst;
+}
+
 // Converts a matrix to an image with scaling and gamma correction.
 // - scale == 0: values are 1/255 normalized before applying gamma.
 // - scale != 0: values are min/max normalized before applying gamma.

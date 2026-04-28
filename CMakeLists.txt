@@ -10,6 +10,7 @@ add_library(cvl
     src/cvl_core.c
     src/cvl_imgproc.c
     src/cvl_hough.c
+    src/cvl_laws.c
     src/cvl_io.c
     src/cvl_error.c
     src/cvl_draw.c

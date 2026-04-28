@@ -196,6 +196,35 @@ void p4(void) {
     cvl_img_free(img);
 }
 
+// Texture Segmentation.
+void p5 (void) {
+    const int N_FILES = 20;
+
+    const char *idir = "./data/original/textures/";
+    const char *odir = "./data/modified/textures/";
+
+    char ipath[256];
+    char opath[256];
+
+    for (int i = 1; i <= N_FILES; i++) {
+        snprintf(ipath, sizeof(ipath), "%s%d.pgm", idir, i);
+        snprintf(opath, sizeof(opath), "%s%d.ppm", odir, i);
+
+        printf("Processing %s -> %s...\n", ipath, opath);
+
+        Image img = cvl_imread(ipath);
+        if (!img.map) perror("Failed imread"); continue;
+
+        // todo: I don't want to manually tune number of clusters... you get 6
+        Image segmented = cvl_texture_segment_laws_kmeans(&img, 6, 15);
+
+        cvl_imwrite(opath, &segmented);
+
+        cvl_img_free(img);
+        cvl_img_free(segmented);
+    }
+}
+
 int main(void) {
 
     p1_i();
@@ -208,6 +237,8 @@ int main(void) {
     p3_ii();
 
     p4();
+    
+    p5();
 
     return 0;
 }

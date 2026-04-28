@@ -5,6 +5,7 @@
 #include <stdbool.h>
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 typedef struct {
     int parent;
@@ -135,6 +136,91 @@ int cvl_threshold(Image *src, Image *dst, int thresh, int maxval, int type) {
 // Changes all pixels below thresh to black (0), otherwise to white (255).
 int cvl_binarize(Image *img, int thresh) {
     return cvl_threshold(img, img, thresh, 255, CVL_THRESH_BINARY);
+}
+
+double cvl_otsu_threshold(const Matrix *src) {
+    const int h = src->height;
+    const int w = src->width;
+    const int n = h * w;
+
+    double min = src->map[0][0];
+    double max = src->map[0][0];
+
+    // Find Range.
+    for (int i = 0; i < h; ++i) {
+        for (int j = 0; j < w; ++j) {
+            double v = src->map[i][j];
+            if (v < min) min = v;
+            if (v > max) max = v;
+        }
+    }
+
+    if (min == max) return min;
+
+    // Histogram.
+    const int otsu_bins = 256; // todo
+    int hist[otsu_bins];
+    memset(hist, 0, sizeof(hist));
+
+    for (int i = 0; i < h; ++i) {
+        for (int j = 0; j < w; ++j) {
+            int idx = (int)((src->map[i][j] - min) / (max - min) * (otsu_bins - 1));
+            hist[idx]++;
+        }
+    }
+
+    // Total Mean.
+    double sum = 0.0;
+    for (int i = 0; i < otsu_bins; ++i) {
+        sum += i * hist[i];
+    }
+
+    double sum_b = 0.0;
+    int wb = 0;
+    int wf = 0;
+
+    double max_var = 0.0;
+    int thresh_bin = 0;
+
+    // Scan thresholds.
+    for (int t = 0; t < otsu_bins; t++) {
+        wb += hist[t];
+        if (wb == 0) continue;
+
+        wf = n - wb;
+        if (wf == 0) break;
+
+        sum_b += t * hist[t];
+
+        double mb = sum_b / wb;
+        double mf = (sum - sum_b) / wf;
+
+        double between = (double)wb * (double)wf * (mb - mf) * (mb - mf);
+
+        if (between > max_var) {
+            max_var = between;
+            thresh_bin = t;
+        }
+    }
+
+    // Convert back to value space.
+    return min + (thresh_bin / (double)(otsu_bins - 1)) * (max - min);
+}
+
+void cvl_threshold_otsu(const Matrix *src, Matrix *dst) {
+    double t = cvl_otsu_threshold(src);
+    // printf("Thresh: %f\n", t);
+
+    const int h = src->height;
+    const int w = src->width;
+
+    for (int i = 0; i < h; ++i) {
+        for (int j = 0; j < w; ++j) {
+            dst->map[i][j] = (src->map[i][j] > t) ? 255.0 : 0.0;
+        }
+    }
+
+    // todo: return threshold?
 }
 
 // Randomly flips binary pixels with probability p.
@@ -465,11 +551,11 @@ static Matrix cvl_gaussian_kernel(int ksize, double sigma) {
 
 /**
  * Blurs an image/matrix using a Gaussian kernel defined by sigma.
- * 
+ *
  * @param src Input matrix.
  * @param dst Output matrix (blurred).
  * @param sigma Gaussian kernel standard deviation.
- * 
+ *
  * @todo ksize?
  * I don't like handling both...
  * but I don't like not having kszie...
@@ -715,7 +801,7 @@ static void cvl_ht(Matrix *src, Matrix *dst, int lo, int hi) {
     int dh[] = {-1, -1, -1, 0, 0, 1, 1, 1};
     int dw[] = {-1, 0, 1, -1, 1, -1, 0, 1};
 
-    typedef struct { int i, j; } Point;
+    typedef struct { int i, j; } Point; // todo: why doesn't this throw error
     Point *queue = malloc(h * w * sizeof(Point));
     assert(queue);
     int front = 0, back = 0;
@@ -735,7 +821,7 @@ static void cvl_ht(Matrix *src, Matrix *dst, int lo, int hi) {
             int ni = p.i + dh[k];
             int nj = p.j + dw[k];
 
-            bool in_bounds = (0 <= ni && ni < h) && (0 <= nj && nj < w); 
+            bool in_bounds = (0 <= ni && ni < h) && (0 <= nj && nj < w);
             if (!in_bounds) continue;
 
             if (tmp.map[ni][nj] == C) {
@@ -787,6 +873,31 @@ void cvl_canny(Matrix *src, Matrix *dst, double sigma, int lo, int hi) {
     cvl_mat_free(gy);
     cvl_mat_free(gx);
     cvl_mat_free(smoothed);
+}
+
+void cvl_texture_local_mean(const Matrix *src, Matrix *dst, int ksize) {
+    cvl_blur_mean(src, dst, ksize);
+}
+
+void cvl_texture_local_variance(const Matrix *src, Matrix *dst, int ksize) {
+    const int h = src->height;
+    const int w = src->width;
+
+    Matrix src_sq = cvl_mat_square_new(src);            // X^2
+    Matrix mean = cvl_blur_mean_new(src, ksize);        // E[X]
+    Matrix mean_sq = cvl_blur_mean_new(&src_sq, ksize); // E[X^2]
+
+    // Var(x) = E[X^2] - (E[X])^2.
+    for (int i = 0; i < h; ++i) {
+        for (int j = 0; j < w; ++j) {
+            double m = mean.map[i][j];
+            dst->map[i][j] = mean_sq.map[i][j] - (m * m);
+        }
+    }
+
+    cvl_mat_free(src_sq);
+    cvl_mat_free(mean);
+    cvl_mat_free(mean_sq);
 }
 
 // Convenience "_new" wrappers
@@ -881,3 +992,16 @@ Matrix cvl_canny_new(Matrix *src, double sigma, int lo, int hi) {
 
     return canny_edges;
 }
+
+Matrix cvl_texture_local_mean_new(const Matrix *src, int ksize) {
+    Matrix dst = cvl_mat_create(src->height, src->width);
+    cvl_texture_local_mean(src, &dst, ksize);
+    return dst;
+}
+
+Matrix cvl_texture_local_variance_new(const Matrix *src, int ksize) {
+    Matrix dst = cvl_mat_create(src->height, src->width);
+    cvl_texture_local_variance(src, &dst, ksize);
+    return dst;
+}
+

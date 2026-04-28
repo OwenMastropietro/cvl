@@ -141,3 +141,136 @@ TEST(ImgProcTest, Convolve) {
     cvl_mat_free(kernel);
     cvl_mat_free(dst);
 }
+
+TEST(ImgProcTest, Outer) {
+    {
+        double vals[] = {1, 4, 6, 4, 1};
+
+        Matrix a = cvl_mat_create_from(vals, 5, 1);
+        Matrix b = cvl_mat_create_from(vals, 5, 1);
+        Matrix dst = cvl_outer_new(&a, &b);
+
+        double exp[5][5] = {
+            { 1,  4,  6,  4,  1},
+            { 4, 16, 24, 16,  4},
+            { 6, 24, 36, 24,  6},
+            { 4, 16, 24, 16,  4},
+            { 1,  4,  6,  4,  1},
+        };
+
+        for (int i = 0; i < 5; ++i) {
+            for (int j = 0; j < 5; ++j) {
+                EXPECT_EQ(dst.map[i][j], exp[i][j]);
+            }
+        }
+
+        cvl_mat_free(a);
+        cvl_mat_free(b);
+        cvl_mat_free(dst);
+    }
+
+    {
+        double avals[] = { 1,  4,  6,  4,  1};
+        double bvals[] = {-1, -2,  0,  2,  1};
+
+        Matrix a = cvl_mat_create_from(avals, 5, 1);
+        Matrix b = cvl_mat_create_from(bvals, 5, 1);
+        Matrix dst = cvl_outer_new(&a, &b);
+
+        double exp[5][5] = {
+            {-1,  -2,   0,   2,   1},
+            {-4,  -8,   0,   8,   4},
+            {-6, -12,   0,  12,   6},
+            {-4,  -8,   0,   8,   4},
+            {-1,  -2,   0,   2,   1},
+        };
+
+        for (int i = 0; i < 5; ++i) {
+            for (int j = 0; j < 5; ++j) {
+                EXPECT_EQ(dst.map[i][j], exp[i][j]);
+            }
+        }
+
+        cvl_mat_free(a);
+        cvl_mat_free(b);
+        cvl_mat_free(dst);
+    }
+    {
+        double avals[] = { 1,  4,  6,  4,  1};
+        double bvals[] = {-1,  0,  2,  0, -1};
+
+        Matrix a = cvl_mat_create_from(avals, 5, 1);
+        Matrix b = cvl_mat_create_from(bvals, 5, 1);
+        Matrix dst = cvl_outer_new(&a, &b);
+
+        double exp[5][5] = {
+            {-1,  0,  2,  0, -1},
+            {-4,  0,  8,  0, -4},
+            {-6,  0, 12,  0, -6},
+            {-4,  0,  8,  0, -4},
+            {-1,  0,  2,  0, -1},
+        };
+
+        for (int i = 0; i < 5; ++i) {
+            for (int j = 0; j < 5; ++j) {
+                EXPECT_EQ(dst.map[i][j], exp[i][j]);
+            }
+        }
+
+        cvl_mat_free(a);
+        cvl_mat_free(b);
+        cvl_mat_free(dst);
+    }
+    {
+        double avals[] = {1,  4,  6,  4,  1};
+        double bvals[] = {1, -4,  6, -4,  1};
+
+        Matrix a = cvl_mat_create_from(avals, 5, 1);
+        Matrix b = cvl_mat_create_from(bvals, 5, 1);
+        Matrix dst = cvl_outer_new(&a, &b);
+
+        double exp[5][5] = {
+            {1,  -4,   6,  -4,   1},
+            {4, -16,  24, -16,   4},
+            {6, -24,  36, -24,   6},
+            {4, -16,  24, -16,   4},
+            {1,  -4,   6,  -4,   1},
+        };
+
+        for (int i = 0; i < 5; ++i) {
+            for (int j = 0; j < 5; ++j) {
+                EXPECT_EQ(dst.map[i][j], exp[i][j]);
+            }
+        }
+
+        cvl_mat_free(a);
+        cvl_mat_free(b);
+        cvl_mat_free(dst);
+    }
+    {
+        double avals[] = {-1,  2,  0, -2,  1};
+        double bvals[] = {-1, -2,  0,  2,  1};
+
+        Matrix a = cvl_mat_create_from(avals, 5, 1);
+        Matrix b = cvl_mat_create_from(bvals, 5, 1);
+        Matrix dst = cvl_outer_new(&a, &b);
+
+        double exp[5][5] = {
+            { 1,  2,  0, -2, -1},
+            {-2, -4,  0,  4,  2},
+            { 0,  0,  0,  0,  0},
+            { 2,  4,  0, -4, -2},
+            {-1, -2,  0,  2,  1},
+        };
+
+        for (int i = 0; i < 5; ++i) {
+            for (int j = 0; j < 5; ++j) {
+                EXPECT_EQ(dst.map[i][j], exp[i][j]);
+            }
+        }
+
+        cvl_mat_free(a);
+        cvl_mat_free(b);
+        cvl_mat_free(dst);
+    }
+}

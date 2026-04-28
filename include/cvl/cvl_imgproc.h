@@ -13,6 +13,10 @@ int cvl_threshold(Image *img, Image *dst, int thresh, int maxval, int type);
 
 int cvl_binarize(Image *img, int thresh);
 
+double cvl_otsu_threshold(const Matrix *src);
+
+void cvl_threshold_otsu(const Matrix *src, Matrix *dst);
+
 void cvl_add_noise(Image *img, double p);
 
 void cvl_rotate(Image *img);
@@ -47,6 +51,10 @@ void cvl_laplacian(const Matrix *src, Matrix *dst);
 
 void cvl_canny(Matrix *src, Matrix *dst, double sigma, int lo, int hi);
 
+void cvl_texture_local_mean(const Matrix *src, Matrix *dst, int ksize);
+
+void cvl_texture_local_variance(const Matrix *src, Matrix *dst, int ksize);
+
 // Convenience "_new" wrappers
 
 Image cvl_threshold_new(Image *src, int thresh, int maxval, int type);
@@ -74,6 +82,10 @@ Matrix cvl_sobel_angle(Matrix *src);
 Matrix cvl_laplacian_new(const Matrix *src);
 
 Matrix cvl_canny_new(Matrix *src, double sigma, int lo, int hi);
+
+Matrix cvl_texture_local_mean_new(const Matrix *src, int ksize);
+
+Matrix cvl_texture_local_variance_new(const Matrix *src, int ksize);
 
 #ifdef __cplusplus
 }
