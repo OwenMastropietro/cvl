@@ -317,108 +317,76 @@ void cvl_normalize(cvl_Mat *src, cvl_Mat *dst) {
 
 // Applies a fixed-level threshold to each array element — determined by type.
 void cvl_threshold(cvl_Mat *img, int thresh, int maxval, int type) {
-    assert(img && img->data);
-    assert(0 < img->channels && img->channels < 4);
-
-    const size_t height = img->height;
-    const size_t width = img->width;
+    const size_t h = img->height;
+    const size_t w = img->width;
     const size_t channels = img->channels;
     const size_t stride = img->stride;
 
     switch (img->depth) {
-    case CVL_UINT8: {
-        uint8_t *data = (uint8_t *)img->data;
-        uint8_t t = (uint8_t)thresh;
-        uint8_t mv = (uint8_t)maxval;
-        for (size_t i = 0; i < height; ++i) {
-            uint8_t *row = data + i * stride;
-            for (size_t j = 0; j < width * channels; ++j) {
-                uint8_t v = row[j];
-                switch (type) {
-                case CVL_THRESH_BINARY:
-                    row[j] = (v > t) ? mv : 0;
-                    break;
-                case CVL_THRESH_BINARY_INV:
-                    row[j] = (v > t) ? 0 : mv;
-                    break;
-                case CVL_THRESH_TRUNC:
-                    row[j] = (v > t) ? t : v;
-                    break;
-                case CVL_THRESH_TOZERO:
-                    row[j] = (v > t) ? v : 0;
-                    break;
-                case CVL_THRESH_TOZERO_INV:
-                    row[j] = (v > t) ? 0 : v;
-                    break;
-                default:
-                    assert(false); // CVL_THRESH_UNKNOWN
+        case CVL_UINT8: {
+            uint8_t t = (uint8_t)thresh;
+            uint8_t mv = (uint8_t)maxval;
+            uint8_t *data = (uint8_t *)img->data;
+            for (size_t i = 0; i < h; ++i) {
+                uint8_t *row = data + i * stride;
+                for (size_t j = 0; j < w * channels; ++j) {
+                    uint8_t v = row[j];
+                    switch (type) {
+                        case CVL_THRESH_BINARY:     row[j] = (v > t) ? mv : 0; break;
+                        case CVL_THRESH_BINARY_INV: row[j] = (v > t) ? 0 : mv; break;
+                        case CVL_THRESH_TRUNC:      row[j] = (v > t) ? t : v;  break;
+                        case CVL_THRESH_TOZERO:     row[j] = (v > t) ? v : 0;  break;
+                        case CVL_THRESH_TOZERO_INV: row[j] = (v > t) ? 0 : v;  break;
+                        default: assert(false); // CVL_THRESH_UNKNOWN
+                    }
                 }
             }
+            break;
         }
-        break;
-    }
-    case CVL_FLOAT32: {
-        float *data = (float *)img->data;
-        float t = (float)thresh;
-        float mv = (float)maxval;
-        for (size_t i = 0; i < height; ++i) {
-            float *row = (float *)((uint8_t *)data + i * stride);
-            for (size_t j = 0; j < width * channels; ++j) {
-                float v = row[j];
-                switch (type) {
-                case CVL_THRESH_BINARY:
-                    row[j] = (v > t) ? mv : 0.0f;
-                    break;
-                case CVL_THRESH_BINARY_INV:
-                    row[j] = (v > t) ? 0.0f : mv;
-                    break;
-                case CVL_THRESH_TRUNC:
-                    row[j] = (v > t) ? t : v;
-                    break;
-                case CVL_THRESH_TOZERO:
-                    row[j] = (v > t) ? v : 0.0f;
-                    break;
-                case CVL_THRESH_TOZERO_INV:
-                    row[j] = (v > t) ? 0.0f : v;
-                    break;
-                default:
-                    assert(false); // CVL_THRESH_UNKNOWN
+
+        case CVL_FLOAT32: {
+            float t = (float)thresh;
+            float mv = (float)maxval;
+            float *data = (float *)img->data;
+            for (size_t i = 0; i < h; ++i) {
+                float *row = (float *)((uint8_t *)data + i * stride);
+                for (size_t j = 0; j < w * channels; ++j) {
+                    float v = row[j];
+                    switch (type) {
+                        case CVL_THRESH_BINARY:     row[j] = (v > t) ? mv : 0.0f; break;
+                        case CVL_THRESH_BINARY_INV: row[j] = (v > t) ? 0.0f : mv; break;
+                        case CVL_THRESH_TRUNC:      row[j] = (v > t) ? t : v;     break;
+                        case CVL_THRESH_TOZERO:     row[j] = (v > t) ? v : 0.0f;  break;
+                        case CVL_THRESH_TOZERO_INV: row[j] = (v > t) ? 0.0f : v;  break;
+                        default: assert(false); // CVL_THRESH_UNKNOWN
+                    }
                 }
             }
+            break;
         }
-        break;
-    }
-    case CVL_FLOAT64: {
-        double *data = (double *)img->data;
-        double t = (double)thresh;
-        double mv = (double)maxval;
-        for (size_t i = 0; i < height; ++i) {
-            double *row = (double *)((uint8_t *)data + i * stride);
-            for (size_t j = 0; j < width * channels; ++j) {
-                double v = row[j];
-                switch (type) {
-                case CVL_THRESH_BINARY:
-                    row[j] = (v > t) ? mv : 0.0;
-                    break;
-                case CVL_THRESH_BINARY_INV:
-                    row[j] = (v > t) ? 0.0 : mv;
-                    break;
-                case CVL_THRESH_TRUNC:
-                    row[j] = (v > t) ? t : v;
-                    break;
-                case CVL_THRESH_TOZERO:
-                    row[j] = (v > t) ? v : 0.0;
-                    break;
-                case CVL_THRESH_TOZERO_INV:
-                    row[j] = (v > t) ? 0.0 : v;
-                    break;
-                default:
-                    assert(false); // CVL_THRESH_UNKNOWN
+
+        case CVL_FLOAT64: {
+            double t = (double)thresh;
+            double mv = (double)maxval;
+            double *data = (double *)img->data;
+            for (size_t i = 0; i < h; ++i) {
+                double *row = (double *)((uint8_t *)data + i * stride);
+                for (size_t j = 0; j < w * channels; ++j) {
+                    double v = row[j];
+                    switch (type) {
+                        case CVL_THRESH_BINARY:     row[j] = (v > t) ? mv : 0.0; break;
+                        case CVL_THRESH_BINARY_INV: row[j] = (v > t) ? 0.0 : mv; break;
+                        case CVL_THRESH_TRUNC:      row[j] = (v > t) ? t : v;    break;
+                        case CVL_THRESH_TOZERO:     row[j] = (v > t) ? v : 0.0;  break;
+                        case CVL_THRESH_TOZERO_INV: row[j] = (v > t) ? 0.0 : v;  break;
+                        default: assert(false); // CVL_THRESH_UNKNOWN
+                    }
                 }
             }
+            break;
         }
-        break;
-    }
+
+        default: assert(false); // bad depth
     }
 }
 

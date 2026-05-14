@@ -1,6 +1,22 @@
 #include <cvl/cvl.h>
 #include <gtest/gtest.h>
 
+
+static void assert_mat_equal_u8(cvl_Mat *a, cvl_Mat *b) {
+    ASSERT_EQ(a->height, b->height);
+    ASSERT_EQ(a->width, b->width);
+    ASSERT_EQ(a->channels, b->channels);
+
+    for (int i = 0; i < a->height; ++i) {
+        uint8_t *row_a = cvl_row_u8(a, i);
+        uint8_t *row_b = cvl_row_u8(b, i);
+
+        for (int j = 0; j < a->width; ++j) {
+            EXPECT_EQ(row_a[j], row_b[j]);
+        }
+    }
+}
+
 TEST(ImgProcTest, Correlate) {
     // ==========================================
     // Test Uniform Square Kernel (3x3)
