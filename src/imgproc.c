@@ -694,40 +694,78 @@ int cvl_color_components(cvl_Mat *img, const cvl_Mat *labels, int thresh) {
 // Correlation & Convolution
 // ==========================
 
-// Floating point correlation of src with kernel (using zero padding).
-static void _correlate_f(const cvl_Mat *src, cvl_Mat *dst, cvl_Mat *kernel) {
-    // G(r, c) = \sum_{i=-m}^{m} \sum_{j=-n}^{n} K(i, j) * I(r + i), c + j)
-    assert(src->height == dst->height);
-    assert(src->width == dst->width);
-    assert(src->channels == dst->channels);
-    assert(src->depth == CVL_FLOAT64);
-    assert(dst->depth == CVL_FLOAT64);
+static void correlate_u8(const cvl_Mat *src, cvl_Mat *dst, const cvl_Mat *kernel) {
+    assert(src->depth == CVL_UINT8);
+    assert(dst->depth == CVL_UINT8);
     assert(kernel->depth == CVL_FLOAT64);
 
-    const int h = src->height;
-    const int w = src->width;
+    const int h   = src->height;
+    const int w   = src->width;
     const int chs = src->channels;
 
     const int kh = kernel->height;
     const int kw = kernel->width;
 
-    const int ar = kh / 2.0; // anchor (row)
-    const int ac = kw / 2.0; // anchor (column)
+    const int ar = kh / 2; // anchor (row)
+    const int ac = kw / 2; // anchor (column)
 
     double *kdata = kernel->data;
 
     for (int r = 0; r < h; ++r) {
         for (int c = 0; c < w; ++c) {
             for (int ch = 0; ch < chs; ++ch) {
-                double ws = 0.0; // weighted sum
+                double ws = 0.0;
 
                 for (int i = 0; i < kh; ++i) {
                     for (int j = 0; j < kw; ++j) {
                         int rr = r + i - ar;
                         int cc = c + j - ac;
+
                         bool in_bounds = (0 <= rr && rr < h) && (0 <= cc && cc < w);
                         if (in_bounds) { // BORDER_CONSTANT
                             double kval = kdata[i * kw + j];
+                            uint8_t sval = CVL_AT_U8(src, rr, cc, ch);
+                            ws += kval * (double)sval;
+                        }
+                    }
+                }
+
+                CVL_AT_U8(dst, r, c, ch) = cvl_sat_u8_f64(ws);
+            }
+        }
+    }
+}
+
+static void correlate_f64(const cvl_Mat *src, cvl_Mat *dst, const cvl_Mat *kernel) {
+    assert(src->depth == CVL_FLOAT64);
+    assert(dst->depth == CVL_FLOAT64);
+    assert(kernel->depth == CVL_FLOAT64);
+
+    const int h   = src->height;
+    const int w   = src->width;
+    const int chs = src->channels;
+
+    const int kh = kernel->height;
+    const int kw = kernel->width;
+
+    const int ar = kh / 2; // anchor (row)
+    const int ac = kw / 2; // anchor (column)
+
+    double *kdata = kernel->data;
+
+    for (int r = 0; r < h; ++r) {
+        for (int c = 0; c < w; ++c) {
+            for (int ch = 0; ch < chs; ++ch) {
+                double ws = 0.0;
+
+                for (int i = 0; i < kh; ++i) {
+                    for (int j = 0; j < kw; ++j) {
+                        int rr = r + i - ar;
+                        int cc = c + j - ac;
+
+                        bool in_bounds = (0 <= rr && rr < h) && (0 <= cc && cc < w);
+                        if (in_bounds) { // BORDER_CONSTANT
+                            double kval = CVL_AT_F64(kernel, i, j, 0);
                             double sval = CVL_AT_F64(src, rr, cc, ch);
                             ws += kval * sval;
                         }
@@ -742,17 +780,16 @@ static void _correlate_f(const cvl_Mat *src, cvl_Mat *dst, cvl_Mat *kernel) {
 
 // Correlate src with kernel using zero padding.
 void cvl_correlate(const cvl_Mat *src, cvl_Mat *dst, cvl_Mat *kernel) {
-    cvl_Mat src_f64 = cvl_mat_create(src->height, src->width, src->channels, CVL_FLOAT64);
-    cvl_Mat dst_f64 = cvl_mat_create(src->height, src->width, src->channels, CVL_FLOAT64);
+    assert(src->height == dst->height);
+    assert(src->width == dst->width);
+    assert(src->depth == dst->depth);
+    assert(src->channels == dst->channels);
 
-    cvl_cvt_depth(src, &src_f64, CVL_FLOAT64, 1.0, 0.0); // src --> f64
-
-    _correlate_f(&src_f64, &dst_f64, kernel);
-
-    cvl_cvt_depth(&dst_f64, dst, dst->depth, 1.0, 0.0); // f64 --> dst
-
-    cvl_mat_free(&src_f64);
-    cvl_mat_free(&dst_f64);
+    switch (src->depth) {
+        case CVL_UINT8:   correlate_u8(src, dst, kernel);  break;
+        case CVL_FLOAT64: correlate_f64(src, dst, kernel); break;
+        default: assert(false);
+    }
 }
 
 cvl_Mat cvl_correlate_new(const cvl_Mat *src, cvl_Mat *kernel) {

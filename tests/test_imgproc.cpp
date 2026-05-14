@@ -2,7 +2,45 @@
 #include <gtest/gtest.h>
 
 TEST(ImgProcTest, Correlate) {
-    // Test 1
+    // ==========================================
+    // Test Uniform Square Kernel (3x3)
+
+    // U8
+    {
+        uint8_t vals[3][3] = {
+            {1, 2, 3},
+            {4, 5, 6},
+            {7, 8, 9},
+        };
+
+        double kval = 1.0 / 9.0;
+
+        uint8_t exp[3][3] = {
+            {1, 2, 2},
+            {3, 5, 4},
+            {3, 4, 3},
+        };
+
+        cvl_Mat src    = cvl_mat_create_from(3, 3, 1, CVL_UINT8, vals);
+        cvl_Mat kernel = cvl_mat_create_fill(3, 3, 1, CVL_FLOAT64, &kval);
+
+        cvl_Mat dst = cvl_correlate_new(&src, &kernel);
+
+        for (int i = 0; i < dst.height; ++i) {
+            uint8_t *row = cvl_row_u8(&dst, i);
+
+            for (int j = 0; j < dst.width; ++j) {
+                uint8_t expected = exp[i][j];
+                EXPECT_EQ(row[j], expected);
+            }
+        }
+
+        cvl_mat_free(&src);
+        cvl_mat_free(&kernel);
+        cvl_mat_free(&dst);
+    }
+
+    // F64
     {
         double vals[3][3] = {
             {1, 2, 3},
@@ -18,8 +56,9 @@ TEST(ImgProcTest, Correlate) {
             {24.0 / 9.0, 39.0 / 9.0, 28.0 / 9.0},
         };
 
-        cvl_Mat src = cvl_mat_create_from(3, 3, 1, CVL_FLOAT64, vals);
+        cvl_Mat src    = cvl_mat_create_from(3, 3, 1, CVL_FLOAT64, vals);
         cvl_Mat kernel = cvl_mat_create_fill(3, 3, 1, CVL_FLOAT64, &kval);
+
         cvl_Mat dst = cvl_correlate_new(&src, &kernel);
 
         for (int i = 0; i < dst.height; ++i) {
@@ -36,7 +75,48 @@ TEST(ImgProcTest, Correlate) {
         cvl_mat_free(&dst);
     }
 
-    // Test 2
+    // ==========================================
+    // Test Non-Uniform Kernel (2x2)
+
+    // U8
+    {
+        uint8_t vals[3][3] = {
+            {1, 2, 3},
+            {4, 5, 6},
+            {7, 8, 9},
+        };
+
+        double kvals[2][2] = {
+            {1.0 / 4.0, 0.0 / 4.0},
+            {0.0 / 4.0, 1.0 / 4.0},
+        };
+
+        uint8_t exp[3][3] = {
+            {0, 1, 1},
+            {1, 2, 2},
+            {2, 3, 4},
+        };
+
+        cvl_Mat src    = cvl_mat_create_from(3, 3, 1, CVL_UINT8, vals);
+        cvl_Mat kernel = cvl_mat_create_from(2, 2, 1, CVL_FLOAT64, kvals);
+
+        cvl_Mat dst = cvl_correlate_new(&src, &kernel);
+
+        for (int i = 0; i < dst.height; ++i) {
+            uint8_t *row = cvl_row_u8(&dst, i);
+
+            for (int j = 0; j < dst.width; ++j) {
+                uint8_t expected = exp[i][j];
+                EXPECT_NEAR(row[j], expected, 1e-6);
+            }
+        }
+
+        cvl_mat_free(&src);
+        cvl_mat_free(&kernel);
+        cvl_mat_free(&dst);
+    }
+
+    // F64
     {
         double vals[3][3] = {
             {1, 2, 3},
