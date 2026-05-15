@@ -14,7 +14,7 @@ add_executable(test_cvl
 )
 
 target_link_libraries(test_cvl PRIVATE
-    cvl
+    cvl_lib
     gtest_main
 )
 
