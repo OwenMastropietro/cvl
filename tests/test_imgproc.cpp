@@ -314,34 +314,61 @@ TEST(ImgProcTest, BlurMean) {
 }
 
 TEST(ImgProcTest, BlurMedian) {
-    // Test 1
+    // Test: Replicate Border
     {
-        double vals[3][3] = {
+        uint8_t vals[3][3] = {
             {1, 2, 3},
             {4, 5, 6},
             {7, 8, 9},
         };
 
-        // double exp[3][3] = { // oops, this is for BOARDER_CONSTANT
+        // uint8_t exp[3][3] = { // oops, this is for BOARDER_CONSTANT
         //     {0, 2, 0},
         //     {2, 5 ,0},
         //     {0, 5, 0},
         // };
-        double exp[3][3] = {
+        uint8_t exp[3][3] = {
             {2, 3, 3},
             {4, 5, 6},
             {7, 7, 8},
         };
 
-        cvl_Mat src = cvl_mat_create_from(3, 3, 1, CVL_FLOAT64, vals);
+        cvl_Mat src = cvl_mat_create_from(3, 3, 1, CVL_UINT8, vals);
         cvl_Mat dst = cvl_blur_median_new(&src, 3);
 
-        for (int i = 0; i < dst.height; ++i) {
-            double *row = cvl_row_f64(&dst, i);
+        ASSERT_NE(dst.data, nullptr);
+        EXPECT_EQ(memcmp(dst.data, exp, sizeof(exp)), 0);
 
-            for (int j = 0; j < dst.width; ++j) {
-                double expected = exp[i][j];
-                EXPECT_EQ(row[j], expected);
+        cvl_mat_free(&src);
+        cvl_mat_free(&dst);
+    }
+
+    // Test: RGB
+    {
+        uint8_t vals[3][3][3] = {{
+            {10, 20, 30},
+            {10, 20, 30},
+            {10, 20, 30},
+        }, {
+            {10, 20, 30},
+            {255, 20, 30},
+            {10, 20, 30},
+        }, {
+            {10, 20, 30},
+            {10, 20, 30},
+            {10, 20, 30},
+        }};
+
+        cvl_Mat src = cvl_mat_create_from(3, 3, 3, CVL_UINT8, vals);
+        cvl_Mat dst = cvl_blur_median_new(&src, 3);
+
+        ASSERT_NE(dst.data, nullptr);
+
+        for (int y = 0; y < dst.height; ++y) {
+            for (int x = 0; x < dst.width; ++x) {
+                EXPECT_EQ(CVL_AT_U8(&dst, y, x, 0), 10);
+                EXPECT_EQ(CVL_AT_U8(&dst, y, x, 1), 20);
+                EXPECT_EQ(CVL_AT_U8(&dst, y, x, 2), 30);
             }
         }
 

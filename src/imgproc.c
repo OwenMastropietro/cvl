@@ -88,24 +88,6 @@ static void _morph(cvl_Mat *img, int pixel_value) {
     free(mask);
 }
 
-// Compares two doubles for qsort ordering.
-static int _cmp(const void *a, const void *b) {
-    return (*(double *)a - *(double *)b);
-}
-
-// Returns the median an array (sorts the array in place).
-static double _median(double nums[], int n) {
-    qsort(nums, n, sizeof(double), _cmp); // hawk tua
-
-    if (n % 2 == 0) { // average of middle two
-        double a = nums[(n - 1) / 2];
-        double b = nums[n / 2];
-        return (a + b) / 2.0;
-    }
-
-    return nums[n / 2];
-}
-
 // Clamp x to inclusive range [lo, hi].
 static inline int _clamp(int x, int lo, int hi) {
     if (x < lo) return lo;
@@ -997,6 +979,20 @@ cvl_Mat cvl_blur_gauss_new(const cvl_Mat *src, int ksize, double sigma) {
     return dst;
 }
 
+static uint8_t _hist_median(const int hist[256], int total) {
+    int acc = 0;
+    int mid = total / 2;
+
+    for (int i = 0; i < 256; ++i) {
+        acc += hist[i];
+        if (acc > mid) {
+            return (uint8_t)i;
+        }
+    }
+
+    return 0;
+}
+
 // Apply median blur using replicated outlier pixel values.
 void cvl_blur_median(const cvl_Mat *src, cvl_Mat *dst, int ksize) {
     assert(src->height == dst->height && src->width == dst->width);
@@ -1006,35 +1002,33 @@ void cvl_blur_median(const cvl_Mat *src, cvl_Mat *dst, int ksize) {
     const int w = src->width;
     const int chs = src->channels;
 
-    const int ar = ksize / 2; // anchor (row)
-    const int ac = ksize / 2; // anchor (column)
+    const int ar = ksize / 2;
+    const int ac = ksize / 2;
+    const int window_size = ksize * ksize;
 
-    const int kxk = ksize * ksize;
+    int hist[256];
 
-    double *kernel = malloc(sizeof(double) * kxk);
-    assert(kernel);
-
-    for (int r = 0; r < h; ++r) {
-        for (int c = 0; c < w; ++c) {
+    for (int y = 0; y < h; ++y) {
+        for (int x = 0; x < w; ++x) {
             for (int ch = 0; ch < chs; ++ch) {
-                int idx = 0;
 
-                for (int i = 0; i < ksize; ++i) {
-                    for (int j = 0; j < ksize; ++j) {
-                        int rr = _clamp(r + i - ar, 0, h - 1);
-                        int cc = _clamp(c + j - ac, 0, w - 1);
+                memset(hist, 0, sizeof(hist));
 
+                for (int dy = 0; dy < ksize; ++dy) {
+                    for (int dx = 0; dx < ksize; ++dx) {
+                        int yy = _clamp(y + dy - ar, 0, h - 1);
+                        int xx = _clamp(x + dx - ac, 0, w - 1);
                         // BORDER_REPLICATE
-                        kernel[idx++] = CVL_AT_F64(src, rr, cc, ch);
+
+                        uint8_t v = CVL_AT_U8(src, yy, xx, ch);
+                        hist[v]++;
                     }
                 }
 
-                CVL_AT_F64(dst, r, c, ch) = _median(kernel, kxk);
+                CVL_AT_U8(dst, y, x, ch) = _hist_median(hist, window_size);
             }
         }
     }
-
-    free(kernel);
 }
 
 cvl_Mat cvl_blur_median_new(const cvl_Mat *src, int ksize) {
