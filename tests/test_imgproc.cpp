@@ -496,3 +496,61 @@ TEST(ImgProcTest, CvtColor) {
         cvl_mat_free(&dst);
     }
 }
+
+TEST(ImgProcTest, Crop) {
+    {
+        uint8_t vals[3][3] = {
+            {1, 2, 3},
+            {4, 5, 6},
+            {7, 8, 9},
+        };
+        uint8_t exp_vals[2][2] = {
+            {5, 6},
+            {8, 9},
+        };
+
+        cvl_Mat src = cvl_mat_create_from(3, 3, 1, CVL_UINT8, vals);
+        cvl_Mat exp = cvl_mat_create_from(2, 2, 1, CVL_UINT8, exp_vals);
+        cvl_Mat res = cvl_crop_new(&src, 1, 1, 2, 2);
+
+        assert_mat_equal_u8(&res, &exp);
+
+        cvl_mat_free(&src);
+        cvl_mat_free(&exp);
+        cvl_mat_free(&res);
+    }
+
+    // Test: RGB
+    {
+        uint8_t vals[3][3][3] = {{
+            {10, 20, 30},
+            {40, 50, 60},
+            {70, 80, 90},
+        }, {
+            {11, 21, 31},
+            {41, 51, 61},
+            {71, 81, 91},
+        }, {
+            {12, 22, 32},
+            {42, 52, 62},
+            {72, 82, 92},
+        }};
+        uint8_t exp_vals[2][2][3] = {{
+            {41, 51, 61},
+            {71, 81, 91},
+        }, {
+            {42, 52, 62},
+            {72, 82, 92},
+        }};
+
+        cvl_Mat src = cvl_mat_create_from(3, 3, 3, CVL_UINT8, vals);
+        cvl_Mat exp = cvl_mat_create_from(2, 2, 3, CVL_UINT8, exp_vals);
+        cvl_Mat res = cvl_crop_new(&src, 1, 1, 2, 2);
+
+        assert_mat_equal_u8(&res, &exp);
+
+        cvl_mat_free(&src);
+        cvl_mat_free(&exp);
+        cvl_mat_free(&res);
+    }
+}

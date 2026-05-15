@@ -25,6 +25,8 @@ void cvl_expand(cvl_Mat *img);
 
 void cvl_shrink(cvl_Mat *img);
 
+void cvl_crop(const cvl_Mat *src, cvl_Mat *dst, int r, int c);
+
 int cvl_connected_components(const cvl_Mat *src, cvl_Mat *labels, int connectivity);
 
 int cvl_color_components(cvl_Mat *dst, const cvl_Mat *labels, int thresh);
@@ -56,6 +58,8 @@ cvl_Mat cvl_cvt_color_new(const cvl_Mat *src, int code);
 cvl_Mat cvl_cvt_depth_new(const cvl_Mat *src, cvl_depth_t ddepth, double alpha, double beta);
 
 cvl_Mat cvl_threshold_new(const cvl_Mat *src, int thresh, int maxval, int type);
+
+cvl_Mat cvl_crop_new(const cvl_Mat *src, int r, int c, int h, int w);
 
 cvl_Mat cvl_correlate_new(const cvl_Mat *src, cvl_Mat *kernel);
 

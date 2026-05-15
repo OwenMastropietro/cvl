@@ -477,6 +477,31 @@ void cvl_expand(cvl_Mat *img) { _morph(img, BLACK); }
 // Changes all pixels with white neighbors to white.
 void cvl_shrink(cvl_Mat *img) { _morph(img, WHITE); }
 
+// Copies a region of interest defined by (r, c) from src into dst.
+void cvl_crop(const cvl_Mat *src, cvl_Mat *dst, int r, int c) {
+    assert (src->depth == dst->depth);
+
+    const int h = dst->height;
+    const int w = dst->width;
+
+    const size_t psize = src->channels * cvl_elem_size(src->depth);
+    const size_t rsize = (size_t)w * psize;
+    const size_t col_offset = (size_t)c * psize;
+
+    for (int y = 0; y < h; y++) {
+        uint8_t *srow = cvl_mat_row(src, y + r) + col_offset;
+        uint8_t *drow = cvl_mat_row(dst, y);
+        memcpy(drow, srow, rsize);
+    }
+}
+
+// Copies a region of interest defined by (r, c) from src into a new matrix of size hxw.
+cvl_Mat cvl_crop_new(const cvl_Mat *src, int r, int c, int h, int w) {
+    cvl_Mat dst = cvl_mat_create(h, w, src->channels, src->depth);
+    cvl_crop(src, &dst, r, c);
+    return dst;
+}
+
 // ==========================
 // Connected Component Labeling
 // ==========================
