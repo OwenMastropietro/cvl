@@ -5,95 +5,218 @@
 #include <stdio.h>
 #include <string.h>
 
-void test_bad_ext(void);
-void test_write_pbm(void);
-void test_write_pgm(void);
-void test_write_ppm(void);
+// ==============================================
+// cvl_imread
+// ==============================================
 
-TEST(IOTest, Imwrite) {
-    // test_write_pbm();
-    // test_write_pgm();
-    // test_write_ppm();
+std::string TEST_DIR = std::string(TEST_SOURCE_DIR) + "/data/";
 
-    // Test 1: invalid extension
+TEST(ImRead, FileNotFound) {
+    std::string path = TEST_DIR + "nonexistent.sol";
+    cvl_Mat img = cvl_imread(path.c_str());
+    ASSERT_EQ(img.data, nullptr);
+}
+
+TEST(ImRead, InvalidFormat) {
+    std::string path = TEST_DIR + "test.txt";
+    cvl_Mat img = cvl_imread(path.c_str());
+    ASSERT_EQ(img.data, nullptr);
+}
+
+TEST(ImRead, ReadPBM) {
     {
-        cvl_Mat img = cvl_mat_create(5, 10, 1, CVL_UINT8);
-        ASSERT_EQ(cvl_imwrite("test.bad", &img), -1);
+        std::string path = TEST_DIR + "test.pbm";
+        cvl_Mat img = cvl_imread(path.c_str());
+        ASSERT_NE(img.data,     nullptr);
+        EXPECT_EQ(img.width,    10);
+        EXPECT_EQ(img.height,   2);
+        EXPECT_EQ(img.channels, 1);
+        EXPECT_EQ(img.depth,    CVL_UINT8);
         cvl_mat_free(&img);
     }
+}
 
-    // Test 2: write PBM
+TEST(ImRead, ReadPGM) {
     {
-        cvl_Mat img = cvl_mat_create(5, 10, 1, CVL_UINT8);
+        std::string path = TEST_DIR + "test.pgm";
+        cvl_Mat img = cvl_imread(path.c_str());
+        ASSERT_NE(img.data,     nullptr);
+        EXPECT_EQ(img.width,    5);
+        EXPECT_EQ(img.height,   3);
+        EXPECT_EQ(img.channels, 1);
+        EXPECT_EQ(img.depth,    CVL_UINT8);
+        cvl_mat_free(&img);
+    }
+}
+        
+TEST(ImRead, ReadPPM) {
+    {
+        std::string path = TEST_DIR + "test.ppm";
+        cvl_Mat img = cvl_imread(path.c_str());
+        ASSERT_NE(img.data,     nullptr);
+        EXPECT_EQ(img.width,    2);
+        EXPECT_EQ(img.height,   2);
+        EXPECT_EQ(img.channels, 3);
+        EXPECT_EQ(img.depth,    CVL_UINT8);
+        cvl_mat_free(&img);
+    }
+}
+
+TEST(ImRead, ReadPNG) {
+    {
+        std::string path = TEST_DIR + "test.png";
+        cvl_Mat img = cvl_imread(path.c_str());
+        ASSERT_NE(img.data,     nullptr);
+        EXPECT_EQ(img.width,    481);
+        EXPECT_EQ(img.height,   321);
+        EXPECT_EQ(img.channels, 3);
+        EXPECT_EQ(img.depth,    CVL_UINT8);
+        cvl_mat_free(&img);
+    }
+}
+
+TEST(ImRead, ReadJPG) {
+    {
+        std::string path = TEST_DIR + "test.jpg";
+        cvl_Mat img = cvl_imread(path.c_str());
+        ASSERT_NE(img.data,     nullptr);
+        EXPECT_EQ(img.width,    481);
+        EXPECT_EQ(img.height,   321);
+        EXPECT_EQ(img.channels, 3);
+        EXPECT_EQ(img.depth,    CVL_UINT8);
+        cvl_mat_free(&img);
+    }
+}
+
+// ==============================================
+// cvl_imwrite
+// ==============================================
+
+TEST(ImWrite, InvalidFormat) {
+        cvl_Mat img = cvl_mat_create(2, 3, 1, CVL_UINT8);
+        ASSERT_NE(cvl_imwrite("test.bad", &img), 0);
+        cvl_mat_free(&img);
+}
+
+TEST(ImWrite, WritePBM) {
+    {
+        uint8_t vals[2][3] = {
+            {0,   255, 0},
+            {255, 0,   255},
+        };
+
+        cvl_Mat img = cvl_mat_create_from(2, 3, 1, CVL_UINT8, vals);
 
         ASSERT_EQ(cvl_imwrite("test.pbm", &img), 0);
 
-        FILE *f = fopen("test.pbm", "rb");
-        ASSERT_NE(f, nullptr);
+        cvl_Mat loaded = cvl_imread("test.pbm");
+        ASSERT_NE(loaded.data,     nullptr);
+        EXPECT_EQ(loaded.height,   2);
+        EXPECT_EQ(loaded.width,    3);
+        EXPECT_EQ(loaded.channels, 1);
+        EXPECT_EQ(loaded.depth,    CVL_UINT8);
 
-        // Read type.
-        char type[3] = {0};
-        ASSERT_TRUE(fscanf(f, "%s", type));
-        ASSERT_EQ(strncmp(type, "P4", 2), 0);
+        EXPECT_EQ(memcmp(img.data, loaded.data, img.height * img.width), 0);
 
-        // Read dims.
-        int width = 0;
-        int height = 0;
-        ASSERT_EQ(fscanf(f, "%d %d\n", &width, &height), 2);
-        EXPECT_EQ(width, 10);
-        EXPECT_EQ(height, 5);
-
-        fclose(f);
         cvl_mat_free(&img);
+        cvl_mat_free(&loaded);
     }
+}
 
-    // Test 3: write PGM
+TEST(ImWrite, WritePGM) {
     {
-        cvl_Mat img = cvl_mat_create(5, 10, 1, CVL_UINT8);
+        uint8_t vals[2][3] = {
+            {0, 128, 255},
+            {4, 20,  69},
+        };
 
-        ASSERT_EQ(cvl_imwrite("test_img.pgm", &img), 0);
+        cvl_Mat img = cvl_mat_create_from(2, 3, 1, CVL_UINT8, vals);
 
-        FILE *f = fopen("test_img.pgm", "rb");
-        ASSERT_NE(f, nullptr);
+        ASSERT_EQ(cvl_imwrite("test.pgm", &img), 0);
 
-        // Read type.
-        char type[3] = {0};
-        ASSERT_TRUE(fscanf(f, "%s", type));
-        ASSERT_EQ(strncmp(type, "P5", 2), 0);
+        cvl_Mat loaded = cvl_imread("test.pgm");
+        ASSERT_NE(loaded.data,     nullptr);
+        EXPECT_EQ(loaded.height,   2);
+        EXPECT_EQ(loaded.width,    3);
+        EXPECT_EQ(loaded.channels, 1);
+        EXPECT_EQ(loaded.depth,    CVL_UINT8);
 
-        // Read dims.
-        int width = 0;
-        int height = 0;
-        ASSERT_EQ(fscanf(f, "%d %d\n", &width, &height), 2);
-        EXPECT_EQ(width, 10);
-        EXPECT_EQ(height, 5);
+        EXPECT_EQ(memcmp(img.data, loaded.data, img.height * img.width), 0);
 
-        fclose(f);
         cvl_mat_free(&img);
+        cvl_mat_free(&loaded);
     }
+}
 
-    // Test 4: write PPM
+TEST(ImWrite, WritePPM) {
     {
-        cvl_Mat img = cvl_mat_create(5, 10, 3, CVL_UINT8);
+        uint8_t vals[2][3][3] = {
+            {{0, 0,  0},  {128, 128, 128}, {255, 255, 255}},
+            {{4, 20, 69}, {255, 0,   0},   {0,   255, 0}},
+        };
 
-        ASSERT_EQ(cvl_imwrite("test_img.ppm", &img), 0);
+        cvl_Mat img = cvl_mat_create_from(2, 3, 3, CVL_UINT8, vals);
 
-        FILE *f = fopen("test_img.ppm", "rb");
-        ASSERT_NE(f, nullptr);
+        ASSERT_EQ(cvl_imwrite("test.ppm", &img), 0);
 
-        // Read type.
-        char type[3] = {0};
-        ASSERT_TRUE(fscanf(f, "%s", type));
-        ASSERT_EQ(strncmp(type, "P6", 2), 0);
+        cvl_Mat loaded = cvl_imread("test.ppm");
+        ASSERT_NE(loaded.data,     nullptr);
+        EXPECT_EQ(loaded.height,   2);
+        EXPECT_EQ(loaded.width,    3);
+        EXPECT_EQ(loaded.channels, 3);
+        EXPECT_EQ(loaded.depth,    CVL_UINT8);
 
-        // Read dims.
-        int width = 0;
-        int height = 0;
-        ASSERT_EQ(fscanf(f, "%d %d\n", &width, &height), 2);
-        EXPECT_EQ(width, 10);
-        EXPECT_EQ(height, 5);
+        EXPECT_EQ(memcmp(img.data, loaded.data, img.height * img.width * img.channels), 0);
 
-        fclose(f);
         cvl_mat_free(&img);
+        cvl_mat_free(&loaded);
+    }
+}
+
+TEST(ImWrite, WritePNG) {
+    {
+        uint8_t vals[2][3][3] = {
+            {{0, 0,  0},  {128, 128, 128}, {255, 255, 255}},
+            {{4, 20, 69}, {255, 0,   0},   {0,   255, 0}},
+        };
+
+        cvl_Mat img = cvl_mat_create_from(2, 3, 3, CVL_UINT8, vals);
+
+        ASSERT_EQ(cvl_imwrite("test.png", &img), 0);
+
+        cvl_Mat loaded = cvl_imread("test.png");
+        ASSERT_NE(loaded.data,     nullptr);
+        EXPECT_EQ(loaded.height,   2);
+        EXPECT_EQ(loaded.width,    3);
+        EXPECT_EQ(loaded.channels, 3);
+        EXPECT_EQ(loaded.depth,    CVL_UINT8);
+
+        EXPECT_EQ(memcmp(img.data, loaded.data, img.height * img.width * img.channels), 0);
+
+        cvl_mat_free(&img);
+        cvl_mat_free(&loaded);
+    }
+}
+
+TEST(ImWrite, WriteJPG) {
+    {
+        uint8_t vals[2][3][3] = {
+            {{0, 0,  0},  {128, 128, 128}, {255, 255, 255}},
+            {{4, 20, 69}, {255, 0,   0},   {0,   255, 0}},
+        };
+
+        cvl_Mat img = cvl_mat_create_from(2, 3, 3, CVL_UINT8, vals);
+
+        ASSERT_EQ(cvl_imwrite("test.jpg", &img), 0);
+
+        cvl_Mat loaded = cvl_imread("test.jpg");
+        ASSERT_NE(loaded.data,     nullptr);
+        EXPECT_EQ(loaded.height,   2);
+        EXPECT_EQ(loaded.width,    3);
+        EXPECT_EQ(loaded.channels, 3);
+        EXPECT_EQ(loaded.depth,    CVL_UINT8);
+
+        cvl_mat_free(&img);
+        cvl_mat_free(&loaded);
     }
 }

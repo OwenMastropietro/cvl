@@ -8,12 +8,14 @@ add_library(cvl
     src/core.c
     src/imgproc.c
     src/io.c
+    src/stb.c
 )
 
 target_link_libraries(cvl PUBLIC m)
 
 target_include_directories(cvl PUBLIC
     $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty>
     # todo: install interface
 )
 

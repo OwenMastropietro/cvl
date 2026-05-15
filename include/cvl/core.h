@@ -40,6 +40,8 @@ typedef enum cvl_format_t {
     CVL_FMT_PBM,
     CVL_FMT_PGM,
     CVL_FMT_PPM,
+    CVL_FMT_PNG,
+    CVL_FMT_JPG,
 } cvl_format_t;
 
 // pixel depth
