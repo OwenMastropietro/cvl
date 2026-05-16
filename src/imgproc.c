@@ -32,62 +32,6 @@ static void uf_union(UFNode *uf, int32_t a, int32_t b) {
     }
 }
 
-// Changes all pixels with a pixel_value neighbor to pixel_value.
-static void _morph(cvl_Mat *img, int pixel_value) {
-    assert(img && img->data);
-    assert(img->channels == 1);
-    assert(img->depth == CVL_UINT8);
-
-    const int h = img->height;
-    const int w = img->width;
-    const size_t stride = img->stride;
-
-    uint8_t *data = img->data;
-
-    bool *mask = calloc(h * w, sizeof(bool));
-    assert(mask);
-
-    int dh[] = {-1, -1, -1, 0, 0, 1, 1, 1};
-    int dw[] = {-1, 0, 1, -1, 1, -1, 0, 1};
-    const int n_neighbors = 8;
-
-    // Set Mask - Marking Pixels to Change.
-    for (int i = 0; i < h; ++i) {
-        uint8_t *row = data + i * stride;
-
-        for (int j = 0; j < w; ++j) {
-            if (row[j] == pixel_value) continue;
-
-            for (int k = 0; k < n_neighbors; ++k) {
-                int ni = i + dh[k];
-                int nj = j + dw[k];
-
-                bool in_bounds = ((0 <= ni && ni < h) && (0 <= nj && nj < w));
-                if (!in_bounds) continue;
-
-                uint8_t *nrow = data + ni * stride;
-                if (nrow[nj] == pixel_value) {
-                    mask[i * w + j] = true;
-                    break;
-                }
-            }
-        }
-    }
-
-    // Change Pixels According to Mask.
-    for (int i = 0; i < h; ++i) {
-        uint8_t *row = data + i * stride;
-
-        for (int j = 0; j < w; ++j) {
-            if (mask[i * w + j]) {
-                row[j] = pixel_value;
-            }
-        }
-    }
-
-    free(mask);
-}
-
 // Clamp x to inclusive range [lo, hi].
 static inline int _clamp(int x, int lo, int hi) {
     if (x < lo) return lo;
@@ -383,30 +327,6 @@ cvl_Mat cvl_threshold_new(const cvl_Mat *src, int thresh, int maxval, int type) 
     return dst;
 }
 
-// Randomly flips binary pixels with probability p.
-void cvl_add_noise(cvl_Mat *img, double p) {
-    assert(img && img->data);
-    assert(img->channels == 1);
-    assert(img->depth == CVL_UINT8);
-    assert(0.0 <= p && p <= 1.0);
-
-    uint8_t *data = img->data;
-
-    for (int i = 0; i < img->height; ++i) {
-        uint8_t *row = data + i * img->stride;
-
-        for (int j = 0; j < img->width; ++j) {
-            uint8_t pixel = row[j];
-            assert(pixel == BLACK || pixel == WHITE);
-
-            double r = (double)rand() / RAND_MAX;
-            if (r < p) {
-                row[j] = (pixel == BLACK) ? WHITE : BLACK;
-            }
-        }
-    }
-}
-
 // Rotates the image 180º.
 void cvl_rotate(cvl_Mat *img) {
     const int h = img->height;
@@ -476,11 +396,87 @@ void cvl_invert(cvl_Mat *img, int maxval) {
     }
 }
 
-// Changes all pixels with black neighbors to black.
-void cvl_expand(cvl_Mat *img) { _morph(img, BLACK); }
+// Changes all pixels to their neighborhood max.
+void cvl_dilate(const cvl_Mat *src, cvl_Mat *dst, int ksize) {
+    const int h = src->height;
+    const int w = src->width;
+    const int chs = src->channels;
 
-// Changes all pixels with white neighbors to white.
-void cvl_shrink(cvl_Mat *img) { _morph(img, WHITE); }
+    const int r = ksize / 2;
+
+    for (int y = 0; y < h; ++y) {
+        for (int x = 0; x < w; ++x) {
+            for (int ch = 0; ch < chs; ++ch) {
+                uint8_t maxv = 0;
+
+                for (int dy = -r; dy <= r; ++dy) {
+                    for (int dx = -r; dx <= r; ++dx) {
+                        int yy = _clamp(y + dy, 0, h - 1);
+                        int xx = _clamp(x + dx, 0, w - 1);
+
+                        uint8_t v = CVL_AT_U8(src, yy, xx, ch);
+
+                        if (v > maxv) {
+                            maxv = v;
+                        }
+                    }
+                }
+                CVL_AT_U8(dst, y, x, ch) = maxv;
+            }
+        }
+    }
+}
+
+// Changes all pixels to their neighborhood min.
+void cvl_erode(const cvl_Mat *src, cvl_Mat *dst, int ksize) {
+    const int h = src->height;
+    const int w = src->width;
+    const int chs = src->channels;
+
+    const int r = ksize / 2;
+
+    for (int y = 0; y < h; ++y) {
+        for (int x = 0; x < w; ++x) {
+            for (int ch = 0; ch < chs; ++ch) {
+                uint8_t minv = 255;
+
+                for (int dy = -r; dy <= r; ++dy) {
+                    for (int dx = -r; dx <= r; ++dx) {
+                        int yy = _clamp(y + dy, 0, h - 1);
+                        int xx = _clamp(x + dx, 0, w - 1);
+
+                        uint8_t v = CVL_AT_U8(src, yy, xx, ch);
+
+                        if (v < minv) {
+                            minv = v;
+                        }
+                    }
+                }
+                CVL_AT_U8(dst, y, x, ch) = minv;
+            }
+        }
+    }
+}
+
+// Morphological opening applies erode then dilate.
+void cvl_open(const cvl_Mat *src, cvl_Mat *dst, int ksize) {
+    cvl_Mat tmp = cvl_mat_create(src->height, src->width, src->channels, src->depth);
+
+    cvl_erode(src, &tmp, ksize);
+    cvl_dilate(&tmp, dst, ksize);
+
+    cvl_mat_free(&tmp);
+}
+
+// Morphological closing applies dilate then erode.
+void cvl_close(const cvl_Mat *src, cvl_Mat *dst, int ksize) {
+    cvl_Mat tmp = cvl_mat_create(src->height, src->width, src->channels, src->depth);
+
+    cvl_dilate(src, &tmp, ksize);
+    cvl_erode(&tmp, dst, ksize);
+
+    cvl_mat_free(&tmp);
+}
 
 // Copies a region of interest defined by (r, c) from src into dst.
 void cvl_crop(const cvl_Mat *src, cvl_Mat *dst, int r, int c) {

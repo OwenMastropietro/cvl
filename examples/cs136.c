@@ -7,28 +7,52 @@
 #include <stdio.h>
 #include <stdlib.h>
 
+// Randomly flip binary pixels with probability p.
+static void add_noise(cvl_Mat *img, double p) {
+    uint8_t *data = img->data;
+
+    for (int i = 0; i < img->height; ++i) {
+        uint8_t *row = data + i * img->stride;
+
+        for (int j = 0; j < img->width; ++j) {
+            uint8_t pixel = row[j];
+            assert(pixel == BLACK || pixel == WHITE);
+
+            double r = (double)rand() / RAND_MAX;
+            if (r < p) {
+                row[j] = (pixel == BLACK) ? WHITE : BLACK;
+            }
+        }
+    }
+}
+
+
 // Add and Remove Salt and Pepper Noise (via shrink-expand pipeline).
 void p1_i(void) {
+    // Load.
     cvl_Mat img = cvl_imread("./data/original/text.pgm");
-    assert(img.channels == 1);
 
-    cvl_imwrite("./data/modified/text.pgm", &img);
-
-    cvl_threshold(&img, 128, 255, CVL_THRESH_BINARY);
-
-    cvl_imwrite("./data/modified/text_bw.pbm", &img);
-
+    // Add Noise.
     srand(42);
-    cvl_add_noise(&img, 0.05);
-    cvl_imwrite("./data/modified/text_noise.pbm", &img);
+    cvl_Mat noisy = cvl_threshold_new(&img, 128, 255, CVL_THRESH_BINARY);
+    add_noise(&noisy, 0.02);
 
-    cvl_expand(&img);
-    cvl_shrink(&img);
-    cvl_shrink(&img);
-    cvl_expand(&img);
-    cvl_imwrite("./data/modified/text_clear.pbm", &img);
+    // Remove Noise.
+    cvl_Mat clear = cvl_mat_copy(&img);
+    cvl_Mat tmp = cvl_mat_copy(&img);
+    cvl_open(&noisy, &tmp, 3);
+    cvl_close(&tmp, &clear, 3);
 
+    // Write.
+    cvl_imwrite("./data/modified/1-text.pgm", &img);
+    cvl_imwrite("./data/modified/2-text_noisy.pbm", &noisy);
+    cvl_imwrite("./data/modified/3-text_clear.pbm", &clear);
+
+    // Free.
     cvl_mat_free(&img);
+    cvl_mat_free(&noisy);
+    cvl_mat_free(&clear);
+    cvl_mat_free(&tmp);
 }
 
 // CCL - Count Components.
@@ -100,11 +124,11 @@ void p2(void) {
 
 int main(void) {
 
-    // p1_i();
+    p1_i();
     // p1_ii();
     // p1_iii();
 
-    p2();
+    // p2();
 
     return 0;
 }

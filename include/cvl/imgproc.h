@@ -21,9 +21,13 @@ void cvl_rotate(cvl_Mat *img);
 
 void cvl_invert(cvl_Mat *img, int maxval);
 
-void cvl_expand(cvl_Mat *img);
+void cvl_dilate(const cvl_Mat *src, cvl_Mat *dst, int ksize);
 
-void cvl_shrink(cvl_Mat *img);
+void cvl_erode(const cvl_Mat *src, cvl_Mat *dst, int ksize);
+
+void cvl_open(const cvl_Mat *src, cvl_Mat *dst, int ksize);
+
+void cvl_close(const cvl_Mat *src, cvl_Mat *dst, int ksize);
 
 void cvl_crop(const cvl_Mat *src, cvl_Mat *dst, int r, int c);
 
