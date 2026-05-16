@@ -166,68 +166,67 @@ void cvl_cvt_depth(const cvl_Mat *src, cvl_Mat *dst, cvl_depth_t ddepth, double 
     for (int i = 0; i < h; ++i) {
 
         switch (sdepth) {
-        case CVL_UINT8: {
-            uint8_t *srow = cvl_row_u8(src, i);
-
-            switch (ddepth) {
             case CVL_UINT8: {
-                uint8_t *drow = cvl_row_u8(dst, i);
-                for (int j = 0; j < w * ch; ++j) {
-                    double v = (double)srow[j];
-                    v = alpha * v + beta;
-                    drow[j] = cvl_sat_u8_f64(v);
+                const uint8_t *srow = cvl_mat_row_const(src, i);
+
+                switch (ddepth) {
+                case CVL_UINT8: {
+                    uint8_t *drow = cvl_mat_row(dst, i);
+                    for (int j = 0; j < w * ch; ++j) {
+                        double v = (double)srow[j];
+                        v = alpha * v + beta;
+                        drow[j] = cvl_sat_u8_f64(v);
+                    }
+                    break;
+                }
+
+                case CVL_FLOAT64: {
+                    double *drow = (double *)cvl_mat_row(dst, i);
+                    for (int j = 0; j < w * ch; ++j) {
+                        double v = (double)srow[j];
+                        v = alpha * v + beta;
+                        drow[j] = v;
+                    }
+                    break;
+                }
+
+                default:
+                    assert(false);
                 }
                 break;
             }
 
             case CVL_FLOAT64: {
-                double *drow = cvl_row_f64(dst, i);
-                for (int j = 0; j < w * ch; ++j) {
-                    double v = (double)srow[j];
-                    v = alpha * v + beta;
-                    drow[j] = v;
+                const double *srow = (const double *)cvl_mat_row_const(src, i);
+
+                switch (ddepth) {
+                    case CVL_UINT8: {
+                        uint8_t *drow = cvl_mat_row(dst, i);
+                        for (int j = 0; j < w * ch; ++j) {
+                            double v = srow[j];
+                            v = alpha * v + beta;
+                            drow[j] = cvl_sat_u8_f64(v);
+                        }
+                        break;
+                    }
+
+                    case CVL_FLOAT64: {
+                        double *drow = (double *)cvl_mat_row(dst, i);
+                        for (int j = 0; j < w * ch; ++j) {
+                            double v = srow[j];
+                            v = alpha * v + beta;
+                            drow[j] = v;
+                        }
+                        break;
+                    }
+
+                    default: assert(false);
                 }
+
                 break;
             }
 
-            default:
-                assert(false);
-            }
-            break;
-        }
-
-        case CVL_FLOAT64: {
-            double *srow = cvl_row_f64(src, i);
-
-            switch (ddepth) {
-            case CVL_UINT8: {
-                uint8_t *drow = cvl_row_u8(dst, i);
-                for (int j = 0; j < w * ch; ++j) {
-                    double v = srow[j];
-                    v = alpha * v + beta;
-                    drow[j] = cvl_sat_u8_f64(v);
-                }
-                break;
-            }
-
-            case CVL_FLOAT64: {
-                double *drow = cvl_row_f64(dst, i);
-                for (int j = 0; j < w * ch; ++j) {
-                    double v = srow[j];
-                    v = alpha * v + beta;
-                    drow[j] = v;
-                }
-                break;
-            }
-
-            default:
-                assert(false);
-            }
-            break;
-        }
-
-        default:
-            assert(false);
+            default: assert(false);
         }
     }
 }
@@ -490,7 +489,7 @@ void cvl_crop(const cvl_Mat *src, cvl_Mat *dst, int r, int c) {
     const size_t col_offset = (size_t)c * psize;
 
     for (int y = 0; y < h; y++) {
-        uint8_t *srow = cvl_mat_row(src, y + r) + col_offset;
+        const uint8_t *srow = cvl_mat_row_const(src, y + r) + col_offset;
         uint8_t *drow = cvl_mat_row(dst, y);
         memcpy(drow, srow, rsize);
     }
@@ -556,8 +555,8 @@ void resize_linear(const cvl_Mat *src, cvl_Mat *dst) {
         y0 = _clamp(y0, 0, sh - 1);
         y1 = _clamp(y1, 0, sh - 1);
 
-        const uint8_t *row0 = cvl_row_u8(src, y0);
-        const uint8_t *row1 = cvl_row_u8(src, y1);
+        const uint8_t *row0 = cvl_mat_row_const(src, y0);
+        const uint8_t *row1 = cvl_mat_row_const(src, y1);
 
         for (int x = 0; x < dw; ++x) {
             float x_src = (x + 0.5f) * scale_x - 0.5f;
@@ -630,8 +629,8 @@ int cvl_connected_components(const cvl_Mat *src, cvl_Mat *labels, int connectivi
 
     // Pass I - Assign Labels and Equivalences.
     for (int i = 0; i < h; ++i) {
-        uint8_t *srow = cvl_row_u8(src, i);
-        int32_t *lrow = cvl_row_i32(labels, i);
+        const uint8_t *srow = cvl_mat_row_const(src, i);
+        int32_t *lrow = (int32_t *)cvl_mat_row(labels, i);
 
         for (int j = 0; j < w; ++j) {
             if (srow[j] == WHITE) continue;
@@ -645,7 +644,7 @@ int cvl_connected_components(const cvl_Mat *src, cvl_Mat *labels, int connectivi
                 bool in_bounds = (0 <= ni && ni < h) && (0 <= nj && nj < w);
                 if (!in_bounds) continue;
 
-                int32_t *nrow = cvl_row_i32(labels, ni);
+                int32_t *nrow = (int32_t *)cvl_mat_row(labels, ni);
                 if (nrow[nj] > 0) {
                     neighbor_labels[count++] = nrow[nj];
                 }
@@ -673,7 +672,7 @@ int cvl_connected_components(const cvl_Mat *src, cvl_Mat *labels, int connectivi
 
     // Pass II - Reconcile Equivalences.
     for (int i = 0; i < h; ++i) {
-        int32_t *lrow = cvl_row_i32(labels, i);
+        int32_t *lrow = (int32_t *)cvl_mat_row(labels, i);
 
         for (int j = 0; j < w; ++j) {
             if (lrow[j] > 0) {
@@ -687,7 +686,7 @@ int cvl_connected_components(const cvl_Mat *src, cvl_Mat *labels, int connectivi
     assert(seen);
     int num_components = 0;
     for (int i = 0; i < h; ++i) {
-        int32_t *lrow = cvl_row_i32(labels, i);
+        int32_t *lrow = (int32_t *)cvl_mat_row(labels, i);
 
         for (int j = 0; j < w; ++j) {
             if (lrow[j] > 0 && !seen[lrow[j]]) {
@@ -725,7 +724,7 @@ int cvl_color_components(cvl_Mat *img, const cvl_Mat *labels, int thresh) {
 
     // Pass I - Calculate Component Sizes.
     for (int i = 0; i < h; ++i) {
-        int32_t *row = cvl_row_i32(labels, i);
+        const int32_t *row = (const int32_t *)cvl_mat_row_const(labels, i);
         for (int j = 0; j < w; ++j) {
             if (row[j] > 0) {
                 sizes[row[j]]++;
@@ -746,8 +745,8 @@ int cvl_color_components(cvl_Mat *img, const cvl_Mat *labels, int thresh) {
     const int max = 256 - min;
 
     for (int i = 0; i < h; ++i) {
-        uint8_t *row = cvl_row_u8(img, i);
-        int32_t *lrow = cvl_row_i32(labels, i);
+        uint8_t *row = cvl_mat_row(img, i);
+        const int32_t *lrow = (const int32_t *)cvl_mat_row_const(labels, i);
         for (int j = 0; j < w; ++j) {
             int label = lrow[j];
             if (label > 0 && sizes[label] >= (size_t)thresh) {
@@ -823,8 +822,6 @@ static void correlate_f64(const cvl_Mat *src, cvl_Mat *dst, const cvl_Mat *kerne
 
     const int ar = kh / 2; // anchor (row)
     const int ac = kw / 2; // anchor (column)
-
-    double *kdata = kernel->data;
 
     for (int r = 0; r < h; ++r) {
         for (int c = 0; c < w; ++c) {
@@ -912,8 +909,8 @@ static void _convolve_x(const cvl_Mat *src, cvl_Mat *dst, const cvl_Mat *kernel)
     double *kdata = kernel->data;
 
     for (int y = 0; y < h; ++y) {
-        double *srow = cvl_row_f64(src, y);
-        double *drow = cvl_row_f64(dst, y);
+        const double *srow = (const double *)cvl_mat_row_const(src, y);
+        double *drow = (double *)cvl_mat_row(dst, y);
 
         for (int x = 0; x < w; ++x) {
             for (int ch = 0; ch < chs; ++ch) {
@@ -944,7 +941,7 @@ static void _convolve_y(const cvl_Mat *src, cvl_Mat *dst, const cvl_Mat *kernel)
     double *kdata = kernel->data;
 
     for (int y = 0; y < h; ++y) {
-        double *drow = cvl_row_f64(dst, y);
+        double *drow = (double *)cvl_mat_row(dst, y);
 
         for (int x = 0; x < w; ++x) {
             for (int ch = 0; ch < chs; ++ch) {
@@ -955,7 +952,7 @@ static void _convolve_y(const cvl_Mat *src, cvl_Mat *dst, const cvl_Mat *kernel)
                     yy = _clamp(yy, 0, h - 1); // BOARDER_REPLICATE
                     // if (yy < 0 || yy >= h) continue; // BOARDER_CONSTANT
 
-                    double *srow = cvl_row_f64(src, yy);
+                    const double *srow = (const double *)cvl_mat_row_const(src, yy);
                     sum += kdata[k + radius] * srow[x * chs + ch];
                 }
 
@@ -1164,9 +1161,9 @@ static void _mag(cvl_Mat *g, const cvl_Mat *gx, const cvl_Mat *gy) {
     assert(g->depth == gx->depth && gx->depth == gy->depth && gy->depth == CVL_FLOAT64);
 
     for (int i = 0; i < g->height; ++i) {
-        double *grow = cvl_row_f64(g, i);
-        double *xrow = cvl_row_f64(gx, i);
-        double *yrow = cvl_row_f64(gy, i);
+        double *grow = (double *)cvl_mat_row(g, i);
+        const double *xrow = (const double *)cvl_mat_row_const(gx, i);
+        const double *yrow = (const double *)cvl_mat_row_const(gy, i);
 
         for (int j = 0; j < g->width; ++j) {
             grow[j] = hypot(xrow[j], yrow[j]); // sqrt(x*x + y*y)
@@ -1178,9 +1175,9 @@ static void _ang(cvl_Mat *a, const cvl_Mat *gx, const cvl_Mat *gy) {
     assert(a->depth == gx->depth && gx->depth == gy->depth && gy->depth == CVL_FLOAT64);
 
     for (int i = 0; i < a->height; ++i) {
-        double *arow = cvl_row_f64(a, i);
-        double *xrow = cvl_row_f64(gx, i);
-        double *yrow = cvl_row_f64(gy, i);
+        double *arow = (double *)cvl_mat_row(a, i);
+        const double *xrow = (const double *)cvl_mat_row_const(gx, i);
+        const double *yrow = (const double *)cvl_mat_row_const(gy, i);
 
         for (int j = 0; j < a->width; ++j) {
             arow[j] = atan2(yrow[j], xrow[j]);

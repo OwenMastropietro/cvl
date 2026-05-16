@@ -96,11 +96,7 @@ void cvl_mat_free(cvl_Mat *mat);
 
 uint8_t *cvl_mat_row(cvl_Mat *mat, int r);
 
-uint8_t *cvl_row_u8(cvl_Mat *mat, int r);
-
-double *cvl_row_f64(cvl_Mat *mat, int r);
-
-int32_t *cvl_row_i32(cvl_Mat *mat, int r);
+const uint8_t *cvl_mat_row_const(const cvl_Mat *mat, int r);
 
 #ifdef __cplusplus
 }

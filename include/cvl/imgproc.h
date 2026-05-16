@@ -15,8 +15,6 @@ void cvl_cvt_depth(const cvl_Mat *src, cvl_Mat *dst, cvl_depth_t ddepth, double 
 
 void cvl_threshold(cvl_Mat *img, int thresh, int maxval, int type);
 
-void cvl_add_noise(cvl_Mat *img, double p);
-
 void cvl_rotate(cvl_Mat *img);
 
 void cvl_invert(cvl_Mat *img, int maxval);

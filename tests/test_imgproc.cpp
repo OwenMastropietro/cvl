@@ -8,8 +8,8 @@ static void assert_mat_equal_u8(cvl_Mat *a, cvl_Mat *b) {
     ASSERT_EQ(a->channels, b->channels);
 
     for (int i = 0; i < a->height; ++i) {
-        uint8_t *row_a = cvl_row_u8(a, i);
-        uint8_t *row_b = cvl_row_u8(b, i);
+        uint8_t *row_a = cvl_mat_row(a, i);
+        uint8_t *row_b = cvl_mat_row(b, i);
 
         for (int j = 0; j < a->width; ++j) {
             EXPECT_EQ(row_a[j], row_b[j]);
@@ -43,7 +43,7 @@ TEST(ImgProcTest, Correlate) {
         cvl_Mat dst = cvl_correlate_new(&src, &kernel);
 
         for (int i = 0; i < dst.height; ++i) {
-            uint8_t *row = cvl_row_u8(&dst, i);
+            uint8_t *row = cvl_mat_row(&dst, i);
 
             for (int j = 0; j < dst.width; ++j) {
                 uint8_t expected = exp[i][j];
@@ -78,7 +78,7 @@ TEST(ImgProcTest, Correlate) {
         cvl_Mat dst = cvl_correlate_new(&src, &kernel);
 
         for (int i = 0; i < dst.height; ++i) {
-            double *row = cvl_row_f64(&dst, i);
+            double *row = (double *)cvl_mat_row(&dst, i);
 
             for (int j = 0; j < dst.width; ++j) {
                 double expected = exp[i][j];
@@ -119,7 +119,7 @@ TEST(ImgProcTest, Correlate) {
         cvl_Mat dst = cvl_correlate_new(&src, &kernel);
 
         for (int i = 0; i < dst.height; ++i) {
-            uint8_t *row = cvl_row_u8(&dst, i);
+            uint8_t *row = cvl_mat_row(&dst, i);
 
             for (int j = 0; j < dst.width; ++j) {
                 uint8_t expected = exp[i][j];
@@ -156,7 +156,7 @@ TEST(ImgProcTest, Correlate) {
         cvl_Mat dst = cvl_correlate_new(&src, &kernel);
 
         for (int i = 0; i < dst.height; ++i) {
-            double *row = cvl_row_f64(&dst, i);
+            double *row = (double *)cvl_mat_row(&dst, i);
 
             for (int j = 0; j < dst.width; ++j) {
                 double expected = exp[i][j];
@@ -192,7 +192,7 @@ TEST(ImgProcTest, Convolve) {
         cvl_Mat dst = cvl_convolve_new(&src, &kernel);
 
         for (int i = 0; i < dst.height; ++i) {
-            double *row = cvl_row_f64(&dst, i);
+            double *row = (double *)cvl_mat_row(&dst, i);
 
             for (int j = 0; j < dst.width; ++j) {
                 double expected = exp[i][j];
@@ -229,7 +229,7 @@ TEST(ImgProcTest, Convolve) {
         cvl_Mat dst = cvl_convolve_new(&src, &kernel);
 
         for (int i = 0; i < dst.height; ++i) {
-            double *row = cvl_row_f64(&dst, i);
+            double *row = (double *)cvl_mat_row(&dst, i);
 
             for (int j = 0; j < dst.width; ++j) {
                 double expected = exp[i][j];
@@ -267,7 +267,7 @@ TEST(ImgProcTest, Convolve) {
         cvl_Mat dst = cvl_convolve_new(&src, &kernel);
 
         for (int i = 0; i < dst.height; ++i) {
-            double *row = cvl_row_f64(&dst, i);
+            double *row = (double *)cvl_mat_row(&dst, i);
 
             for (int j = 0; j < dst.width; ++j) {
                 double expected = exp[i][j];
@@ -300,7 +300,7 @@ TEST(ImgProcTest, BlurMean) {
         cvl_Mat dst = cvl_blur_mean_new(&src, 3);
 
         for (int i = 0; i < dst.height; ++i) {
-            double *row = cvl_row_f64(&dst, i);
+            double *row = (double *)cvl_mat_row(&dst, i);
 
             for (int j = 0; j < dst.width; ++j) {
                 double expected = exp[i][j];
@@ -394,7 +394,7 @@ TEST(ImgProcTest, CvtColor) {
         cvl_Mat dst = cvl_cvt_color_new(&src, CVL_COLOR_RGB2GRAY);
 
         for (int i = 0; i < dst.height; ++i) {
-            uint8_t *row = cvl_row_u8(&dst, i);
+            uint8_t *row = cvl_mat_row(&dst, i);
 
             for (int j = 0; j < dst.width; ++j) {
                 uint8_t expected = exp[i][j];
@@ -422,7 +422,7 @@ TEST(ImgProcTest, CvtColor) {
         cvl_Mat dst = cvl_cvt_color_new(&src, CVL_COLOR_BGR2GRAY);
 
         for (int i = 0; i < dst.height; ++i) {
-            uint8_t *row = cvl_row_u8(&dst, i);
+            uint8_t *row = cvl_mat_row(&dst, i);
 
             for (int j = 0; j < dst.width; ++j) {
                 uint8_t expected = exp[i][j];
@@ -450,7 +450,7 @@ TEST(ImgProcTest, CvtColor) {
         cvl_Mat dst = cvl_cvt_color_new(&src, CVL_COLOR_GRAY2RGB);
 
         for (int i = 0; i < dst.height; ++i) {
-            uint8_t *row = cvl_row_u8(&dst, i);
+            uint8_t *row = cvl_mat_row(&dst, i);
 
             for (int j = 0; j < dst.width; ++j) {
                 uint8_t *expected = exp[i][j];
@@ -481,7 +481,7 @@ TEST(ImgProcTest, CvtColor) {
         cvl_Mat dst = cvl_cvt_color_new(&src, CVL_COLOR_GRAY2BGR);
 
         for (int i = 0; i < dst.height; ++i) {
-            uint8_t *row = cvl_row_u8(&dst, i);
+            uint8_t *row = cvl_mat_row(&dst, i);
 
             for (int j = 0; j < dst.width; ++j) {
                 uint8_t *expected = exp[i][j];

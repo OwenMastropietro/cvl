@@ -94,26 +94,18 @@ void cvl_mat_free(cvl_Mat *m) {
     m->data = NULL;
 }
 
-// Returns raw byte pointer to the start of row r.
+// Returns a mutable raw byte pointer to the start of row r.
 uint8_t *cvl_mat_row(cvl_Mat *mat, int r) {
-    assert(mat != NULL);
-    assert(mat->data != NULL);
+    assert(mat && mat->data);
     assert(0 <= r && r < mat->height);
 
     return (uint8_t *)mat->data + (size_t)r * mat->stride;
 }
 
-uint8_t *cvl_row_u8(cvl_Mat *mat, int r) {
-    assert(mat->depth == CVL_UINT8);
-    return cvl_mat_row(mat, r);
-}
+// Returns an immutable raw byte pointer to the start of row r.
+const uint8_t *cvl_mat_row_const(const cvl_Mat *mat, int r) {
+    assert(mat && mat->data);
+    assert(0 <= r && r < mat->height);
 
-double *cvl_row_f64(cvl_Mat *mat, int r) {
-    assert(mat->depth == CVL_FLOAT64);
-    return (double *)cvl_mat_row(mat, r);
-}
-
-int32_t *cvl_row_i32(cvl_Mat *mat, int r) {
-    assert(mat->depth == CVL_32S);
-    return (int32_t *)cvl_mat_row(mat, r);
+    return (const uint8_t *)mat->data + (size_t)r * mat->stride;
 }

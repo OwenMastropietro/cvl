@@ -8,8 +8,8 @@ static void assert_mat_equal_u8(cvl_Mat *a, cvl_Mat *b) {
     ASSERT_EQ(a->channels, b->channels);
 
     for (int i = 0; i < a->height; ++i) {
-        uint8_t *row_a = cvl_row_u8(a, i);
-        uint8_t *row_b = cvl_row_u8(b, i);
+        uint8_t *row_a = cvl_mat_row(a, i);
+        uint8_t *row_b = cvl_mat_row(b, i);
 
         for (int j = 0; j < a->width; ++j) {
             EXPECT_EQ(row_a[j], row_b[j]);
@@ -23,8 +23,8 @@ static void assert_mat_equal_f64(cvl_Mat *a, cvl_Mat *b) {
     ASSERT_EQ(a->channels, b->channels);
 
     for (int i = 0; i < a->height; ++i) {
-        double *row_a = cvl_row_f64(a, i);
-        double *row_b = cvl_row_f64(b, i);
+        double *row_a = (double *)cvl_mat_row(a, i);
+        double *row_b = (double *)cvl_mat_row(b, i);
 
         for (int j = 0; j < a->width; ++j) {
             EXPECT_EQ(row_a[j], row_b[j]);

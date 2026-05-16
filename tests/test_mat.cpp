@@ -358,7 +358,7 @@ TEST(MatCreateFromTest, MatCreateFrom) {
         ASSERT_NE(mat.data, nullptr);
 
         for (int i = 0; i < mat.height; ++i) {
-            double *row = cvl_row_f64(&mat, i);
+            double *row = (double *)cvl_mat_row(&mat, i);
 
             for (int j = 0; j < mat.width; ++j) {
                 double expected = values_3[i * mat.width + j];
@@ -382,7 +382,7 @@ TEST(MatCreateFromTest, MatCreateFrom) {
         ASSERT_NE(mat.data, nullptr);
 
         for (int i = 0; i < mat.height; ++i) {
-            double* row = cvl_row_f64(&mat, i);
+            double* row = (double *)cvl_mat_row(&mat, i);
 
             for (int j = 0; j < mat.width; ++j) {
                 double expected = values_4[i * mat.width + j];
