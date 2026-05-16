@@ -554,3 +554,91 @@ TEST(ImgProcTest, Crop) {
         cvl_mat_free(&res);
     }
 }
+
+TEST(ImgProcTest, Invert) {
+    // U8
+    {
+        uint8_t vals[2][2] = {
+            {0, 255},
+            {128, 64},
+        };
+
+        uint8_t exp[2][2] = {
+            {255, 0},
+            {127, 191},
+        };
+
+        cvl_Mat src = cvl_mat_create_from(2, 2, 1, CVL_UINT8, vals);
+        cvl_invert(&src, 255);
+
+        for (int i = 0; i < src.height; ++i) {
+            uint8_t *row = cvl_mat_row(&src, i);
+
+            for (int j = 0; j < src.width; ++j) {
+                uint8_t expected = exp[i][j];
+                EXPECT_EQ(row[j], expected);
+            }
+        }
+
+        cvl_mat_free(&src);
+    }
+
+    // RGB
+    {
+        uint8_t vals[2][2][3] = {
+            {{0, 0, 0}, {255, 255, 255}},
+            {{128, 64, 32}, {64, 128, 192}},
+        };
+
+        uint8_t exp[2][2][3] = {
+            {{255, 255, 255}, {0, 0, 0}},
+            {{127, 191, 223}, {191, 127, 63}},
+        };
+
+        cvl_Mat src = cvl_mat_create_from(2, 2, 3, CVL_UINT8, vals);
+        cvl_invert(&src, 255);
+
+        for (int i = 0; i < src.height; ++i) {
+            uint8_t *row = cvl_mat_row(&src, i);
+
+            for (int j = 0; j < src.width; ++j) {
+                uint8_t *expected = exp[i][j];
+                uint8_t *p = row + j * 3;
+                EXPECT_EQ(p[0], expected[0]);
+                EXPECT_EQ(p[1], expected[1]);
+                EXPECT_EQ(p[2], expected[2]);
+            }
+        }
+
+        cvl_mat_free(&src);
+    }
+
+    // F64
+    {
+        double vals[3][3] = {
+            {0, 255, 420.69},
+            {8, 128, 6.7},
+            {8, -70, 9000},
+        };
+
+        double exp[3][3] = {
+            {600, 345, 179.31},
+            {592, 472, 593.3},
+            {592, 670, -8400},
+        };
+
+        cvl_Mat src = cvl_mat_create_from(3, 3, 1, CVL_FLOAT64, vals);
+        cvl_invert(&src, 600);
+
+        for (int i = 0; i < src.height; ++i) {
+            double *row = (double *)cvl_mat_row(&src, i);
+
+            for (int j = 0; j < src.width; ++j) {
+                double expected = exp[i][j];
+                EXPECT_EQ(row[j], expected);
+            }
+        }
+
+        cvl_mat_free(&src);
+    }
+}

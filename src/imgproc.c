@@ -371,27 +371,36 @@ void cvl_rotate(cvl_Mat *img) {
     }
 }
 
-// Inverts RGB channels according to the given max value.
-void cvl_invert(cvl_Mat *img, int maxval) {
+// Applies per-channel arithmetic inversion (dst = maxval - src).
+void cvl_invert(cvl_Mat *img, double maxval) {
     const int h = img->height;
     const int w = img->width;
     const int chs = img->channels;
 
-    for (int i = 0; i < h; ++i) {
-        for (int j = 0; j < w; ++j) {
-            for (int ch = 0; ch < chs; ++ch) {
-                if (img->depth == CVL_UINT8) {
-                    uint8_t v = CVL_AT_U8(img, i, j, ch);
-                    double out = maxval - v;
-                    CVL_AT_U8(img, i, j, ch) = cvl_sat_u8_f64(out);
-                } else if (img->depth == CVL_FLOAT64) {
-                    double v = CVL_AT_F64(img, i, j, ch);
-                    CVL_AT_F64(img, i, j, ch) = maxval - v;
-                } else {
-                    assert(false);
+    switch (img->depth) {
+        case CVL_UINT8: {
+            for (int y = 0; y < h; ++y) {
+                for (int x = 0; x < w; ++x) {
+                    for (int ch = 0; ch < chs; ++ch) {
+                        double v = maxval - (double)CVL_AT_U8(img, y, x, ch);
+                        CVL_AT_U8(img, y, x, ch) = cvl_sat_u8_f64(v);
+                    }
                 }
             }
+            break;
         }
+        case CVL_FLOAT64: {
+            for (int y = 0; y < h; ++y) {
+                for (int x = 0; x < w; ++x) {
+                    for (int ch = 0; ch < chs; ++ch) {
+                        double v = maxval - CVL_AT_F64(img, y, x, ch);
+                        CVL_AT_F64(img, y, x, ch) = v;
+                    }
+                }
+            }
+            break;
+        }
+        default: break;
     }
 }
 

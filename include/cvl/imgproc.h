@@ -17,7 +17,7 @@ void cvl_threshold(cvl_Mat *img, int thresh, int maxval, int type);
 
 void cvl_rotate(cvl_Mat *img);
 
-void cvl_invert(cvl_Mat *img, int maxval);
+void cvl_invert(cvl_Mat *img, double maxval);
 
 void cvl_dilate(const cvl_Mat *src, cvl_Mat *dst, int ksize);
 
