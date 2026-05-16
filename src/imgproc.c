@@ -100,6 +100,11 @@ static inline uint8_t cvl_sat_u8_f64(double v) {
     return (v < 0.0) ? 0 : (v > 255.0) ? 255 : (uint8_t)(v + 0.5);
 }
 
+// Clamps and rounds float into uint8_t.
+static inline uint8_t sat_u8_f32(float v) {
+    return (v < 0.0f) ? 0 : (v > 255.0f) ? 255 : (uint8_t)(v + 0.5f);
+}
+
 // ==========================
 // Color & Depth Conversion
 // ==========================
@@ -499,6 +504,103 @@ void cvl_crop(const cvl_Mat *src, cvl_Mat *dst, int r, int c) {
 cvl_Mat cvl_crop_new(const cvl_Mat *src, int r, int c, int h, int w) {
     cvl_Mat dst = cvl_mat_create(h, w, src->channels, src->depth);
     cvl_crop(src, &dst, r, c);
+    return dst;
+}
+
+// Resizes matrix according to nearest neighbor interpolation.
+void resize_nearest(const cvl_Mat *src, cvl_Mat *dst) {
+    const int sh = src->height;
+    const int sw = src->width;
+    const int sch = src->channels;
+    const int dh = dst->height;
+    const int dw = dst->width;
+
+    const float scale_y = (float)sh / dh;
+    const float scale_x = (float)sw / dw;
+
+    for (int y = 0; y < dh; y++) {
+        int yy = (int)floorf((y + 0.5f) * scale_y);
+        yy = _clamp(yy, 0, sh - 1);
+
+        for (int x = 0; x < dw; ++x) {
+            int xx = (int)floorf((x + 0.5f) * scale_x);
+            xx = _clamp(xx, 0, sw - 1);
+
+            for (int c = 0; c < sch; ++c) {
+                CVL_AT_U8(dst, y, x, c) = CVL_AT_U8(src, yy, xx, c);
+            }
+        }
+    }
+}
+
+// Linear IntERPolation.
+static inline float lerp(float a, float b, float t) {
+    return a + (b - a) * t;
+}
+
+// Resizes matrix according to bilinear interpolation.
+void resize_linear(const cvl_Mat *src, cvl_Mat *dst) {
+    const int sh = src->height;
+    const int sw = src->width;
+    const int sch = src->channels;
+    const int dh = dst->height;
+    const int dw = dst->width;
+
+    const float scale_y = (float)sh / dh;
+    const float scale_x = (float)sw / dw;
+
+    // todo: separable
+    for (int y = 0; y < dh; ++y) {
+        float y_src = (y + 0.5f) * scale_y - 0.5f;
+
+        int y0 = (int)floorf(y_src);
+        int y1 = y0 + 1;
+        float ty = y_src - (float)y0;
+
+        y0 = _clamp(y0, 0, sh - 1);
+        y1 = _clamp(y1, 0, sh - 1);
+
+        const uint8_t *row0 = cvl_row_u8(src, y0);
+        const uint8_t *row1 = cvl_row_u8(src, y1);
+
+        for (int x = 0; x < dw; ++x) {
+            float x_src = (x + 0.5f) * scale_x - 0.5f;
+
+            int x0 = (int)floorf(x_src);
+            int x1 = x0 + 1;
+            float tx = x_src - (float)x0;
+
+            x0 = _clamp(x0, 0, sw - 1);
+            x1 = _clamp(x1, 0, sw - 1);
+
+            for (int c = 0; c < sch; ++c) {
+                float p00 = row0[x0 * sch + c];
+                float p01 = row0[x1 * sch + c];
+                float p10 = row1[x0 * sch + c];
+                float p11 = row1[x1 * sch + c];
+
+                float top = lerp(p00, p01, tx);
+                float bot = lerp(p10, p11, tx);
+                float val = lerp(top, bot, ty);
+
+                CVL_AT_U8(dst, y, x, c) = sat_u8_f32(val);
+            }
+        }
+    }
+}
+
+void cvl_resize(const cvl_Mat *src, cvl_Mat *dst, cvl_interp_t type) {
+    switch (type) {
+        case CVL_INTER_NEAREST: resize_nearest(src, dst); break;
+        case CVL_INTER_LINEAR:  resize_linear(src, dst);  break;
+
+        default: resize_nearest(src, dst); break;
+    }
+}
+
+cvl_Mat cvl_resize_new(const cvl_Mat *src, int height, int width, cvl_interp_t type) {
+    cvl_Mat dst = cvl_mat_create(height, width, src->channels, src->depth);
+    cvl_resize(src, &dst, type);
     return dst;
 }
 

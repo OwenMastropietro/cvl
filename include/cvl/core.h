@@ -70,6 +70,12 @@ typedef enum cvl_thresh_type {
     CVL_THRESH_TOZERO_INV,
 } cvl_thresh_type;
 
+// interpolation types
+typedef enum cvl_interp_t {
+    CVL_INTER_NEAREST, // nearest neighbor
+    CVL_INTER_LINEAR, // bilinear
+} cvl_interp_t;
+
 #ifdef __cplusplus
 extern "C" {
 #endif

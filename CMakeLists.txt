@@ -52,6 +52,9 @@ target_link_libraries(cvl_ccl cvl_lib)
 add_executable(cvl_sobel examples/sobel.c)
 target_link_libraries(cvl_sobel cvl_lib)
 
+add_executable(cvl_resize examples/resize.c)
+target_link_libraries(cvl_resize cvl_lib)
+
 # Optionally Build Tests.
 option(BUILD_TESTS "Build tests" OFF)
 
