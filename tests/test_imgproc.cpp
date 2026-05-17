@@ -642,3 +642,91 @@ TEST(ImgProcTest, Invert) {
         cvl_mat_free(&src);
     }
 }
+
+TEST(ImgProcTest, Rotate) {
+    // Rotate 90 CW
+    {
+        uint8_t vals[2][3] = {
+            {1, 2, 3},
+            {4, 5, 6},
+        };
+
+        uint8_t exp[3][2] = {
+            {4, 1},
+            {5, 2},
+            {6, 3},
+        };
+
+        cvl_Mat src = cvl_mat_create_from(2, 3, 1, CVL_UINT8, vals);
+        cvl_Mat dst = cvl_rotate_new(&src, 90, CVL_INTER_NEAREST);
+
+        for (int i = 0; i < dst.height; ++i) {
+            uint8_t *row = cvl_mat_row(&dst, i);
+
+            for (int j = 0; j < dst.width; ++j) {
+                uint8_t expected = exp[i][j];
+                EXPECT_EQ(row[j], expected);
+            }
+        }
+
+        cvl_mat_free(&src);
+        cvl_mat_free(&dst);
+    }
+
+    // Rotate 180
+    {
+        uint8_t vals[2][3] = {
+            {1, 2, 3},
+            {4, 5, 6},
+        };
+
+        uint8_t exp[2][3] = {
+            {6, 5, 4},
+            {3, 2, 1},
+        };
+
+        cvl_Mat src = cvl_mat_create_from(2, 3, 1, CVL_UINT8, vals);
+        cvl_Mat dst = cvl_rotate_new(&src, 180, CVL_INTER_NEAREST);
+
+        for (int i = 0; i < dst.height; ++i) {
+            uint8_t *row = cvl_mat_row(&dst, i);
+
+            for (int j = 0; j < dst.width; ++j) {
+                uint8_t expected = exp[i][j];
+                EXPECT_EQ(row[j], expected);
+            }
+        }
+
+        cvl_mat_free(&src);
+        cvl_mat_free(&dst);
+    }
+
+    // Rotate 270 CW
+    {
+        uint8_t vals[2][3] = {
+            {1, 2, 3},
+            {4, 5, 6},
+        };
+
+        uint8_t exp[3][2] = {
+            {3, 6},
+            {2, 5},
+            {1, 4},
+        };
+
+        cvl_Mat src = cvl_mat_create_from(2, 3, 1, CVL_UINT8, vals);
+        cvl_Mat dst = cvl_rotate_new(&src, 270, CVL_INTER_NEAREST);
+
+        for (int i = 0; i < dst.height; ++i) {
+            uint8_t *row = cvl_mat_row(&dst, i);
+
+            for (int j = 0; j < dst.width; ++j) {
+                uint8_t expected = exp[i][j];
+                EXPECT_EQ(row[j], expected);
+            }
+        }
+
+        cvl_mat_free(&src);
+        cvl_mat_free(&dst);
+    }
+}

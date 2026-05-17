@@ -15,7 +15,7 @@ void cvl_cvt_depth(const cvl_Mat *src, cvl_Mat *dst, cvl_depth_t ddepth, double 
 
 void cvl_threshold(cvl_Mat *img, int thresh, int maxval, int type);
 
-void cvl_rotate(cvl_Mat *img);
+void cvl_rotate(const cvl_Mat *src, cvl_Mat *dst, float angle, cvl_interp_t interp);
 
 void cvl_invert(cvl_Mat *img, double maxval);
 
@@ -62,6 +62,10 @@ cvl_Mat cvl_cvt_color_new(const cvl_Mat *src, int code);
 cvl_Mat cvl_cvt_depth_new(const cvl_Mat *src, cvl_depth_t ddepth, double alpha, double beta);
 
 cvl_Mat cvl_threshold_new(const cvl_Mat *src, int thresh, int maxval, int type);
+
+cvl_Mat cvl_rotate_new(const cvl_Mat *src, float angle, cvl_interp_t interp);
+
+cvl_Mat cvl_rotate_bound_new(const cvl_Mat *src, float angle, cvl_interp_t interp);
 
 cvl_Mat cvl_crop_new(const cvl_Mat *src, int r, int c, int h, int w);
 

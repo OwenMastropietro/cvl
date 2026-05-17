@@ -326,51 +326,6 @@ cvl_Mat cvl_threshold_new(const cvl_Mat *src, int thresh, int maxval, int type) 
     return dst;
 }
 
-// Rotates the image 180º.
-void cvl_rotate(cvl_Mat *img) {
-    const int h = img->height;
-    const int w = img->width;
-    const int chs = img->channels;
-
-    const size_t elem_size = cvl_elem_size(img->depth);
-    const size_t pixel_size = chs * elem_size;
-
-    uint8_t *data = (uint8_t *)img->data;
-
-    uint8_t *tmp[64];
-    assert(pixel_size <= sizeof(tmp));
-
-    for (int i = 0; i < h / 2; ++i) {
-        for (int j = 0; j < w; ++j) {
-            int r = h - i - 1;
-            int c = w - j - 1;
-
-            uint8_t *p1 = data + i * img->stride + j * pixel_size;
-            uint8_t *p2 = data + r * img->stride + c * pixel_size;
-
-            // swap pixel
-            memcpy(tmp, p1, pixel_size);
-            memcpy(p1, p2, pixel_size);
-            memcpy(p2, tmp, pixel_size);
-        }
-    }
-
-    if (h % 2 == 1) {
-        int i = h / 2;
-        for (int j = 0; j < w / 2; ++j) {
-            int c = w - j - 1;
-
-            uint8_t *p1 = data + i * img->stride + j * pixel_size;
-            uint8_t *p2 = data + i * img->stride + c * pixel_size;
-
-            // swap pixel
-            memcpy(tmp, p1, pixel_size);
-            memcpy(p1, p2, pixel_size);
-            memcpy(p2, tmp, pixel_size);
-        }
-    }
-}
-
 // Applies per-channel arithmetic inversion (dst = maxval - src).
 void cvl_invert(cvl_Mat *img, double maxval) {
     const int h = img->height;
@@ -607,6 +562,187 @@ cvl_Mat cvl_resize_new(const cvl_Mat *src, int height, int width, cvl_interp_t t
     cvl_resize(src, &dst, type);
     return dst;
 }
+
+static inline void sample_nearest(const cvl_Mat *src, cvl_Mat *dst, int dy, int dx, float sy, float sx) {
+    int y = (int)roundf(sy);
+    int x = (int)roundf(sx);
+
+    if (y < 0 || y >= src->height || x < 0 || x >= src->width) {
+        return;
+    }
+
+    const int chs = src->channels;
+
+    const uint8_t *srow = cvl_mat_row_const(src, y);
+    uint8_t *drow = cvl_mat_row(dst, dy);
+
+    for (int ch = 0; ch < chs; ++ch) {
+        drow[dx * chs + ch] = srow[x * chs + ch];
+    }
+}
+
+static inline void sample_bilinear(const cvl_Mat *src, cvl_Mat *dst, int dy, int dx, float sy, float sx) {
+    // todo: resize and rotate both use bilinear interpolation
+
+    int x0 = (int)floorf(sx);
+    int y0 = (int)floorf(sy);
+
+    int x1 = x0 + 1;
+    int y1 = y0 + 1;
+
+    if (y0 < 0 || y1 >= src->height || x0 < 0 || x1 >= src->width) {
+        return;
+    }
+
+    float x = sx - x0;
+    float y = sy - y0;
+
+    const int chs = src->channels;
+
+    const uint8_t *srow0 = cvl_mat_row_const(src, y0);
+    const uint8_t *srow1 = cvl_mat_row_const(src, y1);
+    uint8_t *drow = cvl_mat_row(dst, dy);
+
+    for (int ch = 0; ch < chs; ++ch) {
+        float p00 = srow0[x0 * chs + ch];
+        float p01 = srow0[x1 * chs + ch];
+        float p10 = srow1[x0 * chs + ch];
+        float p11 = srow1[x1 * chs + ch];
+
+        float top = lerp(p00, p01, x);
+        float bot = lerp(p10, p11, x);
+        float val = lerp(top, bot, y);
+
+        drow[dx * chs + ch] = (uint8_t)(val + 0.5f);
+    }
+}
+
+static void rot90(const cvl_Mat *src, cvl_Mat *dst) {
+    const int chs = src->channels;
+
+    for (int y = 0; y < src->height; ++y) {
+        const uint8_t *srow = cvl_mat_row_const(src, y);
+
+        for (int x = 0; x < src->width; ++x) {
+            uint8_t *drow = cvl_mat_row(dst, x);
+
+            for (int ch = 0; ch < chs; ++ch) {
+                drow[(dst->width - 1 - y) * chs + ch] = srow[x * chs + ch];
+            }
+        }
+
+    }
+}
+
+static void rot180(const cvl_Mat *src, cvl_Mat *dst) {
+    const int chs = src->channels;
+
+    for (int y = 0; y < src->height; ++y) {
+        const uint8_t *srow = cvl_mat_row_const(src, y);
+        uint8_t *drow = cvl_mat_row(dst, dst->height - 1 - y);
+
+        for (int x = 0; x < src->width; ++x) {
+            for (int ch = 0; ch < chs; ++ch) {
+                drow[(dst->width - 1 - x) * chs + ch] = srow[x * chs + ch];
+            }
+        }
+    }
+}
+
+static void rot270(const cvl_Mat *src, cvl_Mat *dst) {
+    const int chs = src->channels;
+
+    for (int y = 0; y < src->height; ++y) {
+        const uint8_t *srow = cvl_mat_row_const(src, y);
+
+        for (int x = 0; x < src->width; ++x) {
+            uint8_t *drow = cvl_mat_row(dst, dst->height - 1 - x);
+
+            for (int ch = 0; ch < chs; ++ch) {
+                drow[y * chs + ch] = srow[x * chs + ch];
+            }
+        }
+    }
+}
+
+// Rotates a matrix clockwise by angle degrees using the specified interpolation method.
+void cvl_rotate(const cvl_Mat *src, cvl_Mat *dst, float angle, cvl_interp_t interp) {
+    // todo: implement something like cvl_warp_affine
+
+    int a = ((int)roundf(angle)) % 360;
+    if (a < 0) a += 360;
+
+    // Orthogonal Rotations.
+    if (a == 90)  return rot90(src, dst);
+    if (a == 180) return rot180(src, dst);
+    if (a == 270) return rot270(src, dst);
+
+    // Affine Rotations.
+    const float theta = angle * (float)M_PI / 180.0f;
+    const float c = cosf(theta);
+    const float s = sinf(theta);
+
+    const float scx = (src->width  - 1) * 0.5f;
+    const float scy = (src->height - 1) * 0.5f;
+    const float dcx = (dst->width  - 1) * 0.5f;
+    const float dcy = (dst->height - 1) * 0.5f;
+
+    for (int y = 0; y < dst->height; ++y) {
+        for (int x = 0; x < dst->width; ++x) {
+
+            float dx = x - dcx;
+            float dy = y - dcy;
+
+            float sx =  c * dx + s * dy + scx;
+            float sy = -s * dx + c * dy + scy;
+
+            if (interp == CVL_INTER_NEAREST) {
+                sample_nearest(src, dst, y, x, sy, sx);
+            } else {
+                sample_bilinear(src, dst, y, x, sy, sx);
+            }
+        }
+    }
+}
+
+// Rotates a matrix clockwise by angle degrees using the specified interpolation method.
+// Output shape matches input shape, so non-orthogonal rotations may crop corners.
+cvl_Mat cvl_rotate_new(const cvl_Mat *src, float angle, cvl_interp_t interp) {
+    int a = ((int)roundf(angle)) % 360;
+    if (a < 0) a += 360;
+
+    int h = src->height;
+    int w = src->width;
+
+    if (a == 90 || a == 270) {
+        h = src->width;
+        w = src->height;
+    }
+
+    cvl_Mat dst = cvl_mat_create(h, w, src->channels, src->depth);
+
+    cvl_rotate(src, &dst, angle, interp);
+
+    return dst;
+}
+
+// Rotates a matrix clockwise by angle degrees using the specified interpolation method.
+// Output shape is expanded to preserve the full rotated image without cropping corners.
+cvl_Mat cvl_rotate_bound_new(const cvl_Mat *src, float angle, cvl_interp_t interp) {
+    const float theta = angle * (float)M_PI / 180.0f;
+    const float c = fabsf(cosf(theta));
+    const float s = fabsf(sinf(theta));
+
+    int w = (int)(src->height * s + src->width  * c + 0.5f);
+    int h = (int)(src->height * c + src->width  * s + 0.5f);
+
+    cvl_Mat dst = cvl_mat_create(h, w, src->channels, src->depth);
+
+    cvl_rotate(src, &dst, angle, interp);
+
+    return dst;
+}
+
 
 // ==========================
 // Connected Component Labeling
