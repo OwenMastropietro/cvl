@@ -11,8 +11,8 @@ typedef enum {
 static blur_t parse_type(const char *s) {
     if (!s) return BLUR_MEAN;
 
-    if (strncmp(s, "mean", 4) == 0) return BLUR_MEAN;
-    if (strncmp(s, "gauss", 5) == 0) return BLUR_GAUSS;
+    if (strncmp(s, "mean", 4) == 0)   return BLUR_MEAN;
+    if (strncmp(s, "gauss", 5) == 0)  return BLUR_GAUSS;
     if (strncmp(s, "median", 6) == 0) return BLUR_MEDIAN;
 
     fprintf(stderr, "Unknown blur type.\n");

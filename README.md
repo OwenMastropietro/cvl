@@ -6,33 +6,43 @@ _Computer Vision Library in C._
 
 ---
 
-**CVL** implements a small computer vision library for raster images with support for reading and writing [Netpbm](https://netpbm.sourceforge.net/doc/ppm.html) image formats (PGM, PGM, PPM), along with thresholding, filtering, connected component labeling, and edge detection.
+**CVL** implements a small computer vision library for raster images with support for reading and writing [Netpbm](https://netpbm.sourceforge.net/doc/ppm.html) image formats (PGM, PGM, PPM) and [stb](https://github.com/nothings/stb/blob/master/stb_image.h) formats (PNG, JPG, etc.), along with thresholding, filtering, connected component labeling, and edge detection.
 
 ---
 
 ## Usage
 
-> Build and run example programs.
+> Build and Run (CLI).
 
 ```sh
-# Manual Compile & Execute.
-gcc examples/<example>.c src/* -Iinclude -o <example>
-./<example>
-
-# With CMake.
-cmake -B build -S .
+cmake -S . -B build
 cmake --build build
 
-./build/<example>
+# cvl ...
+
+# e.g.,
+cvl blur path/to/input.img path/to/output.img --type mean --ksize 5
 ```
 
-> Build and run tests.
+> Build and Run (tests).
 
 ```sh
-cmake -B build -S . -DBUILD_TESTS=ON
+cmake -S . -B build -DBUILD_TESTS=ON
 cmake --build build
 
 ctest --test-dir build
+```
+
+> Build and Run (example programs).
+
+```sh
+cmake -S . -B build -DBUILD_EXAMPLES=ON
+cmake --build build
+
+# ./build/<prog>
+
+# e.g.,
+./build/cvl_blur
 ```
 
 ## Example Programs

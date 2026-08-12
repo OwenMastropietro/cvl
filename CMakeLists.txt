@@ -1,8 +1,9 @@
 cmake_minimum_required(VERSION 3.16)
 
-project(cvl)
+project(cvl VERSION 0.1.0)
 
 set(CMAKE_C_STANDARD 11)
+set(CMAKE_C_STANDARD_REQUIRED ON)
 
 add_library(cvl_lib
     src/core.c
@@ -13,55 +14,44 @@ add_library(cvl_lib
 
 target_link_libraries(cvl_lib PUBLIC m)
 
-target_include_directories(cvl_lib PUBLIC
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
-    $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/thirdparty>
-    # todo: install interface
+target_include_directories(cvl_lib
+    PUBLIC  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty
 )
 
-target_compile_options(cvl_lib PRIVATE -Wall -Wextra)
+add_library(cvl_warnings INTERFACE)
+target_compile_options(cvl_warnings INTERFACE -Wall -Wextra)
 
-# =================
-# CLI
-# =================
-add_executable(cvl
-    src/cli/main.c
-    src/cli/cmd_blur.c
-)
-target_link_libraries(cvl PRIVATE cvl_lib)
+# Build examples by default.
+option(BUILD_EXAMPLES "Build example programs" OFF)
+if (BUILD_EXAMPLES)
+    add_subdirectory(examples)
+endif()
 
-# =================
-# Example Programs
-# =================
+# Build CLI by default.
+option(BUILD_CLI "Build the cvl command-line tool" ON)
+if (BUILD_CLI)
+    add_subdirectory(cli)
+endif()
 
-add_executable(cvl_cs136 examples/cs136.c)
-target_link_libraries(cvl_cs136 cvl_lib)
-
-add_executable(cvl_color examples/color.c)
-target_link_libraries(cvl_color cvl_lib)
-
-add_executable(cvl_threshold examples/threshold.c)
-target_link_libraries(cvl_threshold cvl_lib)
-
-add_executable(cvl_blur examples/blur.c)
-target_link_libraries(cvl_blur cvl_lib)
-
-add_executable(cvl_ccl examples/ccl.c)
-target_link_libraries(cvl_ccl cvl_lib)
-
-add_executable(cvl_sobel examples/sobel.c)
-target_link_libraries(cvl_sobel cvl_lib)
-
-add_executable(cvl_resize examples/resize.c)
-target_link_libraries(cvl_resize cvl_lib)
-
-add_executable(cvl_rotate examples/rotate.c)
-target_link_libraries(cvl_rotate cvl_lib)
-
-# Optionally Build Tests.
+# Build Tests if enabeld.
 option(BUILD_TESTS "Build tests" OFF)
-
 if (BUILD_TESTS)
     enable_testing()
     add_subdirectory(tests)
 endif()
+
+# Installation.
+set(CVL_INSTALL_TARGETS cvl_lib)
+if (BUILD_CLI)
+    list(APPEND CVL_INSTALL_TARGETS cvl)
+endif()
+
+install(TARGETS ${CVL_INSTALL_TARGETS}
+    EXPORT cvlTargets
+    RUNTIME DESTINATION bin
+    LIBRARY DESTINATION lib
+    ARCHIVE DESTINATION lib
+)
+install(EXPORT cvlTargets NAMESPACE cvl:: FILE cvlConfig.cmake DESTINATION lib/cmake/cvl)
+install(DIRECTORY include/cvl DESTINATION include)
