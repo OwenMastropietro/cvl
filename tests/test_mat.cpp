@@ -1,6 +1,8 @@
 #include <cvl/cvl.h>
 #include <gtest/gtest.h>
+#include <cstring>
 #include <float.h>
+#include <stdint.h>
 
 // ================
 // cvl_mat_create
@@ -407,4 +409,64 @@ TEST(MatTest, MatFree) {
     cvl_mat_free(&mat);
 
     ASSERT_EQ(mat.data, nullptr);
+}
+
+static void expect_empty(const cvl_Mat &mat) {
+    EXPECT_EQ(mat.data, nullptr);
+    EXPECT_EQ(mat.height, 0);
+    EXPECT_EQ(mat.width, 0);
+    EXPECT_EQ(mat.channels, 0);
+    EXPECT_EQ(mat.stride, 0u);
+}
+
+TEST(MatCreateInvalid, NonPositiveAndOverflow) {
+    expect_empty(cvl_mat_create(0, 2, 1, CVL_UINT8));
+    expect_empty(cvl_mat_create(2, 0, 1, CVL_UINT8));
+    expect_empty(cvl_mat_create(2, 2, 0, CVL_UINT8));
+    expect_empty(cvl_mat_create(-1, 2, 1, CVL_UINT8));
+    expect_empty(cvl_mat_create(2, -1, 1, CVL_UINT8));
+    expect_empty(cvl_mat_create(2, 2, -1, CVL_UINT8));
+
+    // width * channels * elem_size does not fit in size_t.
+    expect_empty(cvl_mat_create(1, INT32_MAX, INT32_MAX, CVL_FLOAT64));
+    // stride fits, height * stride does not.
+    expect_empty(cvl_mat_create(INT32_MAX, INT32_MAX, 2, CVL_UINT8));
+
+    uint8_t fill = 7;
+    expect_empty(cvl_mat_create_fill(0, 2, 1, CVL_UINT8, &fill));
+    expect_empty(cvl_mat_create_fill(2, 2, 1, CVL_UINT8, nullptr));
+
+    uint8_t pixel = 9;
+    expect_empty(cvl_mat_create_from(0, 2, 1, CVL_UINT8, &pixel));
+    expect_empty(cvl_mat_create_from(1, 1, 1, CVL_UINT8, nullptr));
+    expect_empty(cvl_mat_create_from(INT32_MAX, INT32_MAX, 2, CVL_UINT8, &pixel));
+}
+
+TEST(MatCopy, CopiesPixelsAndRejectsEmpty) {
+    uint8_t values[] = {1, 2, 3, 4};
+    cvl_Mat src = cvl_mat_create_from(2, 2, 1, CVL_UINT8, values);
+    ASSERT_NE(src.data, nullptr);
+
+    cvl_Mat dst = cvl_mat_copy(&src);
+    ASSERT_NE(dst.data, nullptr);
+    EXPECT_NE(dst.data, src.data);
+    EXPECT_EQ(dst.height, 2);
+    EXPECT_EQ(dst.width, 2);
+    EXPECT_EQ(dst.channels, 1);
+    EXPECT_EQ(dst.stride, src.stride);
+    EXPECT_EQ(memcmp(dst.data, values, 4), 0);
+
+    static_cast<uint8_t *>(dst.data)[0] = 9;
+    EXPECT_EQ(static_cast<uint8_t *>(src.data)[0], 1);
+
+    cvl_Mat empty = {0};
+    expect_empty(cvl_mat_copy(&empty));
+    expect_empty(cvl_mat_copy(nullptr));
+
+    src.height = 0;
+    expect_empty(cvl_mat_copy(&src));
+    src.height = 2;
+
+    cvl_mat_free(&src);
+    cvl_mat_free(&dst);
 }

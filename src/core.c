@@ -21,36 +21,79 @@ size_t cvl_elem_size(cvl_depth_t depth) {
     return 0;
 }
 
-cvl_Mat cvl_mat_create(int height, int width, int channels, cvl_depth_t depth) {
-    assert(height > 0 && width > 0 && channels > 0);
+static cvl_Mat cvl_mat_empty(void) {
+    cvl_Mat m;
+    m.height = 0;
+    m.width = 0;
+    m.channels = 0;
+    m.depth = CVL_UINT8;
+    m.stride = 0;
+    m.data = NULL;
+    return m;
+}
 
+// width * channels * elem_size, or 0 if the product does not fit in size_t.
+static size_t cvl_mat_stride(int width, int channels, size_t elem_size) {
+    if (width <= 0 || channels <= 0 || elem_size == 0) {
+        return 0;
+    }
+
+    if ((size_t)width > SIZE_MAX / (size_t)channels) {
+        return 0;
+    }
+    size_t row_elems = (size_t)width * (size_t)channels;
+
+    if (row_elems > SIZE_MAX / elem_size) {
+        return 0;
+    }
+    return row_elems * elem_size;
+}
+
+// height * stride, or 0 if either factor is 0 or the product overflows.
+static size_t cvl_mat_bytes(int height, size_t stride) {
+    if (height <= 0 || stride == 0 || (size_t)height > SIZE_MAX / stride) {
+        return 0;
+    }
+    return (size_t)height * stride;
+}
+
+cvl_Mat cvl_mat_create(int height, int width, int channels, cvl_depth_t depth) {
     size_t elem_size = cvl_elem_size(depth);
+    size_t stride = cvl_mat_stride(width, channels, elem_size);
+    size_t total_bytes = cvl_mat_bytes(height, stride);
+    if (total_bytes == 0) {
+        return cvl_mat_empty();
+    }
+
+    void *data = calloc(1, total_bytes);
+    if (!data) {
+        return cvl_mat_empty();
+    }
 
     cvl_Mat m;
     m.height = height;
     m.width = width;
     m.channels = channels;
     m.depth = depth;
-    m.stride = width * channels * elem_size;
-
-    size_t total_bytes = (size_t)height * m.stride;
-    m.data = calloc(1, total_bytes);
-    assert(m.data);
-
+    m.stride = stride;
+    m.data = data;
     return m;
 }
 
 cvl_Mat cvl_mat_create_fill(int height, int width, int channels, cvl_depth_t depth, const void *fill_value) {
     // todo: opencv uses m.setTo(v) or setTo(scalar{r, g, b})
     // todo: I don't check depth and type of fill_value match... good luck
-    assert(height > 0 && width > 0 && channels > 0);
-    assert(fill_value != NULL);
+    if (!fill_value) {
+        return cvl_mat_empty();
+    }
 
     cvl_Mat mat = cvl_mat_create(height, width, channels, depth);
-    assert(mat.data);
+    if (!mat.data) {
+        return mat;
+    }
 
     size_t elem_size = cvl_elem_size(depth);
-    size_t total_elems = (size_t)height * width * channels;
+    size_t total_elems = (size_t)height * (size_t)width * (size_t)channels;
 
     uint8_t *data = (uint8_t *)mat.data;
     for(size_t i = 0; i < total_elems; ++i) {
@@ -61,31 +104,44 @@ cvl_Mat cvl_mat_create_fill(int height, int width, int channels, cvl_depth_t dep
 }
 
 cvl_Mat cvl_mat_create_from(int height, int width, int channels, cvl_depth_t depth, const void *data) {
-    assert(height > 0 && width > 0 && channels > 0);
-    assert(data);
+    if (!data) {
+        return cvl_mat_empty();
+    }
 
     cvl_Mat mat = cvl_mat_create(height, width, channels, depth);
-    assert(mat.data);
+    if (!mat.data) {
+        return mat;
+    }
 
-    size_t total_bytes = (size_t)height * mat.stride;
-    memcpy(mat.data, data, total_bytes);
+    memcpy(mat.data, data, (size_t)height * mat.stride);
 
     return mat;
 }
 
 cvl_Mat cvl_mat_copy(const cvl_Mat *src) {
+    if (!src || !src->data) {
+        return cvl_mat_empty();
+    }
+
+    size_t total_bytes = cvl_mat_bytes(src->height, src->stride);
+    if (total_bytes == 0) {
+        return cvl_mat_empty();
+    }
+
+    void *data = malloc(total_bytes);
+    if (!data) {
+        return cvl_mat_empty();
+    }
+
+    memcpy(data, src->data, total_bytes);
+
     cvl_Mat dst;
     dst.height = src->height;
     dst.width = src->width;
     dst.channels = src->channels;
     dst.depth = src->depth;
     dst.stride = src->stride;
-
-    dst.data = malloc(dst.height * dst.stride);
-    assert(dst.data);
-
-    memcpy(dst.data, src->data, dst.height * dst.stride);
-
+    dst.data = data;
     return dst;
 }
 
