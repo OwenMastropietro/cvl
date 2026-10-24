@@ -15,7 +15,9 @@ add_library(cvl_lib
 target_link_libraries(cvl_lib PUBLIC m)
 
 target_include_directories(cvl_lib
-    PUBLIC  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+    PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}/include>
+        $<INSTALL_INTERFACE:include>
     PRIVATE ${CMAKE_CURRENT_SOURCE_DIR}/thirdparty
 )
 
@@ -47,11 +49,27 @@ if (BUILD_CLI)
     list(APPEND CVL_INSTALL_TARGETS cvl)
 endif()
 
+include(GNUInstallDirs)
+include(CMakePackageConfigHelpers)
+
 install(TARGETS ${CVL_INSTALL_TARGETS}
     EXPORT cvlTargets
-    RUNTIME DESTINATION bin
-    LIBRARY DESTINATION lib
-    ARCHIVE DESTINATION lib
+    RUNTIME DESTINATION ${CMAKE_INSTALL_BINDIR}
+    LIBRARY DESTINATION ${CMAKE_INSTALL_LIBDIR}
+    ARCHIVE DESTINATION ${CMAKE_INSTALL_LIBDIR}
 )
-install(EXPORT cvlTargets NAMESPACE cvl:: FILE cvlConfig.cmake DESTINATION lib/cmake/cvl)
-install(DIRECTORY include/cvl DESTINATION include)
+install(DIRECTORY include/cvl DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+
+write_basic_package_version_file(
+    ${CMAKE_CURRENT_BINARY_DIR}/cvlConfigVersion.cmake
+    VERSION ${PROJECT_VERSION}
+    COMPATIBILITY SameMajorVersion
+)
+install(EXPORT cvlTargets
+    NAMESPACE cvl::
+    FILE cvlConfig.cmake
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/cvl
+)
+install(FILES ${CMAKE_CURRENT_BINARY_DIR}/cvlConfigVersion.cmake
+    DESTINATION ${CMAKE_INSTALL_LIBDIR}/cmake/cvl
+)

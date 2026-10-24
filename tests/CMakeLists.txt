@@ -1,5 +1,6 @@
 # GoogleTest
 include(FetchContent)
+set(INSTALL_GTEST OFF CACHE BOOL "" FORCE)
 FetchContent_Declare(
   googletest
   URL https://github.com/google/googletest/archive/7917641ff965959afae189afb5f052524395525c.zip

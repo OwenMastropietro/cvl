@@ -2,6 +2,7 @@
 
 #include <cvl/core.h>
 
+#include <stdint.h>
 #include <assert.h>
 #include <ctype.h>
 #include <float.h>
