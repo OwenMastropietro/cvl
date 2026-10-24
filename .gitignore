@@ -5,6 +5,3 @@ scripts/
 
 data/modified/*
 !data/modified/.gitinclude
-
-tests/data/*
-!tests/data/.gitinclude
