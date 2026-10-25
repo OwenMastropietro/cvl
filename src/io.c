@@ -3,16 +3,17 @@
 #include <stb_image.h>
 #include <stb_image_write.h>
 
-#include <assert.h>
 #include <ctype.h>
-#include <float.h>
-#include <math.h>
+#include <stdint.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
 
+
 static cvl_format_t detect_format(FILE *f) {
-    assert(f);
+    if (!f) {
+        return CVL_FMT_UNKNOWN;
+    }
 
     unsigned char buf[8];
 
@@ -22,8 +23,9 @@ static cvl_format_t detect_format(FILE *f) {
     }
 
     size_t n = fread(buf, 1, sizeof(buf), f);
-    fseek(f, pos, SEEK_SET);
-
+    if (fseek(f, pos, SEEK_SET) != 0) {
+        return CVL_FMT_UNKNOWN;
+    }
     if (n < 2) {
         return CVL_FMT_UNKNOWN;
     }
@@ -62,10 +64,8 @@ static int stb_eof(void *user) {
 }
 
 static cvl_Mat read_stb(FILE *f) {
-    cvl_Mat img = {0};
-
-    if (f == NULL) {
-        return img;
+    if (!f) {
+        return cvl_mat_empty();
     }
 
     stbi_io_callbacks cb = {
@@ -80,202 +80,305 @@ static cvl_Mat read_stb(FILE *f) {
 
     uint8_t *data = stbi_load_from_callbacks(&cb, f, &width, &height, &channels, 0);
     if (!data) {
-        return img;
+        return cvl_mat_empty();
     }
 
-    img = cvl_mat_create_from(height, width, channels, CVL_UINT8, data);
+    cvl_Mat img = cvl_mat_create_from(height, width, channels, CVL_UINT8, data);
 
     stbi_image_free(data);
 
     return img;
 }
 
-static cvl_Mat read_pnm(FILE *f) {
-    assert(f);
+static int pnm_token(FILE *f, char *out, size_t out_size) {
+    int c;
+    do {
+        c = fgetc(f);
+        if (c == '#') {
+            while (c != '\n' && c != EOF) {
+                c = fgetc(f);
+            }
+        }
+    } while (c != EOF && isspace(c));
 
-    cvl_Mat img = {0};
+    if (c == EOF) {
+        return 0;
+    }
 
-    int format = detect_format(f);
-    if (format == CVL_FMT_UNKNOWN) return img;
+    size_t n = 0;
+    while (c != EOF && !isspace(c)) {
+        if (n + 1 < out_size) {
+            out[n++] = (char)c;
+        }
+        c = fgetc(f);
+    }
+    out[n] = '\0';
+    return n > 0;
+}
 
-    int height = 0;
+static int pnm_int(FILE *f, int *out) {
+    char tok[64];
+    if (!pnm_token(f, tok, sizeof(tok))) {
+        return 0;
+    }
+    char *end = NULL;
+    long v = strtol(tok, &end, 10);
+    if (end == tok || *end != '\0' || v > INT32_MAX) {
+        return 0;
+    }
+    *out = (int)v;
+    return 1;
+}
+
+static cvl_Mat read_pnm(FILE *f, cvl_format_t format) {
+    if (!f) {
+        return cvl_mat_empty();
+    }
+
+    char magic[8];
+    if (!pnm_token(f, magic, sizeof(magic))) {
+        return cvl_mat_empty();
+    }
+    if ((format == CVL_FMT_PBM && strcmp(magic, "P4") != 0) ||
+        (format == CVL_FMT_PGM && strcmp(magic, "P5") != 0) ||
+        (format == CVL_FMT_PPM && strcmp(magic, "P6") != 0)) {
+        return cvl_mat_empty();
+    }
+
     int width = 0;
-    int maxval = 255;
-
-    char magic[3]; // consume format specifier
-    assert(fscanf(f, "%2s", magic) == 1);
-
-    // skip comments
-    char line[200];
-    *line = '#';
-    while (*line == '#' || *line == '\n' || *line == '\r') {
-        fgets(line, sizeof(line), f);
+    int height = 0;
+    if (!pnm_int(f, &width) || !pnm_int(f, &height) || width <= 0 || height <= 0) {
+        return cvl_mat_empty();
     }
 
-    assert(sscanf(line, "%d %d", &width, &height) == 2);
-    assert(height > 0 && width > 0);
-    
     int channels = (format == CVL_FMT_PPM) ? 3 : 1;
-
-    img = cvl_mat_create(height, width, channels, CVL_UINT8);
-
-    size_t pixels = (size_t)width * height;
-
-    if (format == CVL_FMT_PGM || format == CVL_FMT_PPM) {
-        fscanf(f, "%d", &maxval);
-        fgetc(f); // newline
-        size_t bytes = pixels * channels;
-        assert(fread(img.data, 1, bytes, f) == bytes);
-
-        if (maxval != 255) { // normalize
-            uint8_t *d = img.data;
-            for (size_t i = 0; i < bytes; ++i) {
-                d[i] = (uint8_t)(d[i] * 255 / maxval);
-            }
+    int maxval = 1;
+    if (format != CVL_FMT_PBM) {
+        if (!pnm_int(f, &maxval) || maxval <= 0 || maxval > 255) {
+            return cvl_mat_empty();
         }
-    
-    } else if (format == CVL_FMT_PBM) { // (bit aligned) unpack bits
-        size_t rowbytes = (width + 7) / 8;
-        uint8_t *row = malloc(rowbytes);
-        assert(row);
-        uint8_t *d = img.data;
-
-        for (int i = 0; i < height; ++i) {
-            assert(fread(row, 1, rowbytes, f) == rowbytes);
-
-            for (int j = 0; j < width; ++j) {
-                int byte = j / 8;
-                int bit = 7 - (j % 8);
-                int value = (row[byte] >> bit) & 1;
-                d[i * width + j] = value ? 0 : 255;
-            }
-        }
-        free(row);
-        row = NULL;
     }
-    
-    return img;
-}
 
-static int write_pbm(const char *filename, cvl_Mat *img) {
-    assert(img->channels == 1 && img->depth == CVL_UINT8);
-
-    FILE *f = fopen(filename, "wb");
-    assert(f);
-
-    int height = img->height;
-    int width = img->width;
-    const uint8_t *data = img->data;
-
-    fprintf(f, "P4\n%d %d\n", width, height);
-
-    int rowbytes = (width + 7) / 8;
-    uint8_t *row = calloc(rowbytes, 1);
-    assert(row);
-    for (int i = 0; i < height; ++i) {
-        memset(row, 0, rowbytes);
-        for (int j = 0; j < width; ++j) {
-            uint8_t p = data[i * width + j];
-            assert(p == BLACK || p == WHITE);
-
-            if (p == BLACK) { // hawk tuah, BLACK is 0 fool
-                row[j / 8] |= 0x80 >> (j % 8);
-            }
-        }
-        fwrite(row, 1, rowbytes, f);
-    }
-    free(row);
-    fclose(f);
-
-    return 0;
-}
-
-static int write_pgm(const char *filename, cvl_Mat *img) {
-    assert(img->channels == 1 && img->depth == CVL_UINT8);
-
-    FILE *f = fopen(filename, "wb");
-    assert (f);
-
-    fprintf(f, "P5\n%d %d\n255\n", img->width, img->height);
-    fwrite(img->data, 1, img->height * img->width, f);
-
-    fclose(f);
-
-    return 0;
-}
-
-static int write_ppm(const char *filename, cvl_Mat *img) {
-    FILE *f = fopen(filename, "wb");
-    assert(f);
-
-    fprintf(f, "P6\n%d %d\n255\n", img->width, img->height);
-    fwrite(img->data, 1, img->height * img->width * img->channels, f);
-
-    fclose(f);
-
-    return 0;
-}
-
-static int write_png(const char *filename, cvl_Mat *img) {
-    const int height = img->height;
-    const int width = img->width;
-    const int channels = img->channels;
-    const int stride = width * channels; // in bytes
-
-    int ok = stbi_write_png(filename, width, height, channels, img->data, stride);
-
-    return ok ? 0 : -1;
-}
-
-static int write_jpg(const char *filename, cvl_Mat *img) {
-    const int height = img->height;
-    const int width = img->width;
-    const int channels = img->channels;
-
-    int ok = stbi_write_jpg(filename, width, height, channels, img->data, 90);
-
-    return ok ? 0 : -1;
-}
-
-// Reads an image from a specified file.
-cvl_Mat cvl_imread(const char *filename) {
-    cvl_Mat img = {0};
-
-    FILE *f = fopen(filename, "rb");
-    if (f == NULL) {
+    cvl_Mat img = cvl_mat_create(height, width, channels, CVL_UINT8);
+    if (!img.data) {
         return img;
     }
 
-    int fmt = detect_format(f);
-
-    switch (fmt) {
-        case CVL_FMT_UNKNOWN: break;
-        case CVL_FMT_PBM:
-        case CVL_FMT_PGM:
-        case CVL_FMT_PPM: img = read_pnm(f); break;
-        case CVL_FMT_JPG:
-        case CVL_FMT_PNG: img = read_stb(f); break;
+    if (format == CVL_FMT_PGM || format == CVL_FMT_PPM) {
+        size_t row_bytes = (size_t)width * (size_t)channels;
+        for (int y = 0; y < height; ++y) {
+            uint8_t *row = cvl_mat_row(&img, y);
+            if (fread(row, 1, row_bytes, f) != row_bytes) {
+                cvl_mat_free(&img);
+                return cvl_mat_empty();
+            }
+            if (maxval != 255) {
+                for (size_t i = 0; i < row_bytes; ++i) {
+                    row[i] = (uint8_t)((int)row[i] * 255 / maxval);
+                }
+            }
+        }
+        return img;
     }
 
-    fclose(f);
+    size_t packed = ((size_t)width + 7) / 8;
+    uint8_t *packed_row = malloc(packed);
+    if (!packed_row) {
+        cvl_mat_free(&img);
+        return cvl_mat_empty();
+    }
 
+    for (int y = 0; y < height; ++y) {
+        if (fread(packed_row, 1, packed, f) != packed) {
+            free(packed_row);
+            cvl_mat_free(&img);
+            return cvl_mat_empty();
+        }
+        uint8_t *row = cvl_mat_row(&img, y);
+        for (int x = 0; x < width; ++x) {
+            int bit = (packed_row[x / 8] >> (7 - (x % 8))) & 1;
+            row[x] = bit ? 0 : 255;
+        }
+    }
+    free(packed_row);
     return img;
 }
 
-// Saves an image to a specified file. The image format is determined by the file extension.
+static int write_row(FILE *f, const void *row, size_t n) {
+    return fwrite(row, 1, n, f) == n;
+}
+
+static int write_pbm(const char *filename, const cvl_Mat *img) {
+    if (img->channels != 1 || img->depth != CVL_UINT8) {
+        return -1;
+    }
+
+    FILE *f = fopen(filename, "wb");
+    if (!f) {
+        return -1;
+    }
+
+    if (fprintf(f, "P4\n%d %d\n", img->width, img->height) < 0) {
+        return -1;
+    }
+
+    size_t rowbytes = ((size_t)img->width + 7) / 8;
+    uint8_t *packed = calloc(rowbytes, 1);
+    if (!packed) {
+        return -1;
+    }
+
+    for (int y = 0; y < img->height; ++y) {
+        const uint8_t *row = cvl_mat_row_const(img, y);
+        memset(packed, 0, rowbytes);
+        for (int x = 0; x < img->width; ++x) {
+            uint8_t p = row[x];
+            if (p != BLACK && p != WHITE) {
+                free(packed);
+                return -1;
+            }
+            if (p == BLACK) {
+                packed[x / 8] |= (uint8_t)(0x80 >> (x % 8));
+            }
+        }
+        if (!write_row(f, packed, rowbytes)) {
+            free(packed);
+            return -1;
+        }
+    }
+    free(packed);
+
+    if (fclose(f) != 0) {
+        return -1;
+    }
+
+    return 0;
+}
+
+static int write_pgm(const char *filename, const cvl_Mat *img) {
+    if (img->channels != 1 || img->depth != CVL_UINT8) {
+        return -1;
+    }
+
+    FILE *f = fopen(filename, "wb");
+    if (!f) {
+        return -1;
+    }
+
+    if (fprintf(f, "P5\n%d %d\n255\n", img->width, img->height) < 0) {
+        return -1;
+    }
+
+    for (int y = 0; y < img->height; ++y) {
+        if (!write_row(f, cvl_mat_row_const(img, y), (size_t)img->width)) {
+            return -1;
+        }
+    }
+
+    if (fclose(f) != 0) {
+        return -1;
+    }
+
+    return 0;
+}
+
+static int write_ppm(const char *filename, const cvl_Mat *img) {
+    if (img->channels != 3 || img->depth != CVL_UINT8) {
+        return -1;
+    }
+
+    FILE *f = fopen(filename, "wb");
+    if (!f) {
+        return -1;
+    }
+
+    if (fprintf(f, "P6\n%d %d\n255\n", img->width, img->height) < 0) {
+        return -1;
+    }
+
+    size_t row_bytes = (size_t)img->width * 3;
+    for (int y = 0; y < img->height; ++y) {
+        if (!write_row(f, cvl_mat_row_const(img, y), row_bytes)) {
+            return -1;
+        }
+    }
+
+    if (fclose(f) != 0) {
+        return -1;
+    }
+
+    return 0;
+}
+
+static int write_png(const char *filename, const cvl_Mat *img) {
+    if (img->depth != CVL_UINT8 || img->channels < 1 || img->channels > 4) {
+        return -1;
+    }
+    int ok = stbi_write_png(filename, img->width, img->height, img->channels, img->data, (int)img->stride);
+    return ok ? 0 : -1;
+}
+
+static int write_jpg(const char *filename, const cvl_Mat *img) {
+    if (img->depth != CVL_UINT8 || (img->channels != 1 && img->channels != 3)) {
+        return -1;
+    }
+    if (img->stride != (size_t)img->width * (size_t)img->channels) {
+        return -1;
+    }
+    int ok = stbi_write_jpg(filename, img->width, img->height, img->channels, img->data, 90);
+    return ok ? 0 : -1;
+}
+
+// Reads an image from a specified file. Returns an empty matrix on failure.
+cvl_Mat cvl_imread(const char *filename) {
+    if (!filename) {
+        return cvl_mat_empty();
+    }
+
+    FILE *f = fopen(filename, "rb");
+    if (f == NULL) {
+        return cvl_mat_empty();
+    }
+
+    cvl_format_t fmt = detect_format(f);
+    cvl_Mat img = cvl_mat_empty();
+    switch (fmt) {
+        case CVL_FMT_PBM:
+        case CVL_FMT_PGM:
+        case CVL_FMT_PPM:
+            img = read_pnm(f, fmt);
+            break;
+        case CVL_FMT_JPG:
+        case CVL_FMT_PNG:
+            img = read_stb(f);
+            break;
+        case CVL_FMT_UNKNOWN:
+            break;
+    }
+
+    fclose(f);
+    return img;
+}
+
+// Writes an image to a specified file. The image format is determined by the file extension.
 int cvl_imwrite(const char *filename, cvl_Mat *img) {
-    if (!img || !img->data || img->height <= 0 || img->width <= 0 || img->channels <= 0) {
+    if (!filename || !img || !img->data || img->height <= 0 || img->width <= 0 || img->channels <= 0) {
+        return -1;
+    }
+    if (img->stride < (size_t)img->width * (size_t)img->channels * cvl_elem_size((cvl_depth_t)img->depth)) {
         return -1;
     }
 
     const char *ext = strrchr(filename, '.');
-    assert(ext);
+    if (!ext) {
+        return -1;
+    }
 
     if (strncmp(ext, ".pbm", 3) == 0) return write_pbm(filename, img);
     if (strncmp(ext, ".pgm", 3) == 0) return write_pgm(filename, img);
     if (strncmp(ext, ".ppm", 3) == 0) return write_ppm(filename, img);
     if (strncmp(ext, ".png", 3) == 0) return write_png(filename, img);
-    if (strncmp(ext, ".jpg", 3) == 0) return write_jpg(filename, img);
+    if (strncmp(ext, ".jpg", 3) == 0) return write_jpg(filename, img); // screw jpeg
 
     return -1;
 }

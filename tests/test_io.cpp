@@ -95,7 +95,61 @@ TEST(ImRead, ReadJPG) {
 TEST(ImWrite, InvalidFormat) {
         cvl_Mat img = cvl_mat_create(2, 3, 1, CVL_UINT8);
         ASSERT_NE(cvl_imwrite("test.bad", &img), 0);
+        ASSERT_EQ(cvl_imwrite(nullptr, &img), -1);
+        ASSERT_EQ(cvl_imwrite("/tmp/cvl-noext", &img), -1);
+        ASSERT_EQ(cvl_imwrite("/no/such/dir/out.pgm", &img), -1);
         cvl_mat_free(&img);
+}
+
+TEST(ImRead, TruncatedAndBadMaxval) {
+    const char *short_path = "/tmp/cvl-short.pgm";
+    FILE *f = fopen(short_path, "wb");
+    ASSERT_NE(f, nullptr);
+    fputs("P5\n8 8\n255\n", f);
+    fwrite("abcd", 1, 4, f);
+    fclose(f);
+    cvl_Mat short_img = cvl_imread(short_path);
+    EXPECT_EQ(short_img.data, nullptr);
+
+    const char *max_path = "/tmp/cvl-badmax.pgm";
+    f = fopen(max_path, "wb");
+    ASSERT_NE(f, nullptr);
+    fputs("P5\n2 2\n0\nabcd", f);
+    fclose(f);
+    cvl_Mat badmax = cvl_imread(max_path);
+    EXPECT_EQ(badmax.data, nullptr);
+
+    const char *ascii_path = "/tmp/cvl-ascii.pgm";
+    f = fopen(ascii_path, "wb");
+    ASSERT_NE(f, nullptr);
+    fputs("P2\n2 2\n255\n1 2 3 4\n", f);
+    fclose(f);
+    cvl_Mat ascii = cvl_imread(ascii_path);
+    EXPECT_EQ(ascii.data, nullptr);
+}
+
+TEST(ImWrite, HonorsStride) {
+    cvl_Mat wide = cvl_mat_create(2, 4, 1, CVL_UINT8);
+    ASSERT_NE(wide.data, nullptr);
+    uint8_t *px = static_cast<uint8_t *>(wide.data);
+    for (int i = 0; i < 8; ++i) {
+        px[i] = static_cast<uint8_t>(i + 1);
+    }
+    wide.width = 2;
+
+    ASSERT_EQ(cvl_imwrite("/tmp/cvl-stride.pgm", &wide), 0);
+    cvl_Mat back = cvl_imread("/tmp/cvl-stride.pgm");
+    ASSERT_NE(back.data, nullptr);
+    EXPECT_EQ(back.height, 2);
+    EXPECT_EQ(back.width, 2);
+    uint8_t *b = static_cast<uint8_t *>(back.data);
+    EXPECT_EQ(b[0], 1);
+    EXPECT_EQ(b[1], 2);
+    EXPECT_EQ(b[2], 5);
+    EXPECT_EQ(b[3], 6);
+
+    cvl_mat_free(&wide);
+    cvl_mat_free(&back);
 }
 
 TEST(ImWrite, WritePBM) {
