@@ -84,6 +84,8 @@ extern "C" {
 
 size_t cvl_elem_size(cvl_depth_t depth);
 
+cvl_Mat cvl_mat_empty(void);
+
 cvl_Mat cvl_mat_create(int height, int width, int channels, cvl_depth_t depth);
 
 cvl_Mat cvl_mat_create_fill(int height, int width, int channels, cvl_depth_t depth, const void *fill_value);

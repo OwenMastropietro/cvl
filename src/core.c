@@ -22,15 +22,16 @@ size_t cvl_elem_size(cvl_depth_t depth) {
     return 0;
 }
 
-static cvl_Mat cvl_mat_empty(void) {
-    cvl_Mat m;
-    m.height = 0;
-    m.width = 0;
-    m.channels = 0;
-    m.depth = CVL_UINT8;
-    m.stride = 0;
-    m.data = NULL;
-    return m;
+// Returns an empty matrix with no width, height, or allocated data.
+cvl_Mat cvl_mat_empty(void) {
+    return (cvl_Mat){
+        .height   = 0,
+        .width    = 0,
+        .channels = 0,
+        .depth    = CVL_UINT8,
+        .stride   = 0,
+        .data     = NULL
+    };
 }
 
 // width * channels * elem_size, or 0 if the product does not fit in size_t.

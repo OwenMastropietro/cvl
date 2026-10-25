@@ -4,6 +4,18 @@
 #include <float.h>
 #include <stdint.h>
 
+
+TEST(MatTest, MatEmpty) {
+    cvl_Mat mat = cvl_mat_empty();
+
+    ASSERT_EQ(mat.height, 0);
+    ASSERT_EQ(mat.width, 0);
+    ASSERT_EQ(mat.channels, 0);
+    ASSERT_EQ(mat.depth, CVL_UINT8);
+    ASSERT_EQ(mat.data, nullptr);
+}
+
+
 // ================
 // cvl_mat_create
 // ================
