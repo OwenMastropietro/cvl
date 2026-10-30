@@ -3,6 +3,12 @@
 #include <assert.h>
 #include <math.h>
 #include <stdio.h>
+
+/* M_PI is POSIX. MSVC only defines it if _USE_MATH_DEFINES is set before
+ * the first math.h include, which headers can beat. */
+#ifndef M_PI
+#define M_PI 3.14159265358979323846
+#endif
 #include <stdlib.h>
 #include <string.h>
 

@@ -1,5 +1,6 @@
 #include <cvl/cvl.h>
 #include <gtest/gtest.h>
+#include "test_utils.h"
 
 #include <assert.h>
 #include <stdio.h>
@@ -93,42 +94,54 @@ TEST(ImRead, ReadJPG) {
 // ==============================================
 
 TEST(ImWrite, InvalidFormat) {
+        TempDir temp;
         cvl_Mat img = cvl_mat_create(2, 3, 1, CVL_UINT8);
         ASSERT_NE(cvl_imwrite("test.bad", &img), 0);
         ASSERT_EQ(cvl_imwrite(nullptr, &img), -1);
-        ASSERT_EQ(cvl_imwrite("/tmp/cvl-noext", &img), -1);
-        ASSERT_EQ(cvl_imwrite("/no/such/dir/out.pgm", &img), -1);
+        ASSERT_EQ(cvl_imwrite(temp.file("noext").string().c_str(), &img), -1);
+        ASSERT_EQ(cvl_imwrite((temp.file("missing").string() + "/out.pgm").c_str(), &img), -1);
         cvl_mat_free(&img);
 }
 
 TEST(ImRead, TruncatedAndBadMaxval) {
-    const char *short_path = "/tmp/cvl-short.pgm";
-    FILE *f = fopen(short_path, "wb");
+    TempDir temp;
+    FILE *f;
+
+    auto short_path = temp.file("short.pgm");
+    f = fopen(short_path.string().c_str(), "wb");
     ASSERT_NE(f, nullptr);
+
     fputs("P5\n8 8\n255\n", f);
     fwrite("abcd", 1, 4, f);
     fclose(f);
-    cvl_Mat short_img = cvl_imread(short_path);
+
+    cvl_Mat short_img = cvl_imread(short_path.string().c_str());
     EXPECT_EQ(short_img.data, nullptr);
 
-    const char *max_path = "/tmp/cvl-badmax.pgm";
-    f = fopen(max_path, "wb");
+    auto max_path = temp.file("badmax.pgm");
+    f = fopen(max_path.string().c_str(), "wb");
     ASSERT_NE(f, nullptr);
+
     fputs("P5\n2 2\n0\nabcd", f);
     fclose(f);
-    cvl_Mat badmax = cvl_imread(max_path);
+
+    cvl_Mat badmax = cvl_imread(max_path.string().c_str());
     EXPECT_EQ(badmax.data, nullptr);
 
-    const char *ascii_path = "/tmp/cvl-ascii.pgm";
-    f = fopen(ascii_path, "wb");
+    auto ascii_path = temp.file("ascii.pgm");
+    f = fopen(ascii_path.string().c_str(), "wb");
     ASSERT_NE(f, nullptr);
+
     fputs("P2\n2 2\n255\n1 2 3 4\n", f);
     fclose(f);
-    cvl_Mat ascii = cvl_imread(ascii_path);
+
+    cvl_Mat ascii = cvl_imread(ascii_path.string().c_str());
     EXPECT_EQ(ascii.data, nullptr);
 }
 
 TEST(ImWrite, HonorsStride) {
+    TempDir temp;
+
     cvl_Mat wide = cvl_mat_create(2, 4, 1, CVL_UINT8);
     ASSERT_NE(wide.data, nullptr);
     uint8_t *px = static_cast<uint8_t *>(wide.data);
@@ -137,8 +150,9 @@ TEST(ImWrite, HonorsStride) {
     }
     wide.width = 2;
 
-    ASSERT_EQ(cvl_imwrite("/tmp/cvl-stride.pgm", &wide), 0);
-    cvl_Mat back = cvl_imread("/tmp/cvl-stride.pgm");
+    auto stride_path = temp.file("stride.pgm");
+    ASSERT_EQ(cvl_imwrite(stride_path.string().c_str(), &wide), 0);
+    cvl_Mat back = cvl_imread(stride_path.string().c_str());
     ASSERT_NE(back.data, nullptr);
     EXPECT_EQ(back.height, 2);
     EXPECT_EQ(back.width, 2);
@@ -153,6 +167,8 @@ TEST(ImWrite, HonorsStride) {
 }
 
 TEST(ImWrite, WritePBM) {
+    TempDir temp;
+
     {
         uint8_t vals[2][3] = {
             {0,   255, 0},
@@ -161,9 +177,10 @@ TEST(ImWrite, WritePBM) {
 
         cvl_Mat img = cvl_mat_create_from(2, 3, 1, CVL_UINT8, vals);
 
-        ASSERT_EQ(cvl_imwrite("test.pbm", &img), 0);
+        auto path = temp.file("test.pbm");
+        ASSERT_EQ(cvl_imwrite(path.string().c_str(), &img), 0);
 
-        cvl_Mat loaded = cvl_imread("test.pbm");
+        cvl_Mat loaded = cvl_imread(path.string().c_str());
         ASSERT_NE(loaded.data,     nullptr);
         EXPECT_EQ(loaded.height,   2);
         EXPECT_EQ(loaded.width,    3);
@@ -178,6 +195,8 @@ TEST(ImWrite, WritePBM) {
 }
 
 TEST(ImWrite, WritePGM) {
+    TempDir temp;
+
     {
         uint8_t vals[2][3] = {
             {0, 128, 255},
@@ -186,9 +205,10 @@ TEST(ImWrite, WritePGM) {
 
         cvl_Mat img = cvl_mat_create_from(2, 3, 1, CVL_UINT8, vals);
 
-        ASSERT_EQ(cvl_imwrite("test.pgm", &img), 0);
+        auto path = temp.file("test.pgm");
+        ASSERT_EQ(cvl_imwrite(path.string().c_str(), &img), 0);
 
-        cvl_Mat loaded = cvl_imread("test.pgm");
+        cvl_Mat loaded = cvl_imread(path.string().c_str());
         ASSERT_NE(loaded.data,     nullptr);
         EXPECT_EQ(loaded.height,   2);
         EXPECT_EQ(loaded.width,    3);
@@ -203,6 +223,8 @@ TEST(ImWrite, WritePGM) {
 }
 
 TEST(ImWrite, WritePPM) {
+    TempDir temp;
+
     {
         uint8_t vals[2][3][3] = {
             {{0, 0,  0},  {128, 128, 128}, {255, 255, 255}},
@@ -211,9 +233,10 @@ TEST(ImWrite, WritePPM) {
 
         cvl_Mat img = cvl_mat_create_from(2, 3, 3, CVL_UINT8, vals);
 
-        ASSERT_EQ(cvl_imwrite("test.ppm", &img), 0);
+        auto path = temp.file("test.ppm");
+        ASSERT_EQ(cvl_imwrite(path.string().c_str(), &img), 0);
 
-        cvl_Mat loaded = cvl_imread("test.ppm");
+        cvl_Mat loaded = cvl_imread(path.string().c_str());
         ASSERT_NE(loaded.data,     nullptr);
         EXPECT_EQ(loaded.height,   2);
         EXPECT_EQ(loaded.width,    3);
@@ -228,6 +251,8 @@ TEST(ImWrite, WritePPM) {
 }
 
 TEST(ImWrite, WritePNG) {
+    TempDir temp;
+
     {
         uint8_t vals[2][3][3] = {
             {{0, 0,  0},  {128, 128, 128}, {255, 255, 255}},
@@ -236,9 +261,10 @@ TEST(ImWrite, WritePNG) {
 
         cvl_Mat img = cvl_mat_create_from(2, 3, 3, CVL_UINT8, vals);
 
-        ASSERT_EQ(cvl_imwrite("test.png", &img), 0);
+        auto path = temp.file("test.png");
+        ASSERT_EQ(cvl_imwrite(path.string().c_str(), &img), 0);
 
-        cvl_Mat loaded = cvl_imread("test.png");
+        cvl_Mat loaded = cvl_imread(path.string().c_str());
         ASSERT_NE(loaded.data,     nullptr);
         EXPECT_EQ(loaded.height,   2);
         EXPECT_EQ(loaded.width,    3);
@@ -253,6 +279,8 @@ TEST(ImWrite, WritePNG) {
 }
 
 TEST(ImWrite, WriteJPG) {
+    TempDir temp;
+
     {
         uint8_t vals[2][3][3] = {
             {{0, 0,  0},  {128, 128, 128}, {255, 255, 255}},
@@ -261,9 +289,10 @@ TEST(ImWrite, WriteJPG) {
 
         cvl_Mat img = cvl_mat_create_from(2, 3, 3, CVL_UINT8, vals);
 
-        ASSERT_EQ(cvl_imwrite("test.jpg", &img), 0);
+        auto path = temp.file("test.jpg");
+        ASSERT_EQ(cvl_imwrite(path.string().c_str(), &img), 0);
 
-        cvl_Mat loaded = cvl_imread("test.jpg");
+        cvl_Mat loaded = cvl_imread(path.string().c_str());
         ASSERT_NE(loaded.data,     nullptr);
         EXPECT_EQ(loaded.height,   2);
         EXPECT_EQ(loaded.width,    3);

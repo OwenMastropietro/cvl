@@ -19,8 +19,11 @@ target_link_libraries(test_cvl PRIVATE
     gtest_main
 )
 
+target_compile_features(test_cvl PRIVATE cxx_std_17)
+
 target_include_directories(test_cvl PRIVATE
     ${PROJECT_SOURCE_DIR}/include
+    ${CMAKE_CURRENT_SOURCE_DIR}
 )
 
 target_compile_definitions(test_cvl PRIVATE

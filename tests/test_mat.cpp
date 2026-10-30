@@ -55,7 +55,7 @@ TEST_P(MatCreateTest, MatCreate) {
                         EXPECT_EQ(v, 0);
                 } else if (tc.depth == CVL_FLOAT64) {
                         const double *data = static_cast<const double *>(mat.data);
-                        const double v = data[i * tc_stride + j * tc.channels + c];
+                        const double v = data[(i * tc_stride) / sizeof(double) + j * tc.channels + c];
                         EXPECT_EQ(v, 0);
                 } else {
                     ASSERT_FALSE(true);
