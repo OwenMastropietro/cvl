@@ -12,7 +12,11 @@ add_library(cvl_lib
     src/stb.c
 )
 
-target_link_libraries(cvl_lib PUBLIC m)
+# libm is a separate library on Unix. MSVC provides these symbols in the
+# C runtime, and linking "m" there fails.
+if(NOT MSVC)
+    target_link_libraries(cvl_lib PUBLIC m)
+endif()
 
 target_include_directories(cvl_lib
     PUBLIC
@@ -22,7 +26,11 @@ target_include_directories(cvl_lib
 )
 
 add_library(cvl_warnings INTERFACE)
-target_compile_options(cvl_warnings INTERFACE -Wall -Wextra)
+if(MSVC)
+    target_compile_options(cvl_warnings INTERFACE /W4)
+else()
+    target_compile_options(cvl_warnings INTERFACE -Wall -Wextra)
+endif()
 
 # Build examples by default.
 option(BUILD_EXAMPLES "Build example programs" OFF)

@@ -2,11 +2,15 @@
 
 _Computer Vision Library in C._
 
+[![Linux](https://github.com/OwenMastropietro/cvl/actions/workflows/linux.yml/badge.svg?branch=main)](https://github.com/OwenMastropietro/cvl/actions/workflows/linux.yml?query=branch%3Amain)
+[![macOS](https://github.com/OwenMastropietro/cvl/actions/workflows/macos.yml/badge.svg?branch=main)](https://github.com/OwenMastropietro/cvl/actions/workflows/macos.yml?query=branch%3Amain)
+[![Windows](https://github.com/OwenMastropietro/cvl/actions/workflows/windows.yml/badge.svg?branch=main)](https://github.com/OwenMastropietro/cvl/actions/workflows/windows.yml?query=branch%3Amain)
+
 [docs](https://owenmastropietro.github.io/projects/cvl/)
 
 ---
 
-**CVL** implements a small computer vision library for raster images with support for reading and writing [Netpbm](https://netpbm.sourceforge.net/doc/ppm.html) image formats (PGM, PGM, PPM) and [stb](https://github.com/nothings/stb/blob/master/stb_image.h) formats (PNG, JPG, etc.), along with thresholding, filtering, connected component labeling, and edge detection.
+**CVL** implements a small computer vision library for raster images with support for reading and writing [Netpbm](https://netpbm.sourceforge.net/doc/ppm.html) image formats (PBM, PGM, PPM) and [stb](https://github.com/nothings/stb/blob/master/stb_image.h) formats (PNG, JPG, etc.), along with thresholding, filtering, connected component labeling, and edge detection.
 
 ---
 

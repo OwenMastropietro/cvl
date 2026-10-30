@@ -1,0 +1,34 @@
+name: Build and test
+
+on:
+  workflow_call:
+    inputs:
+      os:
+        description: GitHub-hosted runner
+        required: true
+        type: string
+
+permissions:
+  contents: read
+
+jobs:
+  build:
+    name: ${{ inputs.os }}
+    runs-on: ${{ inputs.os }}
+    steps:
+      - name: Check out repository
+        uses: actions/checkout@v5
+
+      # Pin CMake instead of whatever the runner image happens to ship.
+      # v4.4.5 is the current stable get-cmake release.
+      - name: Install CMake
+        uses: lukka/get-cmake@v4.4.5
+
+      - name: Configure
+        run: cmake -S . -B build -DBUILD_TESTS=ON -DBUILD_CLI=ON -DCMAKE_BUILD_TYPE=Release
+
+      - name: Build
+        run: cmake --build build --config Release --parallel
+
+      - name: Test
+        run: ctest --test-dir build -C Release --output-on-failure
