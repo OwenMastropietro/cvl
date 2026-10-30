@@ -2,9 +2,9 @@
 
 _Computer Vision Library in C._
 
-[![Linux](https://github.com/OwenMastropietro/cvl/actions/workflows/linux.yml/badge.svg?branch=main)](https://github.com/OwenMastropietro/cvl/actions/workflows/linux.yml?query=branch%3Amain)
-[![macOS](https://github.com/OwenMastropietro/cvl/actions/workflows/macos.yml/badge.svg?branch=main)](https://github.com/OwenMastropietro/cvl/actions/workflows/macos.yml?query=branch%3Amain)
-[![Windows](https://github.com/OwenMastropietro/cvl/actions/workflows/windows.yml/badge.svg?branch=main)](https://github.com/OwenMastropietro/cvl/actions/workflows/windows.yml?query=branch%3Amain)
+[![Linux](https://github.com/OwenMastropietro/cvl/actions/workflows/linux.yml/badge.svg)](https://github.com/OwenMastropietro/cvl/actions/workflows/linux.yml)
+[![macOS](https://github.com/OwenMastropietro/cvl/actions/workflows/macos.yml/badge.svg)](https://github.com/OwenMastropietro/cvl/actions/workflows/macos.yml)
+[![Windows](https://github.com/OwenMastropietro/cvl/actions/workflows/windows.yml/badge.svg)](https://github.com/OwenMastropietro/cvl/actions/workflows/windows.yml)
 
 [docs](https://owenmastropietro.github.io/projects/cvl/)
 
