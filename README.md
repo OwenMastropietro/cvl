@@ -6,7 +6,7 @@ _Computer Vision Library in C._
 [![macOS](https://github.com/OwenMastropietro/cvl/actions/workflows/macos.yml/badge.svg)](https://github.com/OwenMastropietro/cvl/actions/workflows/macos.yml)
 [![Windows](https://github.com/OwenMastropietro/cvl/actions/workflows/windows.yml/badge.svg)](https://github.com/OwenMastropietro/cvl/actions/workflows/windows.yml)
 
-[docs](https://owenmastropietro.github.io/projects/cvl/)
+[docs](https://owenmastropietro.com/cvl/)
 
 ---
 
@@ -51,7 +51,7 @@ cmake --build build
 
 ## Example Programs
 
-> See the [docs](https://owenmastropietro.github.io/projects/cvl/) for more examples and documentation.
+> See more [Examples](https://owenmastropietro.com/cvl/examples/).
 
 | Executable      | Source File                                      | Description                  |
 | --------------- | ------------------------------------------------ | ---------------------------- |
@@ -64,7 +64,7 @@ cmake --build build
 
 ## Example Results
 
-> See the [docs](https://owenmastropietro.github.io/projects/cvl/) for more examples and documentation.
+> See more [Examples](https://owenmastropietro.com/cvl/examples/).
 
 ### Sobel Filtering.
 
