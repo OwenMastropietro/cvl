@@ -3,12 +3,6 @@
 #include <assert.h>
 #include <math.h>
 #include <stdio.h>
-
-/* M_PI is POSIX. MSVC only defines it if _USE_MATH_DEFINES is set before
- * the first math.h include, which headers can beat. */
-#ifndef M_PI
-#define M_PI 3.14159265358979323846
-#endif
 #include <stdlib.h>
 #include <string.h>
 
@@ -147,17 +141,6 @@ cvl_Mat cvl_cvt_color_new(const cvl_Mat *src, int code) {
     return dst;
 }
 
-/**
- * Converts a matrix to another type with scaling.
- *
- * Effectively: `dst(x, y) = saturate_cast<ddepth>(α * src(x, y) + β)`
- *
- * @param src Input matrix.
- * @param dst Output matrix.
- * @param ddepth Type to convert to.
- * @param alpha Scale factor (1.0 for no change).
- * @param beta Value added to scaled values (0 for no change).
- */
 void cvl_cvt_depth(const cvl_Mat *src, cvl_Mat *dst, cvl_depth_t ddepth, double alpha, double beta) {
     assert(src->height == dst->height);
     assert(src->width == dst->width);
@@ -251,7 +234,6 @@ void cvl_normalize(cvl_Mat *src, cvl_Mat *dst) {
 // Morphology & Transforms
 // ==========================
 
-// Applies a fixed-level threshold to each array element — determined by type.
 void cvl_threshold(cvl_Mat *img, int thresh, int maxval, int type) {
     const size_t h = img->height;
     const size_t w = img->width;
@@ -332,7 +314,6 @@ cvl_Mat cvl_threshold_new(const cvl_Mat *src, int thresh, int maxval, int type) 
     return dst;
 }
 
-// Applies per-channel arithmetic inversion (dst = maxval - src).
 void cvl_invert(cvl_Mat *img, double maxval) {
     const int h = img->height;
     const int w = img->width;
@@ -365,7 +346,6 @@ void cvl_invert(cvl_Mat *img, double maxval) {
     }
 }
 
-// Changes all pixels to their neighborhood max.
 void cvl_dilate(const cvl_Mat *src, cvl_Mat *dst, int ksize) {
     const int h = src->height;
     const int w = src->width;
@@ -396,7 +376,6 @@ void cvl_dilate(const cvl_Mat *src, cvl_Mat *dst, int ksize) {
     }
 }
 
-// Changes all pixels to their neighborhood min.
 void cvl_erode(const cvl_Mat *src, cvl_Mat *dst, int ksize) {
     const int h = src->height;
     const int w = src->width;
@@ -427,7 +406,6 @@ void cvl_erode(const cvl_Mat *src, cvl_Mat *dst, int ksize) {
     }
 }
 
-// Morphological opening applies erode then dilate.
 void cvl_open(const cvl_Mat *src, cvl_Mat *dst, int ksize) {
     cvl_Mat tmp = cvl_mat_create(src->height, src->width, src->channels, src->depth);
 
@@ -437,7 +415,6 @@ void cvl_open(const cvl_Mat *src, cvl_Mat *dst, int ksize) {
     cvl_mat_free(&tmp);
 }
 
-// Morphological closing applies dilate then erode.
 void cvl_close(const cvl_Mat *src, cvl_Mat *dst, int ksize) {
     cvl_Mat tmp = cvl_mat_create(src->height, src->width, src->channels, src->depth);
 
@@ -447,7 +424,6 @@ void cvl_close(const cvl_Mat *src, cvl_Mat *dst, int ksize) {
     cvl_mat_free(&tmp);
 }
 
-// Copies a region of interest defined by (r, c) from src into dst.
 void cvl_crop(const cvl_Mat *src, cvl_Mat *dst, int r, int c) {
     assert (src->depth == dst->depth);
 
@@ -465,7 +441,6 @@ void cvl_crop(const cvl_Mat *src, cvl_Mat *dst, int r, int c) {
     }
 }
 
-// Copies a region of interest defined by (r, c) from src into a new matrix of size hxw.
 cvl_Mat cvl_crop_new(const cvl_Mat *src, int r, int c, int h, int w) {
     cvl_Mat dst = cvl_mat_create(h, w, src->channels, src->depth);
     cvl_crop(src, &dst, r, c);
@@ -671,7 +646,6 @@ static void rot270(const cvl_Mat *src, cvl_Mat *dst) {
     }
 }
 
-// Rotates a matrix clockwise by angle degrees using the specified interpolation method.
 void cvl_rotate(const cvl_Mat *src, cvl_Mat *dst, float angle, cvl_interp_t interp) {
     // todo: implement something like cvl_warp_affine
 
@@ -684,7 +658,7 @@ void cvl_rotate(const cvl_Mat *src, cvl_Mat *dst, float angle, cvl_interp_t inte
     if (a == 270) return rot270(src, dst);
 
     // Affine Rotations.
-    const float theta = angle * (float)M_PI / 180.0f;
+    const float theta = angle * (float)PI / 180.0f;
     const float c = cosf(theta);
     const float s = sinf(theta);
 
@@ -711,8 +685,6 @@ void cvl_rotate(const cvl_Mat *src, cvl_Mat *dst, float angle, cvl_interp_t inte
     }
 }
 
-// Rotates a matrix clockwise by angle degrees using the specified interpolation method.
-// Output shape matches input shape, so non-orthogonal rotations may crop corners.
 cvl_Mat cvl_rotate_new(const cvl_Mat *src, float angle, cvl_interp_t interp) {
     int a = ((int)roundf(angle)) % 360;
     if (a < 0) a += 360;
@@ -732,10 +704,8 @@ cvl_Mat cvl_rotate_new(const cvl_Mat *src, float angle, cvl_interp_t interp) {
     return dst;
 }
 
-// Rotates a matrix clockwise by angle degrees using the specified interpolation method.
-// Output shape is expanded to preserve the full rotated image without cropping corners.
 cvl_Mat cvl_rotate_bound_new(const cvl_Mat *src, float angle, cvl_interp_t interp) {
-    const float theta = angle * (float)M_PI / 180.0f;
+    const float theta = angle * (float)PI / 180.0f;
     const float c = fabsf(cosf(theta));
     const float s = fabsf(sinf(theta));
 
@@ -749,12 +719,10 @@ cvl_Mat cvl_rotate_bound_new(const cvl_Mat *src, float angle, cvl_interp_t inter
     return dst;
 }
 
-
 // ==========================
 // Connected Component Labeling
 // ==========================
 
-// Performs Connected Component Labeling. Returns number of components found.
 int cvl_connected_components(const cvl_Mat *src, cvl_Mat *labels, int connectivity) {
     assert(src && src->data);
     assert(labels && labels->data);
@@ -853,8 +821,7 @@ int cvl_connected_components(const cvl_Mat *src, cvl_Mat *labels, int connectivi
     return num_components;
 }
 
-// Colors components larger than thresh. Returns the number of such components.
-int cvl_color_components(cvl_Mat *img, const cvl_Mat *labels, int thresh) {
+int cvl_color_components(cvl_Mat *src, const cvl_Mat *labels, int thresh) {
     assert(img && img->data);
     assert(labels && labels->data);
     assert(img->height == labels->height && img->width == labels->width);
@@ -999,7 +966,6 @@ static void correlate_f64(const cvl_Mat *src, cvl_Mat *dst, const cvl_Mat *kerne
     }
 }
 
-// Correlate src with kernel using zero padding.
 void cvl_correlate(const cvl_Mat *src, cvl_Mat *dst, cvl_Mat *kernel) {
     assert(src->height == dst->height);
     assert(src->width == dst->width);
@@ -1019,7 +985,6 @@ cvl_Mat cvl_correlate_new(const cvl_Mat *src, cvl_Mat *kernel) {
     return dst;
 }
 
-// Convolve src with kernel using zero padding.
 void cvl_convolve(const cvl_Mat *src, cvl_Mat *dst, cvl_Mat *kernel) {
     const int h = kernel->height;
     const int w = kernel->width;
@@ -1113,17 +1078,6 @@ static void _convolve_y(const cvl_Mat *src, cvl_Mat *dst, const cvl_Mat *kernel)
     }
 }
 
-/**
- * Applies a separable linear filter to an image.
- * 
- * First, every row of src is convolved with the horizontal kernel,
- * then every column of the result is convolved with the vertical kernel.
- * 
- * @param src Input matrix.
- * @param dst Output matrix.
- * @param kx Horizontal kernel.
- * @param ky Vertical kernel.
- */
 void cvl_convolve_sep(const cvl_Mat *src, cvl_Mat *dst, cvl_Mat *kx, cvl_Mat *ky) {
     // todo: impl. _is_separable(kernel)
 
@@ -1139,7 +1093,6 @@ void cvl_convolve_sep(const cvl_Mat *src, cvl_Mat *dst, cvl_Mat *kx, cvl_Mat *ky
 // Blurring / Smoothing
 // ==========================
 
-// Apply mean blur using a uniform kernel with optional normalization.
 void cvl_blur_box(const cvl_Mat *src, cvl_Mat *dst, int ksize, bool normalize) {
     assert(src && src->data);
     assert(dst && dst->data);
@@ -1160,7 +1113,6 @@ cvl_Mat cvl_blur_box_new(const cvl_Mat *src, int ksize, bool normalize) {
     return dst;
 }
 
-// Apply mean blur using a normalized uniform kernel.
 void cvl_blur_mean(const cvl_Mat *src, cvl_Mat *dst, int ksize) {
     cvl_blur_box(src, dst, ksize, true);
 }
@@ -1200,14 +1152,6 @@ static cvl_Mat _gauss_kernel(int ksize, double sigma) {
     return kernel;
 }
 
-/**
- * Applies Gaussian blur using a kernel defined by ksize and/or sigma.
- * 
- * @param src Input matrix.
- * @param dst Output matrix (blurred).
- * @param ksize Kernel size (if 0, derived from sigma).
- * @param sigma Standard deviation of the Gaussian kernel (if 0, derived from ksize).
- */
 void cvl_blur_gauss(const cvl_Mat *src, cvl_Mat *dst, int ksize, double sigma) {
     assert(ksize > 0.0 || sigma > 0.0);
 
@@ -1235,15 +1179,6 @@ void cvl_blur_gauss(const cvl_Mat *src, cvl_Mat *dst, int ksize, double sigma) {
     cvl_mat_free(&src_f64);
 }
 
-/**
- * Applies Gaussian blur using a kernel defined by ksize and/or sigma.
- * 
- * @param src Input matrix.
- * @param ksize Kernel size (if 0, derived from sigma).
- * @param sigma Standard deviation of the Gaussian kernel (if 0, derived from ksize).
- * 
- * @returns Blurred matrix.
- */
 cvl_Mat cvl_blur_gauss_new(const cvl_Mat *src, int ksize, double sigma) {
     cvl_Mat dst = cvl_mat_create(src->height, src->width, src->channels, src->depth);
     cvl_blur_gauss(src, &dst, ksize, sigma);
@@ -1264,7 +1199,6 @@ static uint8_t _hist_median(const int hist[256], int total) {
     return 0;
 }
 
-// Apply median blur using replicated outlier pixel values.
 void cvl_blur_median(const cvl_Mat *src, cvl_Mat *dst, int ksize) {
     assert(src->height == dst->height && src->width == dst->width);
     assert(ksize % 2 == 1);

@@ -1,0 +1,30 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.18.0" xml:lang="en-US">
+  <compounddef id="struct_u_f_node" kind="struct" language="C++" prot="public">
+    <compoundname>UFNode</compoundname>
+    <sectiondef kind="public-attrib">
+      <memberdef kind="variable" id="struct_u_f_node_1a1934f97b5981f8605f9253ae37ece17e" prot="public" static="no" mutable="no">
+        <type>int32_t</type>
+        <definition>int32_t UFNode::parent</definition>
+        <argsstring></argsstring>
+        <name>parent</name>
+        <qualifiedname>UFNode::parent</qualifiedname>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/imgproc.c" line="14" column="13" bodyfile="src/imgproc.c" bodystart="14" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <location file="src/imgproc.c" line="13" column="1" bodyfile="src/imgproc.c" bodystart="13" bodyend="15"/>
+    <listofallmembers>
+      <member refid="struct_u_f_node_1a1934f97b5981f8605f9253ae37ece17e" prot="public" virt="non-virtual"><scope>UFNode</scope><name>parent</name></member>
+    </listofallmembers>
+  </compounddef>
+</doxygen>

@@ -1,0 +1,736 @@
+<?xml version='1.0' encoding='UTF-8' standalone='no'?>
+<doxygen xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="compound.xsd" version="1.18.0" xml:lang="en-US">
+  <compounddef id="core_8c" kind="file" language="C++">
+    <compoundname>core.c</compoundname>
+    <includes refid="core_8h" local="no">cvl/core.h</includes>
+    <includes local="no">stdint.h</includes>
+    <includes local="no">assert.h</includes>
+    <includes local="no">ctype.h</includes>
+    <includes local="no">float.h</includes>
+    <includes local="no">math.h</includes>
+    <includes local="no">stdio.h</includes>
+    <includes local="no">stdlib.h</includes>
+    <includes local="no">string.h</includes>
+    <incdepgraph>
+      <node id="2">
+        <label>cvl/core.h</label>
+        <link refid="core_8h"/>
+        <childnode refid="3" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+      </node>
+      <node id="1">
+        <label>src/core.c</label>
+        <link refid="core_8c"/>
+        <childnode refid="2" relation="include">
+        </childnode>
+        <childnode refid="4" relation="include">
+        </childnode>
+        <childnode refid="7" relation="include">
+        </childnode>
+        <childnode refid="8" relation="include">
+        </childnode>
+        <childnode refid="9" relation="include">
+        </childnode>
+        <childnode refid="10" relation="include">
+        </childnode>
+        <childnode refid="5" relation="include">
+        </childnode>
+        <childnode refid="6" relation="include">
+        </childnode>
+        <childnode refid="11" relation="include">
+        </childnode>
+      </node>
+      <node id="7">
+        <label>assert.h</label>
+      </node>
+      <node id="8">
+        <label>ctype.h</label>
+      </node>
+      <node id="9">
+        <label>float.h</label>
+      </node>
+      <node id="10">
+        <label>math.h</label>
+      </node>
+      <node id="3">
+        <label>stddef.h</label>
+      </node>
+      <node id="4">
+        <label>stdint.h</label>
+      </node>
+      <node id="5">
+        <label>stdio.h</label>
+      </node>
+      <node id="6">
+        <label>stdlib.h</label>
+      </node>
+      <node id="11">
+        <label>string.h</label>
+      </node>
+    </incdepgraph>
+    <sectiondef kind="define">
+      <memberdef kind="define" id="core_8c_1af08ec37a8c99d747fb60fa15bc28678b" prot="public" static="no">
+        <name>_CRT_SECURE_NO_WARNINGS</name>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/core.c" line="1" column="9" bodyfile="src/core.c" bodystart="1" bodyend="-1"/>
+      </memberdef>
+    </sectiondef>
+    <sectiondef kind="func">
+      <memberdef kind="function" id="core_8c_1a99f6ace151e774f7ec2edb22a0865cae" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>size_t</type>
+        <definition>size_t cvl_elem_size</definition>
+        <argsstring>(cvl_depth_t depth)</argsstring>
+        <name>cvl_elem_size</name>
+        <param>
+          <type><ref refid="core_8h_1a4889e676319625eb11cdfb5d877f234e" kindref="member">cvl_depth_t</ref></type>
+          <declname>depth</declname>
+        </param>
+        <briefdescription>
+<para>Returns the size, in bytes, of a matrix data type. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>depth</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Data type. See <ref refid="core_8h_1a4889e676319625eb11cdfb5d877f234e" kindref="member">cvl_depth_t</ref>. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>Size of one channel element in bytes. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/core.c" line="14" column="8" bodyfile="src/core.c" bodystart="14" bodyend="23"/>
+      </memberdef>
+      <memberdef kind="function" id="core_8c_1aa56eb6fa049cb7dd389edf0c98c96e9e" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="structcvl___mat" kindref="compound">cvl_Mat</ref></type>
+        <definition>cvl_Mat cvl_mat_empty</definition>
+        <argsstring>(void)</argsstring>
+        <name>cvl_mat_empty</name>
+        <param>
+          <type>void</type>
+        </param>
+        <briefdescription>
+<para>Creates an empty matrix. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Equivalent to calling the designated initializer.</para>
+<para><simplesect kind="return"><para>An empty <ref refid="structcvl___mat" kindref="compound">cvl_Mat</ref> with no allocated matrix storage. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/core.c" line="26" column="9" bodyfile="src/core.c" bodystart="26" bodyend="35"/>
+      </memberdef>
+      <memberdef kind="function" id="core_8c_1a30b70d25facedc2a8a97fdbaba7cfdd4" prot="public" static="yes" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>size_t</type>
+        <definition>static size_t cvl_mat_stride</definition>
+        <argsstring>(int width, int channels, size_t elem_size)</argsstring>
+        <name>cvl_mat_stride</name>
+        <param>
+          <type>int</type>
+          <declname>width</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>channels</declname>
+        </param>
+        <param>
+          <type>size_t</type>
+          <declname>elem_size</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/core.c" line="38" column="15" bodyfile="src/core.c" bodystart="38" bodyend="52"/>
+      </memberdef>
+      <memberdef kind="function" id="core_8c_1a1f35fcf51a8ee566a329b8a803aad306" prot="public" static="yes" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>size_t</type>
+        <definition>static size_t cvl_mat_bytes</definition>
+        <argsstring>(int height, size_t stride)</argsstring>
+        <name>cvl_mat_bytes</name>
+        <param>
+          <type>int</type>
+          <declname>height</declname>
+        </param>
+        <param>
+          <type>size_t</type>
+          <declname>stride</declname>
+        </param>
+        <briefdescription>
+        </briefdescription>
+        <detaileddescription>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/core.c" line="55" column="15" bodyfile="src/core.c" bodystart="55" bodyend="60"/>
+      </memberdef>
+      <memberdef kind="function" id="core_8c_1aa61349b93a3bc29c5bbbea27df2eec8c" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="structcvl___mat" kindref="compound">cvl_Mat</ref></type>
+        <definition>cvl_Mat cvl_mat_create</definition>
+        <argsstring>(int height, int width, int channels, cvl_depth_t depth)</argsstring>
+        <name>cvl_mat_create</name>
+        <param>
+          <type>int</type>
+          <declname>height</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>width</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>channels</declname>
+        </param>
+        <param>
+          <type><ref refid="core_8h_1a4889e676319625eb11cdfb5d877f234e" kindref="member">cvl_depth_t</ref></type>
+          <declname>depth</declname>
+        </param>
+        <briefdescription>
+<para>Creates a zero-initialized matrix. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>height</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Number of rows. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>width</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Number of columns. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>channels</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Number of channels per element. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>depth</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Data type used to represent each channel. See <ref refid="core_8h_1a4889e676319625eb11cdfb5d877f234e" kindref="member">cvl_depth_t</ref>. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>The newly allocated matrix. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/core.c" line="62" column="9" bodyfile="src/core.c" bodystart="62" bodyend="83"/>
+      </memberdef>
+      <memberdef kind="function" id="core_8c_1a2d7f180645f8483b6556c2594180ac89" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="structcvl___mat" kindref="compound">cvl_Mat</ref></type>
+        <definition>cvl_Mat cvl_mat_create_fill</definition>
+        <argsstring>(int height, int width, int channels, cvl_depth_t depth, const void *fill_value)</argsstring>
+        <name>cvl_mat_create_fill</name>
+        <param>
+          <type>int</type>
+          <declname>height</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>width</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>channels</declname>
+        </param>
+        <param>
+          <type><ref refid="core_8h_1a4889e676319625eb11cdfb5d877f234e" kindref="member">cvl_depth_t</ref></type>
+          <declname>depth</declname>
+        </param>
+        <param>
+          <type>const void *</type>
+          <declname>fill_value</declname>
+        </param>
+        <briefdescription>
+<para>Creates a matrix initialized with a fill value. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Initializes every matrix channel using the supplied fill value.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>height</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Number of rows. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>width</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Number of columns. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>channels</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Number of channels per element. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>depth</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Data type used to represent each channel. See <ref refid="core_8h_1a4889e676319625eb11cdfb5d877f234e" kindref="member">cvl_depth_t</ref>. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>fill_value</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Pointer to the value used to initialize each channel. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>The newly allocated matrix, or an empty matrix on failure. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/core.c" line="85" column="9" bodyfile="src/core.c" bodystart="85" bodyend="106"/>
+      </memberdef>
+      <memberdef kind="function" id="core_8c_1a87ab5ffce23332e354e41cea221aa9c9" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="structcvl___mat" kindref="compound">cvl_Mat</ref></type>
+        <definition>cvl_Mat cvl_mat_create_from</definition>
+        <argsstring>(int height, int width, int channels, cvl_depth_t depth, const void *data)</argsstring>
+        <name>cvl_mat_create_from</name>
+        <param>
+          <type>int</type>
+          <declname>height</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>width</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>channels</declname>
+        </param>
+        <param>
+          <type><ref refid="core_8h_1a4889e676319625eb11cdfb5d877f234e" kindref="member">cvl_depth_t</ref></type>
+          <declname>depth</declname>
+        </param>
+        <param>
+          <type>const void *</type>
+          <declname>data</declname>
+        </param>
+        <briefdescription>
+<para>Creates a matrix initialized from existing data. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Initializes the matrix using the supplied data buffer.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>height</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Number of rows. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>width</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Number of columns. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>channels</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Number of channels per element. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>depth</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Data type used to represent each channel. See <ref refid="core_8h_1a4889e676319625eb11cdfb5d877f234e" kindref="member">cvl_depth_t</ref>. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>data</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Pointer to the source data. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>The newly allocated matrix, or an empty matrix on failure.</para>
+</simplesect>
+<xrefsect id="todo_1_todo000001"><xreftitle>Todo</xreftitle><xrefdescription><para>Fold into <ref refid="core_8h_1a2d7f180645f8483b6556c2594180ac89" kindref="member">cvl_mat_create_fill()</ref>. </para>
+</xrefdescription></xrefsect></para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/core.c" line="108" column="9" bodyfile="src/core.c" bodystart="108" bodyend="121"/>
+      </memberdef>
+      <memberdef kind="function" id="core_8c_1a1047a11b5fada3a161a0c6d641a4f3ce" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type><ref refid="structcvl___mat" kindref="compound">cvl_Mat</ref></type>
+        <definition>cvl_Mat cvl_mat_copy</definition>
+        <argsstring>(const cvl_Mat *src)</argsstring>
+        <name>cvl_mat_copy</name>
+        <param>
+          <type>const <ref refid="structcvl___mat" kindref="compound">cvl_Mat</ref> *</type>
+          <declname>src</declname>
+        </param>
+        <briefdescription>
+<para>Creates a copy of an existing matrix. </para>
+        </briefdescription>
+        <detaileddescription>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>src</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Pointer to the source matrix. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>The copied matrix, or an empty matrix on failure. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/core.c" line="123" column="9" bodyfile="src/core.c" bodystart="123" bodyend="148"/>
+      </memberdef>
+      <memberdef kind="function" id="core_8c_1a60eb67c7d29f2ff4769e3c75473f5eef" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>void</type>
+        <definition>void cvl_mat_free</definition>
+        <argsstring>(cvl_Mat *m)</argsstring>
+        <name>cvl_mat_free</name>
+        <param>
+          <type><ref refid="structcvl___mat" kindref="compound">cvl_Mat</ref> *</type>
+          <declname>mat</declname>
+          <defname>m</defname>
+        </param>
+        <briefdescription>
+<para>Releases the storage associated with a matrix. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>Frees the matrix&apos;s allocated data and resets its state.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>mat</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Pointer to the matrix to release. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/core.c" line="150" column="6" bodyfile="src/core.c" bodystart="150" bodyend="153"/>
+      </memberdef>
+      <memberdef kind="function" id="core_8c_1a5c7da04a7e1840aab49cb260ff1e1758" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>uint8_t *</type>
+        <definition>uint8_t * cvl_mat_row</definition>
+        <argsstring>(cvl_Mat *mat, int r)</argsstring>
+        <name>cvl_mat_row</name>
+        <param>
+          <type><ref refid="structcvl___mat" kindref="compound">cvl_Mat</ref> *</type>
+          <declname>mat</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>r</declname>
+        </param>
+        <briefdescription>
+<para>Returns a pointer to the beginning of a matrix row. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>The returned pointer addresses the first byte of row <computeroutput>r</computeroutput>. Use the matrix&apos;s <computeroutput>stride</computeroutput> to determine the distance between rows.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>mat</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Pointer to the matrix. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>r</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Row index. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>Pointer to the first byte of the requested row. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/core.c" line="156" column="9" bodyfile="src/core.c" bodystart="156" bodyend="161"/>
+      </memberdef>
+      <memberdef kind="function" id="core_8c_1ac5b665d0e64da5a4f151cdd501876f3e" prot="public" static="no" const="no" explicit="no" inline="no" virt="non-virtual">
+        <type>const uint8_t *</type>
+        <definition>const uint8_t * cvl_mat_row_const</definition>
+        <argsstring>(const cvl_Mat *mat, int r)</argsstring>
+        <name>cvl_mat_row_const</name>
+        <param>
+          <type>const <ref refid="structcvl___mat" kindref="compound">cvl_Mat</ref> *</type>
+          <declname>mat</declname>
+        </param>
+        <param>
+          <type>int</type>
+          <declname>r</declname>
+        </param>
+        <briefdescription>
+<para>Returns a constant pointer to the beginning of a matrix row. </para>
+        </briefdescription>
+        <detaileddescription>
+<para>The returned pointer addresses the first byte of row <computeroutput>r</computeroutput>. Use the matrix&apos;s <computeroutput>stride</computeroutput> to determine the distance between rows.</para>
+<para><parameterlist kind="param"><parameteritem>
+<parameternamelist>
+<parametername>mat</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Pointer to the matrix. </para>
+</parameterdescription>
+</parameteritem>
+<parameteritem>
+<parameternamelist>
+<parametername>r</parametername>
+</parameternamelist>
+<parameterdescription>
+<para>Row index. </para>
+</parameterdescription>
+</parameteritem>
+</parameterlist>
+<simplesect kind="return"><para>Constant pointer to the first byte of the requested row. </para>
+</simplesect>
+</para>
+        </detaileddescription>
+        <inbodydescription>
+        </inbodydescription>
+        <location file="src/core.c" line="164" column="15" bodyfile="src/core.c" bodystart="164" bodyend="169"/>
+      </memberdef>
+    </sectiondef>
+    <briefdescription>
+    </briefdescription>
+    <detaileddescription>
+    </detaileddescription>
+    <programlisting>
+<codeline lineno="1" refid="core_8c_1af08ec37a8c99d747fb60fa15bc28678b" refkind="member"><highlight class="preprocessor">#define<sp/>_CRT_SECURE_NO_WARNINGS</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="2"><highlight class="normal"></highlight></codeline>
+<codeline lineno="3"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;<ref refid="core_8h" kindref="compound">cvl/core.h</ref>&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="4"><highlight class="normal"></highlight></codeline>
+<codeline lineno="5"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;stdint.h&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="6"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;assert.h&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="7"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;ctype.h&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="8"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;float.h&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="9"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;math.h&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="10"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;stdio.h&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="11"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;stdlib.h&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="12"><highlight class="normal"></highlight><highlight class="preprocessor">#include<sp/>&lt;string.h&gt;</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="13"><highlight class="normal"></highlight></codeline>
+<codeline lineno="14" refid="core_8h_1a99f6ace151e774f7ec2edb22a0865cae" refkind="member"><highlight class="normal"></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/><ref refid="core_8h_1a99f6ace151e774f7ec2edb22a0865cae" kindref="member">cvl_elem_size</ref>(<ref refid="core_8h_1a4889e676319625eb11cdfb5d877f234e" kindref="member">cvl_depth_t</ref><sp/>depth)<sp/>{</highlight></codeline>
+<codeline lineno="15"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">switch</highlight><highlight class="normal"><sp/>(depth)<sp/>{</highlight></codeline>
+<codeline lineno="16"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">case</highlight><highlight class="normal"><sp/><ref refid="core_8h_1a4889e676319625eb11cdfb5d877f234eaab6bc5c3982c7fc9f175ed03a39ada7d" kindref="member">CVL_UINT8</ref>:<sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">sizeof</highlight><highlight class="normal">(uint8_t);</highlight></codeline>
+<codeline lineno="17"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">case</highlight><highlight class="normal"><sp/><ref refid="core_8h_1a4889e676319625eb11cdfb5d877f234ea6c53dea3e77a49ac7ec3feeb96dbccdb" kindref="member">CVL_32S</ref>:<sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">sizeof</highlight><highlight class="normal">(int32_t);</highlight></codeline>
+<codeline lineno="18"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">case</highlight><highlight class="normal"><sp/><ref refid="core_8h_1a4889e676319625eb11cdfb5d877f234ea40a5353a90e9890119429edeb3a582e6" kindref="member">CVL_FLOAT32</ref>:<sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">sizeof</highlight><highlight class="normal">(float);</highlight></codeline>
+<codeline lineno="19"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">case</highlight><highlight class="normal"><sp/><ref refid="core_8h_1a4889e676319625eb11cdfb5d877f234eaf7337656772a5f84a2e7e0ca90189288" kindref="member">CVL_FLOAT64</ref>:<sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/></highlight><highlight class="keyword">sizeof</highlight><highlight class="normal">(double);</highlight></codeline>
+<codeline lineno="20"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="21"><highlight class="normal"><sp/><sp/><sp/><sp/>assert(0<sp/>&amp;&amp;<sp/></highlight><highlight class="stringliteral">&quot;Unknown<sp/>depth&quot;</highlight><highlight class="normal">);</highlight></codeline>
+<codeline lineno="22"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>0;</highlight></codeline>
+<codeline lineno="23"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="24"><highlight class="normal"></highlight></codeline>
+<codeline lineno="25"><highlight class="normal"></highlight><highlight class="comment">//<sp/>Returns<sp/>an<sp/>empty<sp/>matrix<sp/>with<sp/>no<sp/>width,<sp/>height,<sp/>or<sp/>allocated<sp/>data.</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="26" refid="core_8h_1aa56eb6fa049cb7dd389edf0c98c96e9e" refkind="member"><highlight class="normal"><ref refid="structcvl___mat" kindref="compound">cvl_Mat</ref><sp/><ref refid="core_8h_1aa56eb6fa049cb7dd389edf0c98c96e9e" kindref="member">cvl_mat_empty</ref>(</highlight><highlight class="keywordtype">void</highlight><highlight class="normal">)<sp/>{</highlight></codeline>
+<codeline lineno="27"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>(<ref refid="structcvl___mat" kindref="compound">cvl_Mat</ref>){</highlight></codeline>
+<codeline lineno="28"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>.height<sp/><sp/><sp/>=<sp/>0,</highlight></codeline>
+<codeline lineno="29"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>.width<sp/><sp/><sp/><sp/>=<sp/>0,</highlight></codeline>
+<codeline lineno="30"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>.channels<sp/>=<sp/>0,</highlight></codeline>
+<codeline lineno="31"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>.depth<sp/><sp/><sp/><sp/>=<sp/><ref refid="core_8h_1a4889e676319625eb11cdfb5d877f234eaab6bc5c3982c7fc9f175ed03a39ada7d" kindref="member">CVL_UINT8</ref>,</highlight></codeline>
+<codeline lineno="32"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>.stride<sp/><sp/><sp/>=<sp/>0,</highlight></codeline>
+<codeline lineno="33"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>.data<sp/><sp/><sp/><sp/><sp/>=<sp/>NULL</highlight></codeline>
+<codeline lineno="34"><highlight class="normal"><sp/><sp/><sp/><sp/>};</highlight></codeline>
+<codeline lineno="35"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="36"><highlight class="normal"></highlight></codeline>
+<codeline lineno="37"><highlight class="normal"></highlight><highlight class="comment">//<sp/>width<sp/>*<sp/>channels<sp/>*<sp/>elem_size,<sp/>or<sp/>0<sp/>if<sp/>the<sp/>product<sp/>does<sp/>not<sp/>fit<sp/>in<sp/>size_t.</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="38"><highlight class="normal"></highlight><highlight class="keyword">static</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/>cvl_mat_stride(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>width,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>channels,<sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/>elem_size)<sp/>{</highlight></codeline>
+<codeline lineno="39"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(width<sp/>&lt;=<sp/>0<sp/>||<sp/>channels<sp/>&lt;=<sp/>0<sp/>||<sp/>elem_size<sp/>==<sp/>0)<sp/>{</highlight></codeline>
+<codeline lineno="40"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>0;</highlight></codeline>
+<codeline lineno="41"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="42"><highlight class="normal"></highlight></codeline>
+<codeline lineno="43"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>((</highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal">)width<sp/>&gt;<sp/>SIZE_MAX<sp/>/<sp/>(</highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal">)channels)<sp/>{</highlight></codeline>
+<codeline lineno="44"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>0;</highlight></codeline>
+<codeline lineno="45"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="46"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/>row_elems<sp/>=<sp/>(size_t)width<sp/>*<sp/>(</highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal">)channels;</highlight></codeline>
+<codeline lineno="47"><highlight class="normal"></highlight></codeline>
+<codeline lineno="48"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(row_elems<sp/>&gt;<sp/>SIZE_MAX<sp/>/<sp/>elem_size)<sp/>{</highlight></codeline>
+<codeline lineno="49"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>0;</highlight></codeline>
+<codeline lineno="50"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="51"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>row_elems<sp/>*<sp/>elem_size;</highlight></codeline>
+<codeline lineno="52"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="53"><highlight class="normal"></highlight></codeline>
+<codeline lineno="54"><highlight class="normal"></highlight><highlight class="comment">//<sp/>height<sp/>*<sp/>stride,<sp/>or<sp/>0<sp/>if<sp/>either<sp/>factor<sp/>is<sp/>0<sp/>or<sp/>the<sp/>product<sp/>overflows.</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="55"><highlight class="normal"></highlight><highlight class="keyword">static</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/>cvl_mat_bytes(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>height,<sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/>stride)<sp/>{</highlight></codeline>
+<codeline lineno="56"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(height<sp/>&lt;=<sp/>0<sp/>||<sp/>stride<sp/>==<sp/>0<sp/>||<sp/>(</highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal">)height<sp/>&gt;<sp/>SIZE_MAX<sp/>/<sp/>stride)<sp/>{</highlight></codeline>
+<codeline lineno="57"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>0;</highlight></codeline>
+<codeline lineno="58"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="59"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>(</highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal">)height<sp/>*<sp/>stride;</highlight></codeline>
+<codeline lineno="60"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="61"><highlight class="normal"></highlight></codeline>
+<codeline lineno="62" refid="core_8h_1aa61349b93a3bc29c5bbbea27df2eec8c" refkind="member"><highlight class="normal"><ref refid="structcvl___mat" kindref="compound">cvl_Mat</ref><sp/><ref refid="core_8h_1aa61349b93a3bc29c5bbbea27df2eec8c" kindref="member">cvl_mat_create</ref>(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>height,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>width,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>channels,<sp/><ref refid="core_8h_1a4889e676319625eb11cdfb5d877f234e" kindref="member">cvl_depth_t</ref><sp/>depth)<sp/>{</highlight></codeline>
+<codeline lineno="63"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/>elem_size<sp/>=<sp/><ref refid="core_8h_1a99f6ace151e774f7ec2edb22a0865cae" kindref="member">cvl_elem_size</ref>(depth);</highlight></codeline>
+<codeline lineno="64"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/>stride<sp/>=<sp/>cvl_mat_stride(width,<sp/>channels,<sp/>elem_size);</highlight></codeline>
+<codeline lineno="65"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/>total_bytes<sp/>=<sp/>cvl_mat_bytes(height,<sp/>stride);</highlight></codeline>
+<codeline lineno="66"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(total_bytes<sp/>==<sp/>0)<sp/>{</highlight></codeline>
+<codeline lineno="67"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/><ref refid="core_8h_1aa56eb6fa049cb7dd389edf0c98c96e9e" kindref="member">cvl_mat_empty</ref>();</highlight></codeline>
+<codeline lineno="68"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="69"><highlight class="normal"></highlight></codeline>
+<codeline lineno="70"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>*data<sp/>=<sp/>calloc(1,<sp/>total_bytes);</highlight></codeline>
+<codeline lineno="71"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(!data)<sp/>{</highlight></codeline>
+<codeline lineno="72"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/><ref refid="core_8h_1aa56eb6fa049cb7dd389edf0c98c96e9e" kindref="member">cvl_mat_empty</ref>();</highlight></codeline>
+<codeline lineno="73"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="74"><highlight class="normal"></highlight></codeline>
+<codeline lineno="75"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="structcvl___mat" kindref="compound">cvl_Mat</ref><sp/>m;</highlight></codeline>
+<codeline lineno="76"><highlight class="normal"><sp/><sp/><sp/><sp/>m.<ref refid="structcvl___mat_1adb09eebc9a4131abd47935439e904f89" kindref="member">height</ref><sp/>=<sp/>height;</highlight></codeline>
+<codeline lineno="77"><highlight class="normal"><sp/><sp/><sp/><sp/>m.<ref refid="structcvl___mat_1a0eac7550dfe3666ea5adda79322ff0f6" kindref="member">width</ref><sp/>=<sp/>width;</highlight></codeline>
+<codeline lineno="78"><highlight class="normal"><sp/><sp/><sp/><sp/>m.<ref refid="structcvl___mat_1a8cedab15dca04a2465cf1c35f3c807cc" kindref="member">channels</ref><sp/>=<sp/>channels;</highlight></codeline>
+<codeline lineno="79"><highlight class="normal"><sp/><sp/><sp/><sp/>m.<ref refid="structcvl___mat_1a71cb86901a271fe1741559382302bcb4" kindref="member">depth</ref><sp/>=<sp/>depth;</highlight></codeline>
+<codeline lineno="80"><highlight class="normal"><sp/><sp/><sp/><sp/>m.<ref refid="structcvl___mat_1a0d6019dc9e366139d2989f2062c22139" kindref="member">stride</ref><sp/>=<sp/>stride;</highlight></codeline>
+<codeline lineno="81"><highlight class="normal"><sp/><sp/><sp/><sp/>m.<ref refid="structcvl___mat_1a7ea2fa4d4e1adbd98db38c5b857c7525" kindref="member">data</ref><sp/>=<sp/>data;</highlight></codeline>
+<codeline lineno="82"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>m;</highlight></codeline>
+<codeline lineno="83"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="84"><highlight class="normal"></highlight></codeline>
+<codeline lineno="85" refid="core_8h_1a2d7f180645f8483b6556c2594180ac89" refkind="member"><highlight class="normal"><ref refid="structcvl___mat" kindref="compound">cvl_Mat</ref><sp/><ref refid="core_8h_1a2d7f180645f8483b6556c2594180ac89" kindref="member">cvl_mat_create_fill</ref>(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>height,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>width,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>channels,<sp/><ref refid="core_8h_1a4889e676319625eb11cdfb5d877f234e" kindref="member">cvl_depth_t</ref><sp/>depth,<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>*fill_value)<sp/>{</highlight></codeline>
+<codeline lineno="86"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>todo:<sp/>opencv<sp/>uses<sp/>m.setTo(v)<sp/>or<sp/>setTo(scalar{r,<sp/>g,<sp/>b})</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="87"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="comment">//<sp/>todo:<sp/>I<sp/>don&apos;t<sp/>check<sp/>depth<sp/>and<sp/>type<sp/>of<sp/>fill_value<sp/>match...<sp/>good<sp/>luck</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="88"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(!fill_value)<sp/>{</highlight></codeline>
+<codeline lineno="89"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/><ref refid="core_8h_1aa56eb6fa049cb7dd389edf0c98c96e9e" kindref="member">cvl_mat_empty</ref>();</highlight></codeline>
+<codeline lineno="90"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="91"><highlight class="normal"></highlight></codeline>
+<codeline lineno="92"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="structcvl___mat" kindref="compound">cvl_Mat</ref><sp/>mat<sp/>=<sp/><ref refid="core_8h_1aa61349b93a3bc29c5bbbea27df2eec8c" kindref="member">cvl_mat_create</ref>(height,<sp/>width,<sp/>channels,<sp/>depth);</highlight></codeline>
+<codeline lineno="93"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(!mat.<ref refid="structcvl___mat_1a7ea2fa4d4e1adbd98db38c5b857c7525" kindref="member">data</ref>)<sp/>{</highlight></codeline>
+<codeline lineno="94"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>mat;</highlight></codeline>
+<codeline lineno="95"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="96"><highlight class="normal"></highlight></codeline>
+<codeline lineno="97"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/>elem_size<sp/>=<sp/><ref refid="core_8h_1a99f6ace151e774f7ec2edb22a0865cae" kindref="member">cvl_elem_size</ref>(depth);</highlight></codeline>
+<codeline lineno="98"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/>total_elems<sp/>=<sp/>(size_t)height<sp/>*<sp/>(</highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal">)width<sp/>*<sp/>(size_t)channels;</highlight></codeline>
+<codeline lineno="99"><highlight class="normal"></highlight></codeline>
+<codeline lineno="100"><highlight class="normal"><sp/><sp/><sp/><sp/>uint8_t<sp/>*data<sp/>=<sp/>(uint8_t<sp/>*)mat.<ref refid="structcvl___mat_1a7ea2fa4d4e1adbd98db38c5b857c7525" kindref="member">data</ref>;</highlight></codeline>
+<codeline lineno="101"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">for</highlight><highlight class="normal">(</highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/>i<sp/>=<sp/>0;<sp/>i<sp/>&lt;<sp/>total_elems;<sp/>++i)<sp/>{</highlight></codeline>
+<codeline lineno="102"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/>memcpy(data<sp/>+<sp/>i<sp/>*<sp/>elem_size,<sp/>fill_value,<sp/>elem_size);</highlight></codeline>
+<codeline lineno="103"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="104"><highlight class="normal"></highlight></codeline>
+<codeline lineno="105"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>mat;</highlight></codeline>
+<codeline lineno="106"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="107"><highlight class="normal"></highlight></codeline>
+<codeline lineno="108" refid="core_8h_1a87ab5ffce23332e354e41cea221aa9c9" refkind="member"><highlight class="normal"><ref refid="structcvl___mat" kindref="compound">cvl_Mat</ref><sp/><ref refid="core_8h_1a87ab5ffce23332e354e41cea221aa9c9" kindref="member">cvl_mat_create_from</ref>(</highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>height,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>width,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>channels,<sp/><ref refid="core_8h_1a4889e676319625eb11cdfb5d877f234e" kindref="member">cvl_depth_t</ref><sp/>depth,<sp/></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>*data)<sp/>{</highlight></codeline>
+<codeline lineno="109"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(!data)<sp/>{</highlight></codeline>
+<codeline lineno="110"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/><ref refid="core_8h_1aa56eb6fa049cb7dd389edf0c98c96e9e" kindref="member">cvl_mat_empty</ref>();</highlight></codeline>
+<codeline lineno="111"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="112"><highlight class="normal"></highlight></codeline>
+<codeline lineno="113"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="structcvl___mat" kindref="compound">cvl_Mat</ref><sp/>mat<sp/>=<sp/><ref refid="core_8h_1aa61349b93a3bc29c5bbbea27df2eec8c" kindref="member">cvl_mat_create</ref>(height,<sp/>width,<sp/>channels,<sp/>depth);</highlight></codeline>
+<codeline lineno="114"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(!mat.<ref refid="structcvl___mat_1a7ea2fa4d4e1adbd98db38c5b857c7525" kindref="member">data</ref>)<sp/>{</highlight></codeline>
+<codeline lineno="115"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>mat;</highlight></codeline>
+<codeline lineno="116"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="117"><highlight class="normal"></highlight></codeline>
+<codeline lineno="118"><highlight class="normal"><sp/><sp/><sp/><sp/>memcpy(mat.<ref refid="structcvl___mat_1a7ea2fa4d4e1adbd98db38c5b857c7525" kindref="member">data</ref>,<sp/>data,<sp/>(</highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal">)height<sp/>*<sp/>mat.<ref refid="structcvl___mat_1a0d6019dc9e366139d2989f2062c22139" kindref="member">stride</ref>);</highlight></codeline>
+<codeline lineno="119"><highlight class="normal"></highlight></codeline>
+<codeline lineno="120"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>mat;</highlight></codeline>
+<codeline lineno="121"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="122"><highlight class="normal"></highlight></codeline>
+<codeline lineno="123" refid="core_8h_1a1047a11b5fada3a161a0c6d641a4f3ce" refkind="member"><highlight class="normal"><ref refid="structcvl___mat" kindref="compound">cvl_Mat</ref><sp/><ref refid="core_8h_1a1047a11b5fada3a161a0c6d641a4f3ce" kindref="member">cvl_mat_copy</ref>(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/><ref refid="structcvl___mat" kindref="compound">cvl_Mat</ref><sp/>*src)<sp/>{</highlight></codeline>
+<codeline lineno="124"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(!src<sp/>||<sp/>!src-&gt;<ref refid="structcvl___mat_1a7ea2fa4d4e1adbd98db38c5b857c7525" kindref="member">data</ref>)<sp/>{</highlight></codeline>
+<codeline lineno="125"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/><ref refid="core_8h_1aa56eb6fa049cb7dd389edf0c98c96e9e" kindref="member">cvl_mat_empty</ref>();</highlight></codeline>
+<codeline lineno="126"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="127"><highlight class="normal"></highlight></codeline>
+<codeline lineno="128"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">size_t</highlight><highlight class="normal"><sp/>total_bytes<sp/>=<sp/>cvl_mat_bytes(src-&gt;<ref refid="structcvl___mat_1adb09eebc9a4131abd47935439e904f89" kindref="member">height</ref>,<sp/>src-&gt;<ref refid="structcvl___mat_1a0d6019dc9e366139d2989f2062c22139" kindref="member">stride</ref>);</highlight></codeline>
+<codeline lineno="129"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(total_bytes<sp/>==<sp/>0)<sp/>{</highlight></codeline>
+<codeline lineno="130"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/><ref refid="core_8h_1aa56eb6fa049cb7dd389edf0c98c96e9e" kindref="member">cvl_mat_empty</ref>();</highlight></codeline>
+<codeline lineno="131"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="132"><highlight class="normal"></highlight></codeline>
+<codeline lineno="133"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/>*data<sp/>=<sp/>malloc(total_bytes);</highlight></codeline>
+<codeline lineno="134"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">if</highlight><highlight class="normal"><sp/>(!data)<sp/>{</highlight></codeline>
+<codeline lineno="135"><highlight class="normal"><sp/><sp/><sp/><sp/><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/><ref refid="core_8h_1aa56eb6fa049cb7dd389edf0c98c96e9e" kindref="member">cvl_mat_empty</ref>();</highlight></codeline>
+<codeline lineno="136"><highlight class="normal"><sp/><sp/><sp/><sp/>}</highlight></codeline>
+<codeline lineno="137"><highlight class="normal"></highlight></codeline>
+<codeline lineno="138"><highlight class="normal"><sp/><sp/><sp/><sp/>memcpy(data,<sp/>src-&gt;<ref refid="structcvl___mat_1a7ea2fa4d4e1adbd98db38c5b857c7525" kindref="member">data</ref>,<sp/>total_bytes);</highlight></codeline>
+<codeline lineno="139"><highlight class="normal"></highlight></codeline>
+<codeline lineno="140"><highlight class="normal"><sp/><sp/><sp/><sp/><ref refid="structcvl___mat" kindref="compound">cvl_Mat</ref><sp/>dst;</highlight></codeline>
+<codeline lineno="141"><highlight class="normal"><sp/><sp/><sp/><sp/>dst.<ref refid="structcvl___mat_1adb09eebc9a4131abd47935439e904f89" kindref="member">height</ref><sp/>=<sp/>src-&gt;<ref refid="structcvl___mat_1adb09eebc9a4131abd47935439e904f89" kindref="member">height</ref>;</highlight></codeline>
+<codeline lineno="142"><highlight class="normal"><sp/><sp/><sp/><sp/>dst.<ref refid="structcvl___mat_1a0eac7550dfe3666ea5adda79322ff0f6" kindref="member">width</ref><sp/>=<sp/>src-&gt;<ref refid="structcvl___mat_1a0eac7550dfe3666ea5adda79322ff0f6" kindref="member">width</ref>;</highlight></codeline>
+<codeline lineno="143"><highlight class="normal"><sp/><sp/><sp/><sp/>dst.<ref refid="structcvl___mat_1a8cedab15dca04a2465cf1c35f3c807cc" kindref="member">channels</ref><sp/>=<sp/>src-&gt;<ref refid="structcvl___mat_1a8cedab15dca04a2465cf1c35f3c807cc" kindref="member">channels</ref>;</highlight></codeline>
+<codeline lineno="144"><highlight class="normal"><sp/><sp/><sp/><sp/>dst.<ref refid="structcvl___mat_1a71cb86901a271fe1741559382302bcb4" kindref="member">depth</ref><sp/>=<sp/>src-&gt;<ref refid="structcvl___mat_1a71cb86901a271fe1741559382302bcb4" kindref="member">depth</ref>;</highlight></codeline>
+<codeline lineno="145"><highlight class="normal"><sp/><sp/><sp/><sp/>dst.<ref refid="structcvl___mat_1a0d6019dc9e366139d2989f2062c22139" kindref="member">stride</ref><sp/>=<sp/>src-&gt;<ref refid="structcvl___mat_1a0d6019dc9e366139d2989f2062c22139" kindref="member">stride</ref>;</highlight></codeline>
+<codeline lineno="146"><highlight class="normal"><sp/><sp/><sp/><sp/>dst.<ref refid="structcvl___mat_1a7ea2fa4d4e1adbd98db38c5b857c7525" kindref="member">data</ref><sp/>=<sp/>data;</highlight></codeline>
+<codeline lineno="147"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>dst;</highlight></codeline>
+<codeline lineno="148"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="149"><highlight class="normal"></highlight></codeline>
+<codeline lineno="150" refid="core_8h_1a988011446094464f3d3d5be3a78e3fb4" refkind="member"><highlight class="normal"></highlight><highlight class="keywordtype">void</highlight><highlight class="normal"><sp/><ref refid="core_8h_1a988011446094464f3d3d5be3a78e3fb4" kindref="member">cvl_mat_free</ref>(<ref refid="structcvl___mat" kindref="compound">cvl_Mat</ref><sp/>*m)<sp/>{</highlight></codeline>
+<codeline lineno="151"><highlight class="normal"><sp/><sp/><sp/><sp/>free(m-&gt;<ref refid="structcvl___mat_1a7ea2fa4d4e1adbd98db38c5b857c7525" kindref="member">data</ref>);</highlight></codeline>
+<codeline lineno="152"><highlight class="normal"><sp/><sp/><sp/><sp/>m-&gt;<ref refid="structcvl___mat_1a7ea2fa4d4e1adbd98db38c5b857c7525" kindref="member">data</ref><sp/>=<sp/>NULL;</highlight></codeline>
+<codeline lineno="153"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="154"><highlight class="normal"></highlight></codeline>
+<codeline lineno="155"><highlight class="normal"></highlight><highlight class="comment">//<sp/>Returns<sp/>a<sp/>mutable<sp/>raw<sp/>byte<sp/>pointer<sp/>to<sp/>the<sp/>start<sp/>of<sp/>row<sp/>r.</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="156" refid="core_8h_1a5c7da04a7e1840aab49cb260ff1e1758" refkind="member"><highlight class="normal">uint8_t<sp/>*<ref refid="core_8h_1a5c7da04a7e1840aab49cb260ff1e1758" kindref="member">cvl_mat_row</ref>(<ref refid="structcvl___mat" kindref="compound">cvl_Mat</ref><sp/>*mat,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>r)<sp/>{</highlight></codeline>
+<codeline lineno="157"><highlight class="normal"><sp/><sp/><sp/><sp/>assert(mat<sp/>&amp;&amp;<sp/>mat-&gt;<ref refid="structcvl___mat_1a7ea2fa4d4e1adbd98db38c5b857c7525" kindref="member">data</ref>);</highlight></codeline>
+<codeline lineno="158"><highlight class="normal"><sp/><sp/><sp/><sp/>assert(0<sp/>&lt;=<sp/>r<sp/>&amp;&amp;<sp/>r<sp/>&lt;<sp/>mat-&gt;height);</highlight></codeline>
+<codeline lineno="159"><highlight class="normal"></highlight></codeline>
+<codeline lineno="160"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>(uint8_t<sp/>*)mat-&gt;<ref refid="structcvl___mat_1a7ea2fa4d4e1adbd98db38c5b857c7525" kindref="member">data</ref><sp/>+<sp/>(size_t)r<sp/>*<sp/>mat-&gt;<ref refid="structcvl___mat_1a0d6019dc9e366139d2989f2062c22139" kindref="member">stride</ref>;</highlight></codeline>
+<codeline lineno="161"><highlight class="normal">}</highlight></codeline>
+<codeline lineno="162"><highlight class="normal"></highlight></codeline>
+<codeline lineno="163"><highlight class="normal"></highlight><highlight class="comment">//<sp/>Returns<sp/>an<sp/>immutable<sp/>raw<sp/>byte<sp/>pointer<sp/>to<sp/>the<sp/>start<sp/>of<sp/>row<sp/>r.</highlight><highlight class="normal"></highlight></codeline>
+<codeline lineno="164" refid="core_8h_1ac5b665d0e64da5a4f151cdd501876f3e" refkind="member"><highlight class="normal"></highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>uint8_t<sp/>*<ref refid="core_8h_1ac5b665d0e64da5a4f151cdd501876f3e" kindref="member">cvl_mat_row_const</ref>(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/><ref refid="structcvl___mat" kindref="compound">cvl_Mat</ref><sp/>*mat,<sp/></highlight><highlight class="keywordtype">int</highlight><highlight class="normal"><sp/>r)<sp/>{</highlight></codeline>
+<codeline lineno="165"><highlight class="normal"><sp/><sp/><sp/><sp/>assert(mat<sp/>&amp;&amp;<sp/>mat-&gt;<ref refid="structcvl___mat_1a7ea2fa4d4e1adbd98db38c5b857c7525" kindref="member">data</ref>);</highlight></codeline>
+<codeline lineno="166"><highlight class="normal"><sp/><sp/><sp/><sp/>assert(0<sp/>&lt;=<sp/>r<sp/>&amp;&amp;<sp/>r<sp/>&lt;<sp/>mat-&gt;height);</highlight></codeline>
+<codeline lineno="167"><highlight class="normal"></highlight></codeline>
+<codeline lineno="168"><highlight class="normal"><sp/><sp/><sp/><sp/></highlight><highlight class="keywordflow">return</highlight><highlight class="normal"><sp/>(</highlight><highlight class="keyword">const</highlight><highlight class="normal"><sp/>uint8_t<sp/>*)mat-&gt;<ref refid="structcvl___mat_1a7ea2fa4d4e1adbd98db38c5b857c7525" kindref="member">data</ref><sp/>+<sp/>(size_t)r<sp/>*<sp/>mat-&gt;<ref refid="structcvl___mat_1a0d6019dc9e366139d2989f2062c22139" kindref="member">stride</ref>;</highlight></codeline>
+<codeline lineno="169"><highlight class="normal">}</highlight></codeline>
+    </programlisting>
+    <location file="src/core.c"/>
+  </compounddef>
+</doxygen>
