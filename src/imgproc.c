@@ -822,17 +822,17 @@ int cvl_connected_components(const cvl_Mat *src, cvl_Mat *labels, int connectivi
 }
 
 int cvl_color_components(cvl_Mat *src, const cvl_Mat *labels, int thresh) {
-    assert(img && img->data);
+    assert(src && src->data);
     assert(labels && labels->data);
-    assert(img->height == labels->height && img->width == labels->width);
-    assert(img->channels == 3);
+    assert(src->height == labels->height && src->width == labels->width);
+    assert(src->channels == 3);
     assert(labels->channels == 1);
-    assert(img->depth == CVL_UINT8 && labels->depth == CVL_32S);
+    assert(src->depth == CVL_UINT8 && labels->depth == CVL_32S);
     assert(thresh >= 0);
 
-    const int h = img->height;
-    const int w = img->width;
-    const int ch = img->channels;
+    const int h = src->height;
+    const int w = src->width;
+    const int ch = src->channels;
 
     size_t max_label = (size_t)h * w + 1;
     assert(max_label < INT32_MAX);
@@ -863,7 +863,7 @@ int cvl_color_components(cvl_Mat *src, const cvl_Mat *labels, int thresh) {
     const int max = 256 - min;
 
     for (int i = 0; i < h; ++i) {
-        uint8_t *row = cvl_mat_row(img, i);
+        uint8_t *row = cvl_mat_row(src, i);
         const int32_t *lrow = (const int32_t *)cvl_mat_row_const(labels, i);
         for (int j = 0; j < w; ++j) {
             int label = lrow[j];
