@@ -11,6 +11,7 @@ add_executable(test_cvl
   test_mat.cpp
   test_imgproc.cpp
   test_io.cpp
+  test_blur.cpp
   test_threshold.cpp
 )
 
