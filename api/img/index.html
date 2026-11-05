@@ -1,0 +1,1483 @@
+
+<!doctype html>
+<html lang="en" class="no-js">
+  <head>
+    
+      <meta charset="utf-8">
+      <meta name="viewport" content="width=device-width,initial-scale=1">
+      
+        <meta name="description" content="A small computer vision library in C.">
+      
+      
+      
+      
+      
+      
+        
+      
+      
+      <link rel="icon" href="../../assets/cvl-logo.png">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.8.0">
+    
+    
+      
+        <title>Img - cvl</title>
+      
+    
+    
+      <link rel="stylesheet" href="../../assets/stylesheets/main.57a0d79d.min.css">
+      
+        
+        <link rel="stylesheet" href="../../assets/stylesheets/palette.fb2fffe2.min.css">
+      
+      
+
+
+    
+    
+      
+    
+    
+      
+        
+        
+        <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Roboto:300,300i,400,400i,700,700i%7CRoboto+Mono:400,400i,700,700i&display=fallback">
+        <style>:root{--md-text-font:"Roboto";--md-code-font:"Roboto Mono"}</style>
+      
+    
+    
+      <link rel="stylesheet" href="../../stylesheets/extra.css">
+    
+    <script>__md_scope=new URL("../..",location),__md_hash=e=>[...e].reduce(((e,_)=>(e<<5)-e+_.charCodeAt(0)),0),__md_get=(e,_=localStorage,t=__md_scope)=>JSON.parse(_.getItem(t.pathname+"."+e)),__md_set=(e,_,t=localStorage,a=__md_scope)=>{try{t.setItem(a.pathname+"."+e,JSON.stringify(_))}catch(e){}}</script>
+    
+      
+
+    
+    
+  </head>
+  
+  
+    
+    
+      
+    
+    
+    
+    
+    <body dir="ltr" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo">
+  
+    
+    <input class="md-toggle" data-md-toggle="drawer" type="checkbox" id="__drawer" autocomplete="off">
+    <input class="md-toggle" data-md-toggle="search" type="checkbox" id="__search" autocomplete="off">
+    <label class="md-overlay" for="__drawer"></label>
+    <div data-md-component="skip">
+      
+        
+        <a href="#cvl_cvt_color" class="md-skip">
+          Skip to content
+        </a>
+      
+    </div>
+    <div data-md-component="announce">
+      
+    </div>
+    
+    
+      
+
+  
+
+<header class="md-header md-header--shadow" data-md-component="header">
+  <nav class="md-header__inner md-grid" aria-label="Header">
+    <a href="../.." title="cvl" class="md-header__button md-logo" aria-label="cvl" data-md-component="logo">
+      
+  <img src="../../assets/cvl-logo.png" alt="logo">
+
+    </a>
+    <label class="md-header__button md-icon" for="__drawer">
+      
+      <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M3 6h18v2H3zm0 5h18v2H3zm0 5h18v2H3z"/></svg>
+    </label>
+    <div class="md-header__title" data-md-component="header-title">
+      <div class="md-header__ellipsis">
+        <div class="md-header__topic">
+          <span class="md-ellipsis">
+            cvl
+          </span>
+        </div>
+        <div class="md-header__topic" data-md-component="header-topic">
+          <span class="md-ellipsis">
+            
+              Img
+            
+          </span>
+        </div>
+      </div>
+    </div>
+    
+      
+        <form class="md-header__option" data-md-component="palette">
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to light mode"  type="radio" name="__palette" id="__palette_0">
+    
+      <label class="md-header__button md-icon" title="Switch to light mode" for="__palette_1" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="m14.3 16-.7-2h-3.2l-.7 2H7.8L11 7h2l3.2 9zM20 8.69V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12zm-9.15 3.96h2.3L12 9z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: light)" data-md-color-scheme="default" data-md-color-primary="indigo" data-md-color-accent="indigo"  aria-label="Switch to dark mode"  type="radio" name="__palette" id="__palette_1">
+    
+      <label class="md-header__button md-icon" title="Switch to dark mode" for="__palette_2" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a4 4 0 0 0-4 4 4 4 0 0 0 4 4 4 4 0 0 0 4-4 4 4 0 0 0-4-4m0 10a6 6 0 0 1-6-6 6 6 0 0 1 6-6 6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+    
+    
+    
+    <input class="md-option" data-md-color-media="(prefers-color-scheme: dark)" data-md-color-scheme="slate" data-md-color-primary="black" data-md-color-accent="indigo"  aria-label="Switch to system preference"  type="radio" name="__palette" id="__palette_2">
+    
+      <label class="md-header__button md-icon" title="Switch to system preference" for="__palette_0" hidden>
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 18c-.89 0-1.74-.2-2.5-.55C11.56 16.5 13 14.42 13 12s-1.44-4.5-3.5-5.45C10.26 6.2 11.11 6 12 6a6 6 0 0 1 6 6 6 6 0 0 1-6 6m8-9.31V4h-4.69L12 .69 8.69 4H4v4.69L.69 12 4 15.31V20h4.69L12 23.31 15.31 20H20v-4.69L23.31 12z"/></svg>
+      </label>
+    
+  
+</form>
+      
+    
+    
+      <script>var palette=__md_get("__palette");if(palette&&palette.color){if("(prefers-color-scheme)"===palette.color.media){var media=matchMedia("(prefers-color-scheme: light)"),input=document.querySelector(media.matches?"[data-md-color-media='(prefers-color-scheme: light)']":"[data-md-color-media='(prefers-color-scheme: dark)']");palette.color.media=input.getAttribute("data-md-color-media"),palette.color.scheme=input.getAttribute("data-md-color-scheme"),palette.color.primary=input.getAttribute("data-md-color-primary"),palette.color.accent=input.getAttribute("data-md-color-accent")}for(var[key,value]of Object.entries(palette.color))document.body.setAttribute("data-md-color-"+key,value)}</script>
+    
+    
+    
+      
+      
+        <label class="md-header__button md-icon" for="__search">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        </label>
+        <div class="md-search" data-md-component="search" role="dialog">
+  <label class="md-search__overlay" for="__search"></label>
+  <div class="md-search__inner" role="search">
+    <form class="md-search__form" name="search">
+      <input type="text" class="md-search__input" name="query" aria-label="Search" placeholder="Search" autocapitalize="off" autocorrect="off" autocomplete="off" spellcheck="false" data-md-component="search-query" required>
+      <label class="md-search__icon md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M20 11v2H8l5.5 5.5-1.42 1.42L4.16 12l7.92-7.92L13.5 5.5 8 11z"/></svg>
+      </label>
+      <nav class="md-search__options" aria-label="Search">
+        
+        <button type="reset" class="md-search__icon md-icon" title="Clear" aria-label="Clear" tabindex="-1">
+          
+          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M19 6.41 17.59 5 12 10.59 6.41 5 5 6.41 10.59 12 5 17.59 6.41 19 12 13.41 17.59 19 19 17.59 13.41 12z"/></svg>
+        </button>
+      </nav>
+      
+    </form>
+    <div class="md-search__output">
+      <div class="md-search__scrollwrap" tabindex="0" data-md-scrollfix>
+        <div class="md-search-result" data-md-component="search-result">
+          <div class="md-search-result__meta">
+            Initializing search
+          </div>
+          <ol class="md-search-result__list" role="presentation"></ol>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+      
+    
+    
+      <div class="md-header__source">
+        <a href="https://github.com/OwenMastropietro/cvl" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    OwenMastropietro/cvl
+  </div>
+</a>
+      </div>
+    
+  </nav>
+  
+</header>
+    
+    <div class="md-container" data-md-component="container">
+      
+      
+        
+          
+        
+      
+      <main class="md-main" data-md-component="main">
+        <div class="md-main__inner md-grid">
+          
+            
+              
+              <div class="md-sidebar md-sidebar--primary" data-md-component="sidebar" data-md-type="navigation" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+
+
+<nav class="md-nav md-nav--primary" aria-label="Navigation" data-md-level="0">
+  <label class="md-nav__title" for="__drawer">
+    <a href="../.." title="cvl" class="md-nav__button md-logo" aria-label="cvl" data-md-component="logo">
+      
+  <img src="../../assets/cvl-logo.png" alt="logo">
+
+    </a>
+    cvl
+  </label>
+  
+    <div class="md-nav__source">
+      <a href="https://github.com/OwenMastropietro/cvl" title="Go to repository" class="md-source" data-md-component="source">
+  <div class="md-source__icon md-icon">
+    
+    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 448 512"><!--! Font Awesome Free 7.1.0 by @fontawesome - https://fontawesome.com License - https://fontawesome.com/license/free (Icons: CC BY 4.0, Fonts: SIL OFL 1.1, Code: MIT License) Copyright 2025 Fonticons, Inc.--><path d="M439.6 236.1 244 40.5c-5.4-5.5-12.8-8.5-20.4-8.5s-15 3-20.4 8.4L162.5 81l51.5 51.5c27.1-9.1 52.7 16.8 43.4 43.7l49.7 49.7c34.2-11.8 61.2 31 35.5 56.7-26.5 26.5-70.2-2.9-56-37.3L240.3 199v121.9c25.3 12.5 22.3 41.8 9.1 55-6.4 6.4-15.2 10.1-24.3 10.1s-17.8-3.6-24.3-10.1c-17.6-17.6-11.1-46.9 11.2-56v-123c-20.8-8.5-24.6-30.7-18.6-45L142.6 101 8.5 235.1C3 240.6 0 247.9 0 255.5s3 15 8.5 20.4l195.6 195.7c5.4 5.4 12.7 8.4 20.4 8.4s15-3 20.4-8.4l194.7-194.7c5.4-5.4 8.4-12.8 8.4-20.4s-3-15-8.4-20.4"/></svg>
+  </div>
+  <div class="md-source__repository">
+    OwenMastropietro/cvl
+  </div>
+</a>
+    </div>
+  
+  <ul class="md-nav__list" data-md-scrollfix>
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../.." class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Home
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../getting-started/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Getting Started
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../../examples/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Examples
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+    
+      
+      
+  
+  
+  
+  
+    
+    
+    
+    
+      
+        
+        
+      
+    
+    
+    <li class="md-nav__item md-nav__item--section md-nav__item--nested">
+      
+        
+        
+        <input class="md-nav__toggle md-toggle " type="checkbox" id="__nav_4" >
+        
+          
+          <label class="md-nav__link" for="__nav_4" id="__nav_4_label" tabindex="">
+            
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    API
+  
+
+    
+  </span>
+  
+  
+
+            <span class="md-nav__icon md-icon"></span>
+          </label>
+        
+        <nav class="md-nav" data-md-level="1" aria-labelledby="__nav_4_label" aria-expanded="false">
+          <label class="md-nav__title" for="__nav_4">
+            <span class="md-nav__icon md-icon"></span>
+            
+  
+    API
+  
+
+          </label>
+          <ul class="md-nav__list" data-md-scrollfix>
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Overview
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../core/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Core
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../io/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    I/O
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+              
+                
+  
+  
+  
+  
+    <li class="md-nav__item">
+      <a href="../image-processing/" class="md-nav__link">
+        
+  
+  
+  <span class="md-ellipsis">
+    
+  
+    Image Processing
+  
+
+    
+  </span>
+  
+  
+
+      </a>
+    </li>
+  
+
+              
+            
+          </ul>
+        </nav>
+      
+    </li>
+  
+
+    
+  </ul>
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+            
+              
+              <div class="md-sidebar md-sidebar--secondary" data-md-component="sidebar" data-md-type="toc" >
+                <div class="md-sidebar__scrollwrap">
+                  <div class="md-sidebar__inner">
+                    
+
+<nav class="md-nav md-nav--secondary" aria-label="Table of contents">
+  
+  
+  
+  
+    <label class="md-nav__title" for="__toc">
+      <span class="md-nav__icon md-icon"></span>
+      Table of contents
+    </label>
+    <ul class="md-nav__list" data-md-component="toc" data-md-scrollfix>
+      
+        <li class="md-nav__item">
+  <a href="#cvl_cvt_color" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cvl_cvt_color()
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cvl_cvt_depth" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cvl_cvt_depth()
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cvl_threshold" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cvl_threshold()
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cvl_rotate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cvl_rotate()
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cvl_invert" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cvl_invert()
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cvl_dilate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cvl_dilate()
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cvl_erode" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cvl_erode()
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cvl_open" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cvl_open()
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cvl_close" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cvl_close()
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cvl_crop" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cvl_crop()
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cvl_resize" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cvl_resize()
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cvl_connected_components" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cvl_connected_components()
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cvl_color_components" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cvl_color_components()
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cvl_correlate" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cvl_correlate()
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cvl_convolve" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cvl_convolve()
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cvl_convolve_sep" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cvl_convolve_sep()
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cvl_blur_box" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cvl_blur_box()
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cvl_blur_mean" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cvl_blur_mean()
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cvl_blur_gauss" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cvl_blur_gauss()
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cvl_blur_median" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cvl_blur_median()
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cvl_sobel" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cvl_sobel()
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cvl_sobel_mag" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cvl_sobel_mag()
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cvl_cvt_color_new" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cvl_cvt_color_new()
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cvl_cvt_depth_new" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cvl_cvt_depth_new()
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cvl_threshold_new" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cvl_threshold_new()
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cvl_rotate_new" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cvl_rotate_new()
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cvl_rotate_bound_new" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cvl_rotate_bound_new()
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cvl_crop_new" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cvl_crop_new()
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cvl_resize_new" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cvl_resize_new()
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cvl_correlate_new" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cvl_correlate_new()
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cvl_convolve_new" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cvl_convolve_new()
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cvl_blur_box_new" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cvl_blur_box_new()
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cvl_blur_mean_new" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cvl_blur_mean_new()
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cvl_blur_gauss_new" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cvl_blur_gauss_new()
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cvl_blur_median_new" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cvl_blur_median_new()
+      
+    </span>
+  </a>
+  
+</li>
+      
+        <li class="md-nav__item">
+  <a href="#cvl_sobel_mag_new" class="md-nav__link">
+    <span class="md-ellipsis">
+      
+        cvl_sobel_mag_new()
+      
+    </span>
+  </a>
+  
+</li>
+      
+    </ul>
+  
+</nav>
+                  </div>
+                </div>
+              </div>
+            
+          
+          
+            <div class="md-content" data-md-component="content">
+              
+              <article class="md-content__inner md-typeset">
+                
+                  
+
+
+  
+  
+
+
+  <h1>Img</h1>
+
+<div class="api-card">
+<div class="api-header">
+<h3 id="cvl_cvt_color">cvl_cvt_color()<a class="headerlink" href="#cvl_cvt_color" title="Permanent link">&para;</a></h3>
+<p>[<a href="https://github.com/OwenMastropietro/cvl/blob/main/src/imgproc.c#L56">source</a>]</p>
+</div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-0-1" name="__codelineno-0-1" href="#__codelineno-0-1"></a><span class="kt">void</span><span class="w"> </span><span class="nf">cvl_cvt_color</span><span class="p">(</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">cvl_Mat</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">src</span><span class="p">,</span>
+<a id="__codelineno-0-2" name="__codelineno-0-2" href="#__codelineno-0-2"></a><span class="w">                    </span><span class="n">cvl_Mat</span><span class="w"> </span><span class="o">*</span><span class="w">       </span><span class="n">dst</span><span class="p">,</span>
+<a id="__codelineno-0-3" name="__codelineno-0-3" href="#__codelineno-0-3"></a><span class="w">                    </span><span class="kt">int</span><span class="w">             </span><span class="n">code</span><span class="w"> </span><span class="p">);</span>
+</code></pre></div>
+</div>
+<div class="api-card">
+<div class="api-header">
+<h3 id="cvl_cvt_depth">cvl_cvt_depth()<a class="headerlink" href="#cvl_cvt_depth" title="Permanent link">&para;</a></h3>
+<p>[<a href="https://github.com/OwenMastropietro/cvl/blob/main/src/imgproc.c#L155">source</a>]</p>
+</div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-1-1" name="__codelineno-1-1" href="#__codelineno-1-1"></a><span class="kt">void</span><span class="w"> </span><span class="nf">cvl_cvt_depth</span><span class="p">(</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">cvl_Mat</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">src</span><span class="p">,</span>
+<a id="__codelineno-1-2" name="__codelineno-1-2" href="#__codelineno-1-2"></a><span class="w">                    </span><span class="n">cvl_Mat</span><span class="w"> </span><span class="o">*</span><span class="w">       </span><span class="n">dst</span><span class="p">,</span>
+<a id="__codelineno-1-3" name="__codelineno-1-3" href="#__codelineno-1-3"></a><span class="w">                    </span><span class="n">cvl_depth_t</span><span class="w">     </span><span class="n">ddepth</span><span class="p">,</span>
+<a id="__codelineno-1-4" name="__codelineno-1-4" href="#__codelineno-1-4"></a><span class="w">                    </span><span class="kt">double</span><span class="w">          </span><span class="n">alpha</span><span class="p">,</span>
+<a id="__codelineno-1-5" name="__codelineno-1-5" href="#__codelineno-1-5"></a><span class="w">                    </span><span class="kt">double</span><span class="w">          </span><span class="n">beta</span><span class="w">   </span><span class="p">);</span>
+</code></pre></div>
+<p>Converts a matrix to another type with scaling.</p>
+<p>Effectively: dst(x, y) = saturate_cast<ddepth>(α * src(x, y) + β)</p>
+<p><strong>Parameters</strong></p>
+<div class="param-list">
+<div class="param">
+    <strong>src</strong>
+    <span>Input matrix.</span>
+  </div>
+<div class="param">
+    <strong>dst</strong>
+    <span>Output matrix.</span>
+  </div>
+<div class="param">
+    <strong>ddepth</strong>
+    <span>Type to convert to.</span>
+  </div>
+<div class="param">
+    <strong>alpha</strong>
+    <span>Scale factor (1.0 for no change).</span>
+  </div>
+<div class="param">
+    <strong>beta</strong>
+    <span>Value added to scaled values (0 for no change).</span>
+  </div>
+</div>
+</div>
+<div class="api-card">
+<div class="api-header">
+<h3 id="cvl_threshold">cvl_threshold()<a class="headerlink" href="#cvl_threshold" title="Permanent link">&para;</a></h3>
+<p>[<a href="https://github.com/OwenMastropietro/cvl/blob/main/src/imgproc.c#L256">source</a>]</p>
+</div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-2-1" name="__codelineno-2-1" href="#__codelineno-2-1"></a><span class="kt">void</span><span class="w"> </span><span class="nf">cvl_threshold</span><span class="p">(</span><span class="w"> </span><span class="n">cvl_Mat</span><span class="w"> </span><span class="o">*</span><span class="w">       </span><span class="n">img</span><span class="p">,</span>
+<a id="__codelineno-2-2" name="__codelineno-2-2" href="#__codelineno-2-2"></a><span class="w">                    </span><span class="kt">int</span><span class="w">             </span><span class="n">thresh</span><span class="p">,</span>
+<a id="__codelineno-2-3" name="__codelineno-2-3" href="#__codelineno-2-3"></a><span class="w">                    </span><span class="kt">int</span><span class="w">             </span><span class="n">maxval</span><span class="p">,</span>
+<a id="__codelineno-2-4" name="__codelineno-2-4" href="#__codelineno-2-4"></a><span class="w">                    </span><span class="kt">int</span><span class="w">             </span><span class="n">type</span><span class="w">   </span><span class="p">);</span>
+</code></pre></div>
+<p>Applies a fixed-level threshold to each element — determined by type.</p>
+<p><strong>Parameters</strong></p>
+<div class="param-list">
+<div class="param">
+    <strong>img</strong>
+    <span>Matrix to apply a threshold to.</span>
+  </div>
+<div class="param">
+    <strong>thresh</strong>
+    <span>Threshold value.</span>
+  </div>
+<div class="param">
+    <strong>maxval</strong>
+    <span>Maximum value.</span>
+  </div>
+<div class="param">
+    <strong>type</strong>
+    <span>Type of thresholding operation to perform. See <a href="../core#cvl_thresh_type"><code>cvl_thresh_type</code></a>.</span>
+  </div>
+</div>
+</div>
+<div class="api-card">
+<div class="api-header">
+<h3 id="cvl_rotate">cvl_rotate()<a class="headerlink" href="#cvl_rotate" title="Permanent link">&para;</a></h3>
+<p>[<a href="https://github.com/OwenMastropietro/cvl/blob/main/src/imgproc.c#L676">source</a>]</p>
+</div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-3-1" name="__codelineno-3-1" href="#__codelineno-3-1"></a><span class="kt">void</span><span class="w"> </span><span class="nf">cvl_rotate</span><span class="p">(</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">cvl_Mat</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">src</span><span class="p">,</span>
+<a id="__codelineno-3-2" name="__codelineno-3-2" href="#__codelineno-3-2"></a><span class="w">                 </span><span class="n">cvl_Mat</span><span class="w"> </span><span class="o">*</span><span class="w">       </span><span class="n">dst</span><span class="p">,</span>
+<a id="__codelineno-3-3" name="__codelineno-3-3" href="#__codelineno-3-3"></a><span class="w">                 </span><span class="kt">float</span><span class="w">           </span><span class="n">angle</span><span class="p">,</span>
+<a id="__codelineno-3-4" name="__codelineno-3-4" href="#__codelineno-3-4"></a><span class="w">                 </span><span class="n">cvl_interp_t</span><span class="w">    </span><span class="n">interp</span><span class="w"> </span><span class="p">);</span>
+</code></pre></div>
+</div>
+<div class="api-card">
+<div class="api-header">
+<h3 id="cvl_invert">cvl_invert()<a class="headerlink" href="#cvl_invert" title="Permanent link">&para;</a></h3>
+<p>[<a href="https://github.com/OwenMastropietro/cvl/blob/main/src/imgproc.c#L337">source</a>]</p>
+</div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-4-1" name="__codelineno-4-1" href="#__codelineno-4-1"></a><span class="kt">void</span><span class="w"> </span><span class="nf">cvl_invert</span><span class="p">(</span><span class="w"> </span><span class="n">cvl_Mat</span><span class="w"> </span><span class="o">*</span><span class="w">       </span><span class="n">img</span><span class="p">,</span>
+<a id="__codelineno-4-2" name="__codelineno-4-2" href="#__codelineno-4-2"></a><span class="w">                 </span><span class="kt">double</span><span class="w">          </span><span class="n">maxval</span><span class="w"> </span><span class="p">);</span>
+</code></pre></div>
+</div>
+<div class="api-card">
+<div class="api-header">
+<h3 id="cvl_dilate">cvl_dilate()<a class="headerlink" href="#cvl_dilate" title="Permanent link">&para;</a></h3>
+<p>[<a href="https://github.com/OwenMastropietro/cvl/blob/main/src/imgproc.c#L370">source</a>]</p>
+</div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-5-1" name="__codelineno-5-1" href="#__codelineno-5-1"></a><span class="kt">void</span><span class="w"> </span><span class="nf">cvl_dilate</span><span class="p">(</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">cvl_Mat</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">src</span><span class="p">,</span>
+<a id="__codelineno-5-2" name="__codelineno-5-2" href="#__codelineno-5-2"></a><span class="w">                 </span><span class="n">cvl_Mat</span><span class="w"> </span><span class="o">*</span><span class="w">       </span><span class="n">dst</span><span class="p">,</span>
+<a id="__codelineno-5-3" name="__codelineno-5-3" href="#__codelineno-5-3"></a><span class="w">                 </span><span class="kt">int</span><span class="w">             </span><span class="n">ksize</span><span class="w"> </span><span class="p">);</span>
+</code></pre></div>
+</div>
+<div class="api-card">
+<div class="api-header">
+<h3 id="cvl_erode">cvl_erode()<a class="headerlink" href="#cvl_erode" title="Permanent link">&para;</a></h3>
+<p>[<a href="https://github.com/OwenMastropietro/cvl/blob/main/src/imgproc.c#L401">source</a>]</p>
+</div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-6-1" name="__codelineno-6-1" href="#__codelineno-6-1"></a><span class="kt">void</span><span class="w"> </span><span class="nf">cvl_erode</span><span class="p">(</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">cvl_Mat</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">src</span><span class="p">,</span>
+<a id="__codelineno-6-2" name="__codelineno-6-2" href="#__codelineno-6-2"></a><span class="w">                </span><span class="n">cvl_Mat</span><span class="w"> </span><span class="o">*</span><span class="w">       </span><span class="n">dst</span><span class="p">,</span>
+<a id="__codelineno-6-3" name="__codelineno-6-3" href="#__codelineno-6-3"></a><span class="w">                </span><span class="kt">int</span><span class="w">             </span><span class="n">ksize</span><span class="w"> </span><span class="p">);</span>
+</code></pre></div>
+</div>
+<div class="api-card">
+<div class="api-header">
+<h3 id="cvl_open">cvl_open()<a class="headerlink" href="#cvl_open" title="Permanent link">&para;</a></h3>
+<p>[<a href="https://github.com/OwenMastropietro/cvl/blob/main/src/imgproc.c#L432">source</a>]</p>
+</div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-7-1" name="__codelineno-7-1" href="#__codelineno-7-1"></a><span class="kt">void</span><span class="w"> </span><span class="nf">cvl_open</span><span class="p">(</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">cvl_Mat</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">src</span><span class="p">,</span>
+<a id="__codelineno-7-2" name="__codelineno-7-2" href="#__codelineno-7-2"></a><span class="w">               </span><span class="n">cvl_Mat</span><span class="w"> </span><span class="o">*</span><span class="w">       </span><span class="n">dst</span><span class="p">,</span>
+<a id="__codelineno-7-3" name="__codelineno-7-3" href="#__codelineno-7-3"></a><span class="w">               </span><span class="kt">int</span><span class="w">             </span><span class="n">ksize</span><span class="w"> </span><span class="p">);</span>
+</code></pre></div>
+</div>
+<div class="api-card">
+<div class="api-header">
+<h3 id="cvl_close">cvl_close()<a class="headerlink" href="#cvl_close" title="Permanent link">&para;</a></h3>
+<p>[<a href="https://github.com/OwenMastropietro/cvl/blob/main/src/imgproc.c#L442">source</a>]</p>
+</div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-8-1" name="__codelineno-8-1" href="#__codelineno-8-1"></a><span class="kt">void</span><span class="w"> </span><span class="nf">cvl_close</span><span class="p">(</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">cvl_Mat</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">src</span><span class="p">,</span>
+<a id="__codelineno-8-2" name="__codelineno-8-2" href="#__codelineno-8-2"></a><span class="w">                </span><span class="n">cvl_Mat</span><span class="w"> </span><span class="o">*</span><span class="w">       </span><span class="n">dst</span><span class="p">,</span>
+<a id="__codelineno-8-3" name="__codelineno-8-3" href="#__codelineno-8-3"></a><span class="w">                </span><span class="kt">int</span><span class="w">             </span><span class="n">ksize</span><span class="w"> </span><span class="p">);</span>
+</code></pre></div>
+</div>
+<div class="api-card">
+<div class="api-header">
+<h3 id="cvl_crop">cvl_crop()<a class="headerlink" href="#cvl_crop" title="Permanent link">&para;</a></h3>
+<p>[<a href="https://github.com/OwenMastropietro/cvl/blob/main/src/imgproc.c#L452">source</a>]</p>
+</div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-9-1" name="__codelineno-9-1" href="#__codelineno-9-1"></a><span class="kt">void</span><span class="w"> </span><span class="nf">cvl_crop</span><span class="p">(</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">cvl_Mat</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">src</span><span class="p">,</span>
+<a id="__codelineno-9-2" name="__codelineno-9-2" href="#__codelineno-9-2"></a><span class="w">               </span><span class="n">cvl_Mat</span><span class="w"> </span><span class="o">*</span><span class="w">       </span><span class="n">dst</span><span class="p">,</span>
+<a id="__codelineno-9-3" name="__codelineno-9-3" href="#__codelineno-9-3"></a><span class="w">               </span><span class="kt">int</span><span class="w">             </span><span class="n">r</span><span class="p">,</span>
+<a id="__codelineno-9-4" name="__codelineno-9-4" href="#__codelineno-9-4"></a><span class="w">               </span><span class="kt">int</span><span class="w">             </span><span class="n">c</span><span class="w">   </span><span class="p">);</span>
+</code></pre></div>
+</div>
+<div class="api-card">
+<div class="api-header">
+<h3 id="cvl_resize">cvl_resize()<a class="headerlink" href="#cvl_resize" title="Permanent link">&para;</a></h3>
+<p>[<a href="https://github.com/OwenMastropietro/cvl/blob/main/src/imgproc.c#L558">source</a>]</p>
+</div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-10-1" name="__codelineno-10-1" href="#__codelineno-10-1"></a><span class="kt">void</span><span class="w"> </span><span class="nf">cvl_resize</span><span class="p">(</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">cvl_Mat</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">src</span><span class="p">,</span>
+<a id="__codelineno-10-2" name="__codelineno-10-2" href="#__codelineno-10-2"></a><span class="w">                 </span><span class="n">cvl_Mat</span><span class="w"> </span><span class="o">*</span><span class="w">       </span><span class="n">dst</span><span class="p">,</span>
+<a id="__codelineno-10-3" name="__codelineno-10-3" href="#__codelineno-10-3"></a><span class="w">                 </span><span class="n">cvl_interp_t</span><span class="w">    </span><span class="n">type</span><span class="w"> </span><span class="p">);</span>
+</code></pre></div>
+</div>
+<div class="api-card">
+<div class="api-header">
+<h3 id="cvl_connected_components">cvl_connected_components()<a class="headerlink" href="#cvl_connected_components" title="Permanent link">&para;</a></h3>
+<p>[<a href="https://github.com/OwenMastropietro/cvl/blob/main/src/imgproc.c#L759">source</a>]</p>
+</div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-11-1" name="__codelineno-11-1" href="#__codelineno-11-1"></a><span class="kt">int</span><span class="w"> </span><span class="nf">cvl_connected_components</span><span class="p">(</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">cvl_Mat</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">src</span><span class="p">,</span>
+<a id="__codelineno-11-2" name="__codelineno-11-2" href="#__codelineno-11-2"></a><span class="w">                              </span><span class="n">cvl_Mat</span><span class="w"> </span><span class="o">*</span><span class="w">       </span><span class="n">labels</span><span class="p">,</span>
+<a id="__codelineno-11-3" name="__codelineno-11-3" href="#__codelineno-11-3"></a><span class="w">                              </span><span class="kt">int</span><span class="w">             </span><span class="n">connectivity</span><span class="w"> </span><span class="p">);</span>
+</code></pre></div>
+</div>
+<div class="api-card">
+<div class="api-header">
+<h3 id="cvl_color_components">cvl_color_components()<a class="headerlink" href="#cvl_color_components" title="Permanent link">&para;</a></h3>
+<p>[<a href="https://github.com/OwenMastropietro/cvl/blob/main/src/imgproc.c#L858">source</a>]</p>
+</div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-12-1" name="__codelineno-12-1" href="#__codelineno-12-1"></a><span class="kt">int</span><span class="w"> </span><span class="nf">cvl_color_components</span><span class="p">(</span><span class="w"> </span><span class="n">cvl_Mat</span><span class="w"> </span><span class="o">*</span><span class="w">       </span><span class="n">dst</span><span class="p">,</span>
+<a id="__codelineno-12-2" name="__codelineno-12-2" href="#__codelineno-12-2"></a><span class="w">                          </span><span class="k">const</span><span class="w"> </span><span class="n">cvl_Mat</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">labels</span><span class="p">,</span>
+<a id="__codelineno-12-3" name="__codelineno-12-3" href="#__codelineno-12-3"></a><span class="w">                          </span><span class="kt">int</span><span class="w">             </span><span class="n">thresh</span><span class="w"> </span><span class="p">);</span>
+</code></pre></div>
+</div>
+<div class="api-card">
+<div class="api-header">
+<h3 id="cvl_correlate">cvl_correlate()<a class="headerlink" href="#cvl_correlate" title="Permanent link">&para;</a></h3>
+<p>[<a href="https://github.com/OwenMastropietro/cvl/blob/main/src/imgproc.c#L1004">source</a>]</p>
+</div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-13-1" name="__codelineno-13-1" href="#__codelineno-13-1"></a><span class="kt">void</span><span class="w"> </span><span class="nf">cvl_correlate</span><span class="p">(</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">cvl_Mat</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">src</span><span class="p">,</span>
+<a id="__codelineno-13-2" name="__codelineno-13-2" href="#__codelineno-13-2"></a><span class="w">                    </span><span class="n">cvl_Mat</span><span class="w"> </span><span class="o">*</span><span class="w">       </span><span class="n">dst</span><span class="p">,</span>
+<a id="__codelineno-13-3" name="__codelineno-13-3" href="#__codelineno-13-3"></a><span class="w">                    </span><span class="n">cvl_Mat</span><span class="w"> </span><span class="o">*</span><span class="w">       </span><span class="n">kernel</span><span class="w"> </span><span class="p">);</span>
+</code></pre></div>
+</div>
+<div class="api-card">
+<div class="api-header">
+<h3 id="cvl_convolve">cvl_convolve()<a class="headerlink" href="#cvl_convolve" title="Permanent link">&para;</a></h3>
+<p>[<a href="https://github.com/OwenMastropietro/cvl/blob/main/src/imgproc.c#L1024">source</a>]</p>
+</div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-14-1" name="__codelineno-14-1" href="#__codelineno-14-1"></a><span class="kt">void</span><span class="w"> </span><span class="nf">cvl_convolve</span><span class="p">(</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">cvl_Mat</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">src</span><span class="p">,</span>
+<a id="__codelineno-14-2" name="__codelineno-14-2" href="#__codelineno-14-2"></a><span class="w">                   </span><span class="n">cvl_Mat</span><span class="w"> </span><span class="o">*</span><span class="w">       </span><span class="n">dst</span><span class="p">,</span>
+<a id="__codelineno-14-3" name="__codelineno-14-3" href="#__codelineno-14-3"></a><span class="w">                   </span><span class="n">cvl_Mat</span><span class="w"> </span><span class="o">*</span><span class="w">       </span><span class="n">kernel</span><span class="w"> </span><span class="p">);</span>
+</code></pre></div>
+</div>
+<div class="api-card">
+<div class="api-header">
+<h3 id="cvl_convolve_sep">cvl_convolve_sep()<a class="headerlink" href="#cvl_convolve_sep" title="Permanent link">&para;</a></h3>
+<p>[<a href="https://github.com/OwenMastropietro/cvl/blob/main/src/imgproc.c#L1128">source</a>]</p>
+</div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-15-1" name="__codelineno-15-1" href="#__codelineno-15-1"></a><span class="kt">void</span><span class="w"> </span><span class="nf">cvl_convolve_sep</span><span class="p">(</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">cvl_Mat</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">src</span><span class="p">,</span>
+<a id="__codelineno-15-2" name="__codelineno-15-2" href="#__codelineno-15-2"></a><span class="w">                       </span><span class="n">cvl_Mat</span><span class="w"> </span><span class="o">*</span><span class="w">       </span><span class="n">dst</span><span class="p">,</span>
+<a id="__codelineno-15-3" name="__codelineno-15-3" href="#__codelineno-15-3"></a><span class="w">                       </span><span class="n">cvl_Mat</span><span class="w"> </span><span class="o">*</span><span class="w">       </span><span class="n">kx</span><span class="p">,</span>
+<a id="__codelineno-15-4" name="__codelineno-15-4" href="#__codelineno-15-4"></a><span class="w">                       </span><span class="n">cvl_Mat</span><span class="w"> </span><span class="o">*</span><span class="w">       </span><span class="n">ky</span><span class="w">  </span><span class="p">);</span>
+</code></pre></div>
+<p>Applies a separable linear filter to an image.</p>
+<p>First, every row of src is convolved with the horizontal kernel, then every column of the result is convolved with the vertical kernel.</p>
+<p><strong>Parameters</strong></p>
+<div class="param-list">
+<div class="param">
+    <strong>src</strong>
+    <span>Input matrix.</span>
+  </div>
+<div class="param">
+    <strong>dst</strong>
+    <span>Output matrix.</span>
+  </div>
+<div class="param">
+    <strong>kx</strong>
+    <span>Horizontal kernel.</span>
+  </div>
+<div class="param">
+    <strong>ky</strong>
+    <span>Vertical kernel.</span>
+  </div>
+</div>
+</div>
+<div class="api-card">
+<div class="api-header">
+<h3 id="cvl_blur_box">cvl_blur_box()<a class="headerlink" href="#cvl_blur_box" title="Permanent link">&para;</a></h3>
+<p>[<a href="https://github.com/OwenMastropietro/cvl/blob/main/src/imgproc.c#L1144">source</a>]</p>
+</div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-16-1" name="__codelineno-16-1" href="#__codelineno-16-1"></a><span class="kt">void</span><span class="w"> </span><span class="nf">cvl_blur_box</span><span class="p">(</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">cvl_Mat</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">src</span><span class="p">,</span>
+<a id="__codelineno-16-2" name="__codelineno-16-2" href="#__codelineno-16-2"></a><span class="w">                   </span><span class="n">cvl_Mat</span><span class="w"> </span><span class="o">*</span><span class="w">       </span><span class="n">dst</span><span class="p">,</span>
+<a id="__codelineno-16-3" name="__codelineno-16-3" href="#__codelineno-16-3"></a><span class="w">                   </span><span class="kt">int</span><span class="w">             </span><span class="n">ksize</span><span class="p">,</span>
+<a id="__codelineno-16-4" name="__codelineno-16-4" href="#__codelineno-16-4"></a><span class="w">                   </span><span class="kt">bool</span><span class="w">            </span><span class="n">normalize</span><span class="w"> </span><span class="p">);</span>
+</code></pre></div>
+</div>
+<div class="api-card">
+<div class="api-header">
+<h3 id="cvl_blur_mean">cvl_blur_mean()<a class="headerlink" href="#cvl_blur_mean" title="Permanent link">&para;</a></h3>
+<p>[<a href="https://github.com/OwenMastropietro/cvl/blob/main/src/imgproc.c#L1165">source</a>]</p>
+</div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-17-1" name="__codelineno-17-1" href="#__codelineno-17-1"></a><span class="kt">void</span><span class="w"> </span><span class="nf">cvl_blur_mean</span><span class="p">(</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">cvl_Mat</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">src</span><span class="p">,</span>
+<a id="__codelineno-17-2" name="__codelineno-17-2" href="#__codelineno-17-2"></a><span class="w">                    </span><span class="n">cvl_Mat</span><span class="w"> </span><span class="o">*</span><span class="w">       </span><span class="n">dst</span><span class="p">,</span>
+<a id="__codelineno-17-3" name="__codelineno-17-3" href="#__codelineno-17-3"></a><span class="w">                    </span><span class="kt">int</span><span class="w">             </span><span class="n">ksize</span><span class="w"> </span><span class="p">);</span>
+</code></pre></div>
+</div>
+<div class="api-card">
+<div class="api-header">
+<h3 id="cvl_blur_gauss">cvl_blur_gauss()<a class="headerlink" href="#cvl_blur_gauss" title="Permanent link">&para;</a></h3>
+<p>[<a href="https://github.com/OwenMastropietro/cvl/blob/main/src/imgproc.c#L1212">source</a>]</p>
+</div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-18-1" name="__codelineno-18-1" href="#__codelineno-18-1"></a><span class="kt">void</span><span class="w"> </span><span class="nf">cvl_blur_gauss</span><span class="p">(</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">cvl_Mat</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">src</span><span class="p">,</span>
+<a id="__codelineno-18-2" name="__codelineno-18-2" href="#__codelineno-18-2"></a><span class="w">                     </span><span class="n">cvl_Mat</span><span class="w"> </span><span class="o">*</span><span class="w">       </span><span class="n">dst</span><span class="p">,</span>
+<a id="__codelineno-18-3" name="__codelineno-18-3" href="#__codelineno-18-3"></a><span class="w">                     </span><span class="kt">int</span><span class="w">             </span><span class="n">ksize</span><span class="p">,</span>
+<a id="__codelineno-18-4" name="__codelineno-18-4" href="#__codelineno-18-4"></a><span class="w">                     </span><span class="kt">double</span><span class="w">          </span><span class="n">sigma</span><span class="w"> </span><span class="p">);</span>
+</code></pre></div>
+<p>Applies Gaussian blur using a kernel defined by ksize and/or sigma.</p>
+<p><strong>Parameters</strong></p>
+<div class="param-list">
+<div class="param">
+    <strong>src</strong>
+    <span>Input matrix.</span>
+  </div>
+<div class="param">
+    <strong>dst</strong>
+    <span>Output matrix (blurred).</span>
+  </div>
+<div class="param">
+    <strong>ksize</strong>
+    <span>Kernel size (if 0, derived from sigma).</span>
+  </div>
+<div class="param">
+    <strong>sigma</strong>
+    <span>Standard deviation of the Gaussian kernel (if 0, derived from ksize).</span>
+  </div>
+</div>
+</div>
+<div class="api-card">
+<div class="api-header">
+<h3 id="cvl_blur_median">cvl_blur_median()<a class="headerlink" href="#cvl_blur_median" title="Permanent link">&para;</a></h3>
+<p>[<a href="https://github.com/OwenMastropietro/cvl/blob/main/src/imgproc.c#L1269">source</a>]</p>
+</div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-19-1" name="__codelineno-19-1" href="#__codelineno-19-1"></a><span class="kt">void</span><span class="w"> </span><span class="nf">cvl_blur_median</span><span class="p">(</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">cvl_Mat</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">src</span><span class="p">,</span>
+<a id="__codelineno-19-2" name="__codelineno-19-2" href="#__codelineno-19-2"></a><span class="w">                      </span><span class="n">cvl_Mat</span><span class="w"> </span><span class="o">*</span><span class="w">       </span><span class="n">dst</span><span class="p">,</span>
+<a id="__codelineno-19-3" name="__codelineno-19-3" href="#__codelineno-19-3"></a><span class="w">                      </span><span class="kt">int</span><span class="w">             </span><span class="n">ksize</span><span class="w"> </span><span class="p">);</span>
+</code></pre></div>
+</div>
+<div class="api-card">
+<div class="api-header">
+<h3 id="cvl_sobel">cvl_sobel()<a class="headerlink" href="#cvl_sobel" title="Permanent link">&para;</a></h3>
+<p>[<a href="https://github.com/OwenMastropietro/cvl/blob/main/src/imgproc.c#L1340">source</a>]</p>
+</div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-20-1" name="__codelineno-20-1" href="#__codelineno-20-1"></a><span class="kt">void</span><span class="w"> </span><span class="nf">cvl_sobel</span><span class="p">(</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">cvl_Mat</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">src</span><span class="p">,</span>
+<a id="__codelineno-20-2" name="__codelineno-20-2" href="#__codelineno-20-2"></a><span class="w">                </span><span class="n">cvl_Mat</span><span class="w"> </span><span class="o">*</span><span class="w">       </span><span class="n">gx</span><span class="p">,</span>
+<a id="__codelineno-20-3" name="__codelineno-20-3" href="#__codelineno-20-3"></a><span class="w">                </span><span class="n">cvl_Mat</span><span class="w"> </span><span class="o">*</span><span class="w">       </span><span class="n">gy</span><span class="w">  </span><span class="p">);</span>
+</code></pre></div>
+</div>
+<div class="api-card">
+<div class="api-header">
+<h3 id="cvl_sobel_mag">cvl_sobel_mag()<a class="headerlink" href="#cvl_sobel_mag" title="Permanent link">&para;</a></h3>
+<p>[<a href="https://github.com/OwenMastropietro/cvl/blob/main/src/imgproc.c#L1371">source</a>]</p>
+</div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-21-1" name="__codelineno-21-1" href="#__codelineno-21-1"></a><span class="kt">void</span><span class="w"> </span><span class="nf">cvl_sobel_mag</span><span class="p">(</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">cvl_Mat</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">src</span><span class="p">,</span>
+<a id="__codelineno-21-2" name="__codelineno-21-2" href="#__codelineno-21-2"></a><span class="w">                    </span><span class="n">cvl_Mat</span><span class="w"> </span><span class="o">*</span><span class="w">       </span><span class="n">dst</span><span class="w"> </span><span class="p">);</span>
+</code></pre></div>
+</div>
+<div class="api-card">
+<div class="api-header">
+<h3 id="cvl_cvt_color_new">cvl_cvt_color_new()<a class="headerlink" href="#cvl_cvt_color_new" title="Permanent link">&para;</a></h3>
+<p>[<a href="https://github.com/OwenMastropietro/cvl/blob/main/src/imgproc.c#L120">source</a>]</p>
+</div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-22-1" name="__codelineno-22-1" href="#__codelineno-22-1"></a><span class="n">cvl_Mat</span><span class="w"> </span><span class="nf">cvl_cvt_color_new</span><span class="p">(</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">cvl_Mat</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">src</span><span class="p">,</span>
+<a id="__codelineno-22-2" name="__codelineno-22-2" href="#__codelineno-22-2"></a><span class="w">                           </span><span class="kt">int</span><span class="w">             </span><span class="n">code</span><span class="w"> </span><span class="p">);</span>
+</code></pre></div>
+</div>
+<div class="api-card">
+<div class="api-header">
+<h3 id="cvl_cvt_depth_new">cvl_cvt_depth_new()<a class="headerlink" href="#cvl_cvt_depth_new" title="Permanent link">&para;</a></h3>
+<p>[<a href="https://github.com/OwenMastropietro/cvl/blob/main/src/imgproc.c#L234">source</a>]</p>
+</div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-23-1" name="__codelineno-23-1" href="#__codelineno-23-1"></a><span class="n">cvl_Mat</span><span class="w"> </span><span class="nf">cvl_cvt_depth_new</span><span class="p">(</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">cvl_Mat</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">src</span><span class="p">,</span>
+<a id="__codelineno-23-2" name="__codelineno-23-2" href="#__codelineno-23-2"></a><span class="w">                           </span><span class="n">cvl_depth_t</span><span class="w">     </span><span class="n">ddepth</span><span class="p">,</span>
+<a id="__codelineno-23-3" name="__codelineno-23-3" href="#__codelineno-23-3"></a><span class="w">                           </span><span class="kt">double</span><span class="w">          </span><span class="n">alpha</span><span class="p">,</span>
+<a id="__codelineno-23-4" name="__codelineno-23-4" href="#__codelineno-23-4"></a><span class="w">                           </span><span class="kt">double</span><span class="w">          </span><span class="n">beta</span><span class="w">   </span><span class="p">);</span>
+</code></pre></div>
+</div>
+<div class="api-card">
+<div class="api-header">
+<h3 id="cvl_threshold_new">cvl_threshold_new()<a class="headerlink" href="#cvl_threshold_new" title="Permanent link">&para;</a></h3>
+<p>[<a href="https://github.com/OwenMastropietro/cvl/blob/main/src/imgproc.c#L330">source</a>]</p>
+</div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-24-1" name="__codelineno-24-1" href="#__codelineno-24-1"></a><span class="n">cvl_Mat</span><span class="w"> </span><span class="nf">cvl_threshold_new</span><span class="p">(</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">cvl_Mat</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">src</span><span class="p">,</span>
+<a id="__codelineno-24-2" name="__codelineno-24-2" href="#__codelineno-24-2"></a><span class="w">                           </span><span class="kt">int</span><span class="w">             </span><span class="n">thresh</span><span class="p">,</span>
+<a id="__codelineno-24-3" name="__codelineno-24-3" href="#__codelineno-24-3"></a><span class="w">                           </span><span class="kt">int</span><span class="w">             </span><span class="n">maxval</span><span class="p">,</span>
+<a id="__codelineno-24-4" name="__codelineno-24-4" href="#__codelineno-24-4"></a><span class="w">                           </span><span class="kt">int</span><span class="w">             </span><span class="n">type</span><span class="w">   </span><span class="p">);</span>
+</code></pre></div>
+</div>
+<div class="api-card">
+<div class="api-header">
+<h3 id="cvl_rotate_new">cvl_rotate_new()<a class="headerlink" href="#cvl_rotate_new" title="Permanent link">&para;</a></h3>
+<p>[<a href="https://github.com/OwenMastropietro/cvl/blob/main/src/imgproc.c#L717">source</a>]</p>
+</div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-25-1" name="__codelineno-25-1" href="#__codelineno-25-1"></a><span class="n">cvl_Mat</span><span class="w"> </span><span class="nf">cvl_rotate_new</span><span class="p">(</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">cvl_Mat</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">src</span><span class="p">,</span>
+<a id="__codelineno-25-2" name="__codelineno-25-2" href="#__codelineno-25-2"></a><span class="w">                        </span><span class="kt">float</span><span class="w">           </span><span class="n">angle</span><span class="p">,</span>
+<a id="__codelineno-25-3" name="__codelineno-25-3" href="#__codelineno-25-3"></a><span class="w">                        </span><span class="n">cvl_interp_t</span><span class="w">    </span><span class="n">interp</span><span class="w"> </span><span class="p">);</span>
+</code></pre></div>
+</div>
+<div class="api-card">
+<div class="api-header">
+<h3 id="cvl_rotate_bound_new">cvl_rotate_bound_new()<a class="headerlink" href="#cvl_rotate_bound_new" title="Permanent link">&para;</a></h3>
+<p>[<a href="https://github.com/OwenMastropietro/cvl/blob/main/src/imgproc.c#L738">source</a>]</p>
+</div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-26-1" name="__codelineno-26-1" href="#__codelineno-26-1"></a><span class="n">cvl_Mat</span><span class="w"> </span><span class="nf">cvl_rotate_bound_new</span><span class="p">(</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">cvl_Mat</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">src</span><span class="p">,</span>
+<a id="__codelineno-26-2" name="__codelineno-26-2" href="#__codelineno-26-2"></a><span class="w">                              </span><span class="kt">float</span><span class="w">           </span><span class="n">angle</span><span class="p">,</span>
+<a id="__codelineno-26-3" name="__codelineno-26-3" href="#__codelineno-26-3"></a><span class="w">                              </span><span class="n">cvl_interp_t</span><span class="w">    </span><span class="n">interp</span><span class="w"> </span><span class="p">);</span>
+</code></pre></div>
+</div>
+<div class="api-card">
+<div class="api-header">
+<h3 id="cvl_crop_new">cvl_crop_new()<a class="headerlink" href="#cvl_crop_new" title="Permanent link">&para;</a></h3>
+<p>[<a href="https://github.com/OwenMastropietro/cvl/blob/main/src/imgproc.c#L470">source</a>]</p>
+</div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-27-1" name="__codelineno-27-1" href="#__codelineno-27-1"></a><span class="n">cvl_Mat</span><span class="w"> </span><span class="nf">cvl_crop_new</span><span class="p">(</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">cvl_Mat</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">src</span><span class="p">,</span>
+<a id="__codelineno-27-2" name="__codelineno-27-2" href="#__codelineno-27-2"></a><span class="w">                      </span><span class="kt">int</span><span class="w">             </span><span class="n">r</span><span class="p">,</span>
+<a id="__codelineno-27-3" name="__codelineno-27-3" href="#__codelineno-27-3"></a><span class="w">                      </span><span class="kt">int</span><span class="w">             </span><span class="n">c</span><span class="p">,</span>
+<a id="__codelineno-27-4" name="__codelineno-27-4" href="#__codelineno-27-4"></a><span class="w">                      </span><span class="kt">int</span><span class="w">             </span><span class="n">h</span><span class="p">,</span>
+<a id="__codelineno-27-5" name="__codelineno-27-5" href="#__codelineno-27-5"></a><span class="w">                      </span><span class="kt">int</span><span class="w">             </span><span class="n">w</span><span class="w">   </span><span class="p">);</span>
+</code></pre></div>
+</div>
+<div class="api-card">
+<div class="api-header">
+<h3 id="cvl_resize_new">cvl_resize_new()<a class="headerlink" href="#cvl_resize_new" title="Permanent link">&para;</a></h3>
+<p>[<a href="https://github.com/OwenMastropietro/cvl/blob/main/src/imgproc.c#L567">source</a>]</p>
+</div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-28-1" name="__codelineno-28-1" href="#__codelineno-28-1"></a><span class="n">cvl_Mat</span><span class="w"> </span><span class="nf">cvl_resize_new</span><span class="p">(</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">cvl_Mat</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">src</span><span class="p">,</span>
+<a id="__codelineno-28-2" name="__codelineno-28-2" href="#__codelineno-28-2"></a><span class="w">                        </span><span class="kt">int</span><span class="w">             </span><span class="n">height</span><span class="p">,</span>
+<a id="__codelineno-28-3" name="__codelineno-28-3" href="#__codelineno-28-3"></a><span class="w">                        </span><span class="kt">int</span><span class="w">             </span><span class="n">width</span><span class="p">,</span>
+<a id="__codelineno-28-4" name="__codelineno-28-4" href="#__codelineno-28-4"></a><span class="w">                        </span><span class="n">cvl_interp_t</span><span class="w">    </span><span class="n">type</span><span class="w">   </span><span class="p">);</span>
+</code></pre></div>
+</div>
+<div class="api-card">
+<div class="api-header">
+<h3 id="cvl_correlate_new">cvl_correlate_new()<a class="headerlink" href="#cvl_correlate_new" title="Permanent link">&para;</a></h3>
+<p>[<a href="https://github.com/OwenMastropietro/cvl/blob/main/src/imgproc.c#L1017">source</a>]</p>
+</div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-29-1" name="__codelineno-29-1" href="#__codelineno-29-1"></a><span class="n">cvl_Mat</span><span class="w"> </span><span class="nf">cvl_correlate_new</span><span class="p">(</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">cvl_Mat</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">src</span><span class="p">,</span>
+<a id="__codelineno-29-2" name="__codelineno-29-2" href="#__codelineno-29-2"></a><span class="w">                           </span><span class="n">cvl_Mat</span><span class="w"> </span><span class="o">*</span><span class="w">       </span><span class="n">kernel</span><span class="w"> </span><span class="p">);</span>
+</code></pre></div>
+</div>
+<div class="api-card">
+<div class="api-header">
+<h3 id="cvl_convolve_new">cvl_convolve_new()<a class="headerlink" href="#cvl_convolve_new" title="Permanent link">&para;</a></h3>
+<p>[<a href="https://github.com/OwenMastropietro/cvl/blob/main/src/imgproc.c#L1046">source</a>]</p>
+</div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-30-1" name="__codelineno-30-1" href="#__codelineno-30-1"></a><span class="n">cvl_Mat</span><span class="w"> </span><span class="nf">cvl_convolve_new</span><span class="p">(</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">cvl_Mat</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">src</span><span class="p">,</span>
+<a id="__codelineno-30-2" name="__codelineno-30-2" href="#__codelineno-30-2"></a><span class="w">                          </span><span class="n">cvl_Mat</span><span class="w"> </span><span class="o">*</span><span class="w">       </span><span class="n">kernel</span><span class="w"> </span><span class="p">);</span>
+</code></pre></div>
+</div>
+<div class="api-card">
+<div class="api-header">
+<h3 id="cvl_blur_box_new">cvl_blur_box_new()<a class="headerlink" href="#cvl_blur_box_new" title="Permanent link">&para;</a></h3>
+<p>[<a href="https://github.com/OwenMastropietro/cvl/blob/main/src/imgproc.c#L1158">source</a>]</p>
+</div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-31-1" name="__codelineno-31-1" href="#__codelineno-31-1"></a><span class="n">cvl_Mat</span><span class="w"> </span><span class="nf">cvl_blur_box_new</span><span class="p">(</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">cvl_Mat</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">src</span><span class="p">,</span>
+<a id="__codelineno-31-2" name="__codelineno-31-2" href="#__codelineno-31-2"></a><span class="w">                          </span><span class="kt">int</span><span class="w">             </span><span class="n">ksize</span><span class="p">,</span>
+<a id="__codelineno-31-3" name="__codelineno-31-3" href="#__codelineno-31-3"></a><span class="w">                          </span><span class="kt">bool</span><span class="w">            </span><span class="n">normalize</span><span class="w"> </span><span class="p">);</span>
+</code></pre></div>
+</div>
+<div class="api-card">
+<div class="api-header">
+<h3 id="cvl_blur_mean_new">cvl_blur_mean_new()<a class="headerlink" href="#cvl_blur_mean_new" title="Permanent link">&para;</a></h3>
+<p>[<a href="https://github.com/OwenMastropietro/cvl/blob/main/src/imgproc.c#L1169">source</a>]</p>
+</div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-32-1" name="__codelineno-32-1" href="#__codelineno-32-1"></a><span class="n">cvl_Mat</span><span class="w"> </span><span class="nf">cvl_blur_mean_new</span><span class="p">(</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">cvl_Mat</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">src</span><span class="p">,</span>
+<a id="__codelineno-32-2" name="__codelineno-32-2" href="#__codelineno-32-2"></a><span class="w">                           </span><span class="kt">int</span><span class="w">             </span><span class="n">ksize</span><span class="w"> </span><span class="p">);</span>
+</code></pre></div>
+</div>
+<div class="api-card">
+<div class="api-header">
+<h3 id="cvl_blur_gauss_new">cvl_blur_gauss_new()<a class="headerlink" href="#cvl_blur_gauss_new" title="Permanent link">&para;</a></h3>
+<p>[<a href="https://github.com/OwenMastropietro/cvl/blob/main/src/imgproc.c#L1248">source</a>]</p>
+</div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-33-1" name="__codelineno-33-1" href="#__codelineno-33-1"></a><span class="n">cvl_Mat</span><span class="w"> </span><span class="nf">cvl_blur_gauss_new</span><span class="p">(</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">cvl_Mat</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">src</span><span class="p">,</span>
+<a id="__codelineno-33-2" name="__codelineno-33-2" href="#__codelineno-33-2"></a><span class="w">                            </span><span class="kt">int</span><span class="w">             </span><span class="n">ksize</span><span class="p">,</span>
+<a id="__codelineno-33-3" name="__codelineno-33-3" href="#__codelineno-33-3"></a><span class="w">                            </span><span class="kt">double</span><span class="w">          </span><span class="n">sigma</span><span class="w"> </span><span class="p">);</span>
+</code></pre></div>
+<p>Applies Gaussian blur using a kernel defined by ksize and/or sigma.</p>
+<p><strong>Parameters</strong></p>
+<div class="param-list">
+<div class="param">
+    <strong>src</strong>
+    <span>Input matrix.</span>
+  </div>
+<div class="param">
+    <strong>ksize</strong>
+    <span>Kernel size (if 0, derived from sigma).</span>
+  </div>
+<div class="param">
+    <strong>sigma</strong>
+    <span>Standard deviation of the Gaussian kernel (if 0, derived from ksize).</span>
+  </div>
+</div>
+<p><strong>Returns</strong>: Blurred matrix.</p>
+</div>
+<div class="api-card">
+<div class="api-header">
+<h3 id="cvl_blur_median_new">cvl_blur_median_new()<a class="headerlink" href="#cvl_blur_median_new" title="Permanent link">&para;</a></h3>
+<p>[<a href="https://github.com/OwenMastropietro/cvl/blob/main/src/imgproc.c#L1306">source</a>]</p>
+</div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-34-1" name="__codelineno-34-1" href="#__codelineno-34-1"></a><span class="n">cvl_Mat</span><span class="w"> </span><span class="nf">cvl_blur_median_new</span><span class="p">(</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">cvl_Mat</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">src</span><span class="p">,</span>
+<a id="__codelineno-34-2" name="__codelineno-34-2" href="#__codelineno-34-2"></a><span class="w">                             </span><span class="kt">int</span><span class="w">             </span><span class="n">ksize</span><span class="w"> </span><span class="p">);</span>
+</code></pre></div>
+</div>
+<div class="api-card">
+<div class="api-header">
+<h3 id="cvl_sobel_mag_new">cvl_sobel_mag_new()<a class="headerlink" href="#cvl_sobel_mag_new" title="Permanent link">&para;</a></h3>
+<p>[<a href="https://github.com/OwenMastropietro/cvl/blob/main/src/imgproc.c#L1391">source</a>]</p>
+</div>
+<div class="highlight"><pre><span></span><code><a id="__codelineno-35-1" name="__codelineno-35-1" href="#__codelineno-35-1"></a><span class="n">cvl_Mat</span><span class="w"> </span><span class="nf">cvl_sobel_mag_new</span><span class="p">(</span><span class="w"> </span><span class="k">const</span><span class="w"> </span><span class="n">cvl_Mat</span><span class="w"> </span><span class="o">*</span><span class="w"> </span><span class="n">src</span><span class="w"> </span><span class="p">);</span>
+</code></pre></div>
+</div>
+
+
+
+
+
+
+
+
+
+
+
+
+                
+              </article>
+            </div>
+          
+          
+  <script>var tabs=__md_get("__tabs");if(Array.isArray(tabs))e:for(var set of document.querySelectorAll(".tabbed-set")){var labels=set.querySelector(".tabbed-labels");for(var tab of tabs)for(var label of labels.getElementsByTagName("label"))if(label.innerText.trim()===tab){var input=document.getElementById(label.htmlFor);input.checked=!0;continue e}}</script>
+
+<script>var target=document.getElementById(location.hash.slice(1));target&&target.name&&(target.checked=target.name.startsWith("__tabbed_"))</script>
+        </div>
+        
+      </main>
+      
+        <footer class="md-footer">
+  
+  <div class="md-footer-meta md-typeset">
+    <div class="md-footer-meta__inner md-grid">
+      <div class="md-copyright">
+  
+  
+    Made with
+    <a href="https://squidfunk.github.io/mkdocs-material/" target="_blank" rel="noopener">
+      Material for MkDocs
+    </a>
+  
+</div>
+      
+    </div>
+  </div>
+</footer>
+      
+    </div>
+    <div class="md-dialog" data-md-component="dialog">
+      <div class="md-dialog__inner md-typeset"></div>
+    </div>
+    
+    
+    
+      
+      
+      <script id="__config" type="application/json">{"annotate": null, "base": "../..", "features": ["navigation.sections", "content.code.copy", "content.tabs.link"], "search": "../../assets/javascripts/workers/search.a7633da7.min.js", "tags": null, "translations": {"clipboard.copied": "Copied to clipboard", "clipboard.copy": "Copy to clipboard", "search.result.more.one": "1 more on this page", "search.result.more.other": "# more on this page", "search.result.none": "No matching documents", "search.result.one": "1 matching document", "search.result.other": "# matching documents", "search.result.placeholder": "Type to start searching", "search.result.term.missing": "Missing", "select.version": "Select version"}, "version": null}</script>
+    
+    
+      <script src="../../assets/javascripts/bundle.c21346df.min.js"></script>
+      
+        <script src="../../javascripts/mathjax.js"></script>
+      
+        <script src="https://unpkg.com/mathjax@3/es5/tex-mml-chtml.js"></script>
+      
+    
+  </body>
+</html>
