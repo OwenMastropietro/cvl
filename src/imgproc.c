@@ -1,4 +1,5 @@
 #include <cvl/imgproc.h>
+#include <cvl/error.h>
 
 #include <assert.h>
 #include <math.h>
@@ -1063,7 +1064,7 @@ static void _convolve_y(const cvl_Mat *src, cvl_Mat *dst, const cvl_Mat *kernel)
             for (int ch = 0; ch < chs; ++ch) {
                 double sum = 0.0;
 
-                for (int k = -radius; k < radius; ++k) {
+                for (int k = -radius; k <= radius; ++k) {
                     int yy = y + k;
                     yy = _clamp(yy, 0, h - 1); // BOARDER_REPLICATE
                     // if (yy < 0 || yy >= h) continue; // BOARDER_CONSTANT
@@ -1139,7 +1140,7 @@ static cvl_Mat _gauss_kernel(int ksize, double sigma) {
     const int radius = ksize / 2;
     double sum = 0.0;
 
-    for (int x = -radius; x < radius; ++x) {
+    for (int x = -radius; x <= radius; ++x) {
         double gx = exp(-(x * x) / (2.0 * sigma * sigma));
         k[x + radius] = gx;
         sum += gx;
@@ -1152,36 +1153,68 @@ static cvl_Mat _gauss_kernel(int ksize, double sigma) {
     return kernel;
 }
 
-void cvl_blur_gauss(const cvl_Mat *src, cvl_Mat *dst, int ksize, double sigma) {
-    assert(ksize > 0.0 || sigma > 0.0);
-
-    if (ksize > 0.0 && sigma <= 0.0) { // compute sigma from ksize
-        sigma = 0.3 * ((ksize - 1) * 0.5 - 1) + 0.8; // from opencv
+cvl_status cvl_blur_gauss(const cvl_Mat *src, cvl_Mat *dst, int ksize, double sigma) {
+    if (!cvl_mat_ok(src) || !cvl_mat_ok(dst)) {
+        return CVL_ERR_NULL;
     }
-    if (sigma > 0.0 && ksize <= 0.0) { // compute ksize from sigma
+    if (!cvl_mat_same_shape(src, dst)) {
+        return CVL_ERR_STATE;
+    }
+
+    if (ksize < 0 || (ksize > 0 && ksize % 2 == 0)) {
+        return CVL_ERR_RANGE;
+    }
+    if (!isfinite(sigma) || sigma < 0.0) {
+        return CVL_ERR_RANGE;
+    }
+    if (ksize == 0 && sigma == 0.0) {
+        return CVL_ERR_RANGE;
+    }
+
+    if (ksize > 0 && sigma == 0.0) { // compute sigma from ksize
+        sigma = 0.3 * ((ksize - 1) * 0.5 - 1) + 0.8; // from opencv
+    } else if (ksize == 0) { // compute ksize from sigma
         ksize = 2 * ceil(3.0 * sigma) + 1;
     }
 
+    cvl_status status = CVL_OK;
 
-    // Convert to f64.
     cvl_Mat src_f64 = cvl_mat_create(src->height, src->width, src->channels, CVL_FLOAT64);
     cvl_Mat dst_f64 = cvl_mat_create(src->height, src->width, src->channels, CVL_FLOAT64);
-
+    cvl_Mat kernel = _gauss_kernel(ksize, sigma);
+    if (!src_f64.data || !dst_f64.data || !kernel.data) {
+        status = CVL_ERR_NOMEM;
+        goto cleanup;
+    }
+    // Convert to float64.
     cvl_cvt_depth(src, &src_f64, CVL_FLOAT64, 1.0, 0.0);
 
-    cvl_Mat kernel = _gauss_kernel(ksize, sigma);
+    // Blur.
     cvl_convolve_sep(&src_f64, &dst_f64, &kernel, &kernel);
 
+    // Convert back.
     cvl_cvt_depth(&dst_f64, dst, dst->depth, 1.0, 0.0);
 
+cleanup:
     cvl_mat_free(&kernel);
     cvl_mat_free(&dst_f64);
     cvl_mat_free(&src_f64);
+
+    return status;
 }
 
 cvl_Mat cvl_blur_gauss_new(const cvl_Mat *src, int ksize, double sigma) {
+    if (!cvl_mat_ok(src)) {
+        return cvl_mat_empty();
+    }
+
     cvl_Mat dst = cvl_mat_create(src->height, src->width, src->channels, src->depth);
-    cvl_blur_gauss(src, &dst, ksize, sigma);
+
+    if (cvl_blur_gauss(src, &dst, ksize, sigma) != CVL_OK) {
+        cvl_mat_free(&dst);
+        return cvl_mat_empty();
+    }
+
     return dst;
 }
 

@@ -4,7 +4,7 @@
 static void usage(void) {
     printf("Usage: cvl <command> [options]\n");
 
-    printf("    cvl blur <input> <output> [--type mean|gauss|median] [--ksize N]\n");
+    printf("    cvl blur <input> <output> [--type mean|gauss|median] [--ksize N] [--sigma N]\n");
 }
 
 int cmd_blur(int argc, char **argv);

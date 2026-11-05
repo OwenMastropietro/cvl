@@ -1,5 +1,7 @@
 #include <cvl/cvl.h>
+
 #include <stdio.h>
+#include <stdlib.h>
 #include <string.h>
 
 typedef enum {
@@ -26,9 +28,15 @@ static int parse_ksize(const char *s) {
     return atoi(s);
 }
 
+static double parse_sigma(const char *s) {
+    if (!s) return 0.0;
+
+    return strtod(s, NULL);
+}
+
 int cmd_blur(int argc, char **argv) {
     if (argc < 4) {
-        fprintf(stderr, "Usage: cvl blur <input> <output> [--type mean|gauss|median] [--ksize N]\n");
+        fprintf(stderr, "Usage: cvl blur <input> <output> [--type mean|gauss|median] [--ksize N] [--sigma N]\n");
         return 1;
     }
 
@@ -38,6 +46,7 @@ int cmd_blur(int argc, char **argv) {
     
     blur_t type = BLUR_MEAN;
     int ksize = 3;
+    double sigma = 0.0;
 
     for (int i = 4; i < argc; i++) {
         if (strncmp(argv[i], "--type", 6) == 0 && i + 1 < argc) {
@@ -45,6 +54,9 @@ int cmd_blur(int argc, char **argv) {
         }
         else if (strncmp(argv[i], "--ksize", 7) == 0 && i + 1 < argc) {
             ksize = parse_ksize(argv[++i]);
+        }
+        else if (strncmp(argv[i], "--sigma", 7) == 0 && i + 1 < argc) {
+            sigma = parse_sigma(argv[++i]);
         }
         else {
             fprintf(stderr, "Unknown arg.\n");
@@ -62,9 +74,9 @@ int cmd_blur(int argc, char **argv) {
     // Blur.
     cvl_Mat res = {0};
     switch (type) {
-        case BLUR_MEAN:   res = cvl_blur_mean_new(&img, ksize);       break;
-        case BLUR_GAUSS:  res = cvl_blur_gauss_new(&img, ksize, 0.0); break; // todo: sigma
-        case BLUR_MEDIAN: res = cvl_blur_median_new(&img, ksize);     break;
+        case BLUR_MEAN:   res = cvl_blur_mean_new(&img, ksize);         break;
+        case BLUR_GAUSS:  res = cvl_blur_gauss_new(&img, ksize, sigma); break;
+        case BLUR_MEDIAN: res = cvl_blur_median_new(&img, ksize);       break;
     }
 
     // Write.

@@ -7,6 +7,7 @@ set(CMAKE_C_STANDARD_REQUIRED ON)
 
 add_library(cvl_lib
     src/core.c
+    src/error.c
     src/imgproc.c
     src/io.c
     src/stb.c

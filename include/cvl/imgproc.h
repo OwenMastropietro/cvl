@@ -16,6 +16,7 @@
 #pragma once
 
 #include <cvl/core.h>
+#include <cvl/error.h>
 #include <stdbool.h>
 
 #ifdef __cplusplus
@@ -288,8 +289,8 @@ void cvl_blur_mean(const cvl_Mat *src, cvl_Mat *dst, int ksize);
 /**
  * @brief Applies Gaussian blur to a matrix.
  *
- * If ksize is zero or negative, the kernel size is derived from sigma.
- * If sigma is zero or negative, the standard deviation is derived
+ * If ksize is zero, the kernel size is derived from sigma.
+ * If sigma is zero, the standard deviation is derived
  * from ksize.
  *
  * @param src Source matrix.
@@ -298,10 +299,11 @@ void cvl_blur_mean(const cvl_Mat *src, cvl_Mat *dst, int ksize);
  *              when sigma is not specified.
  * @param sigma Standard deviation of the Gaussian distribution.
  *              Must be positive when ksize is not specified.
+ * @return @ref CVL_OK on success, or an error code on failure. See @ref cvl_status.
  *
  * @see cvl_blur_gauss_new()
  */
-void cvl_blur_gauss(const cvl_Mat *src, cvl_Mat *dst, int ksize, double sigma);
+cvl_status cvl_blur_gauss(const cvl_Mat *src, cvl_Mat *dst, int ksize, double sigma);
 
 /**
  * @brief Applies median filtering to a matrix.
